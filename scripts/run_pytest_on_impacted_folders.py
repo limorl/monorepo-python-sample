@@ -17,7 +17,7 @@ def find_packages_not_ignored(root_dir, spec):
         if spec.match_file(dirpath):
             continue
         if "__init__.py" in filenames:
-            yield dirpath 
+            yield dirpath
 
         # Remove ignored directories
         dirnames[:] = [d for d in dirnames if not spec.match_file(os.path.join(dirpath, d))]
