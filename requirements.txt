@@ -1,0 +1,14 @@
+flake8==7.0.0
+pathspec==0.12.1
+pylint==3.1.0
+pyright==1.1.296
+pytest==7.2.1
+pytest-cov==3.0.0
+pre-commit==3.6.2
+semantic-version==2.10.0
+python-semantic-release==9.3.0
+debugpy==1.8.1
+localstack==3.2.0
+
+-r services/greeting/requirements.txt
+

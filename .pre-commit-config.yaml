@@ -1,0 +1,29 @@
+repos:
+    - repo: https://github.com/Yelp/detect-secrets
+      rev: v1.4.0
+      hooks:
+        - id: detect-secrets
+          args: ['--no-verify']
+          stages: [commit]
+
+    - repo: https://github.com/pycqa/flake8
+      rev: 7.0.0
+      hooks:
+        - id: flake8
+          stages: [push]
+
+    - repo: https://github.com/hcodes/yaspeller
+      rev: v10.0.1
+      hooks:
+        - id: yaspeller
+          stages: [push]
+
+    # This will be updated to run recursively after Poetry is added and to run only on impacted tests. The ci.yml workflow should run all unit tests
+    - repo: local
+      hooks:
+        - id: unit-tests
+          name: unit-tests
+          entry: ./scripts/run_pytest_on_impacted_folders.py
+          language: script
+          stages: [push]
+          pass_filenames: false

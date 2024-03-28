@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "lambda-alone"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1lcx29wiwvv2b"
+s3_prefix = "lambda-alone"
+region = "ap-northeast-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
