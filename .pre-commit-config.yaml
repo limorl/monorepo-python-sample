@@ -23,7 +23,7 @@ repos:
       hooks:
         - id: unit-tests
           name: unit-tests
-          entry: ./scripts/run_pytest_on_impacted_folders.py
-          language: script
+          entry: python ./scripts/run_pytest_on_impacted_folders.py
+          language: python
           stages: [push]
           pass_filenames: false
