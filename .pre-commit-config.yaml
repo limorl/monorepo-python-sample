@@ -24,6 +24,6 @@ repos:
         - id: unit-tests
           name: unit-tests
           entry: python ./scripts/run_pytest_on_impacted_folders.py
-          language: python
+          language: system
           stages: [push]
           pass_filenames: false
