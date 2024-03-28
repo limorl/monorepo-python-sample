@@ -7,13 +7,15 @@
 ARG IMAGE="mcr.microsoft.com/vscode/devcontainers/python"
 ARG VERSION="3.10"
 ARG VARIANT="-bullseye"
-ARG TARGETARCH="arm64"
 
 FROM ${IMAGE}:${VERSION}${VARIANT}
 
 # Node.js version: none, lts/*, 16, 14, 12, 10
 #ARG NODE_VERSION="lts/*"
 #RUN su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"
+
+# Default target architecture. For another architecture, change .env file
+ARG TARGETARCH="arm64"
 
 # Install Docker CE CLI
 RUN apt-get update \
@@ -31,16 +33,11 @@ RUN export LATEST_COMPOSE_VERSION=$(curl -sSL "https://api.github.com/repos/dock
 # Install terraform
 ARG TERRAFORM_VERSION="1.7.5"
 
-# RUN curl "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip" -o "terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip" \
-#     && unzip "terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip" \
-#     && mv terraform /usr/local/bin/ \
-#     && rm -rf "terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip"
-
 # Install terraform
-RUN curl "https://releases.hashicorp.com/terraform/1.7.5/terraform_1.7.5_linux_arm64.zip" -o "terraform_1.7.5_linux_arm64.zip" \
-    && unzip terraform_1.7.5_linux_arm64.zip \
+RUN curl "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip" -o "terraform.zip" \
+    && unzip terraform.zip \
     && mv terraform /usr/local/bin/ \
-    && rm -rf terraform_1.7.5_linux_arm64.zip
+    && rm -rf terraform.zip
 
 # Update and install dependencies
 RUN apt-get update && \
