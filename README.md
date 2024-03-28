@@ -1,4 +1,4 @@
-# Sample Python Monorepo
+# Sample Python Monorepo [A work in progress]
 
 This is a sample monorepo that can be used as a reference to get familiar with the concept of:
 * Developing inside Devcontainer (dockerized development environment)
