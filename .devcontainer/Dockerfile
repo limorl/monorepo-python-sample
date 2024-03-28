@@ -44,19 +44,19 @@ RUN apt-get update && \
     apt-get install -y software-properties-common zip unzip && \
     apt-get clean
 
-# Install AWS CLI v2
-RUN if [ "${TARGETARCH}" == "arm64" ]; then \
-    export AWS_CLI_ARCH="aarch64"; \
+RUN if [ "${TARGETARCH}" = "arm64" ]; then \
+        export AWS_CLI_ARCH="aarch64" && \
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-${AWS_CLI_ARCH}.zip" -o "awscli.zip" && \
+        unzip awscli.zip && \
+        ./aws/install && \
+        rm -rf aws && rm awscli.zip ; \
     else \
-        export AWS_CLI_ARCH="x86_64"; \
+        export AWS_CLI_ARCH="x86_64" && \
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-${AWS_CLI_ARCH}.zip" -o "awscli.zip" && \
+        unzip awscli.zip && \
+        ./aws/install && \
+        rm -rf aws && rm awscli.zip ; \
     fi
-RUN echo :"*******  ${AWS_CLI_ARCH}    ***************"
-
-# Install AWS CLI
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscli-exe-linux-aarch64.zip" \
-    && unzip awscli-exe-linux-aarch64.zip \
-    && ./aws/install \
-    && rm -rf aws && rm awscli-exe-linux-aarch64.zip
 
 # Install AWS SAM CLI
 RUN pip install aws-sam-cli
