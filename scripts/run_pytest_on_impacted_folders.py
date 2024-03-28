@@ -2,6 +2,7 @@ import os
 import pathspec
 import subprocess
 
+
 def load_gitignore(root_dir):
     gitignore_path = os.path.join(root_dir, '.gitignore')
     patterns = []
@@ -56,6 +57,7 @@ def main(root_dir):
         changed_files = git_changed_files(package)
         impacted_files = identify_impacted_files(changed_files)
         run_pytest_on_files(package, impacted_files)
+
 
 if __name__ == "__main__":
     root_dir = os.getcwd()
