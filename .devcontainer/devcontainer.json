@@ -5,9 +5,8 @@
     "dockerComposeFile": "docker-compose.yml",
     "service": "devcontainer",
     "workspaceFolder": "${localWorkspaceFolder}",
-    "runArgs": ["--init"],
-    "remoteUser": "root",
-
+    "runArgs": ["--env-file",".devcontainer/.env"],
+    "remoteUser": "vscode",
     "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",
         "python.pythonPath": "/usr/local/bin/python",

@@ -1,13 +1,19 @@
 
-ARG VARIANT=0-3.10-bullseye
-FROM mcr.microsoft.com/vscode/devcontainers/python:${VARIANT}
+# Variant suitable fo Apple Silicone
+#ARG VARIANT=3.10-bullseye 
+#FROM mcr.microsoft.com/vscode/devcontainers/python:${VARIANT}
 
-# Set the working directory in the container to /workspace
-# This creates the directory if it does not already exist
-WORKDIR /workspace
+# Default image for DevContainer: Python 3.10 for Apple Silicone
+ARG IMAGE="mcr.microsoft.com/vscode/devcontainers/python"
+ARG VERSION="3.10"
+ARG VARIANT="-bullseye"
+ARG TARGETARCH="arm64"
 
-# making git case sensetive, so rename from File.js to file.js will be makred as a change
-RUN git config --global core.ignorecase false
+FROM ${IMAGE}:${VERSION}${VARIANT}
+
+# Node.js version: none, lts/*, 16, 14, 12, 10
+#ARG NODE_VERSION="lts/*"
+#RUN su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"
 
 # Install Docker CE CLI
 RUN apt-get update \
@@ -23,11 +29,18 @@ RUN export LATEST_COMPOSE_VERSION=$(curl -sSL "https://api.github.com/repos/dock
     && chmod +x /usr/local/bin/docker-compose
 
 # Install terraform
-ENV TERRAFORM_VERSION "1.7.5"
-RUN curl "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_arm64.zip" -o "terraform_${TERRAFORM_VERSION}_linux_arm64.zip" \
-     && unzip terraform_${TERRAFORM_VERSION}_linux_arm64.zip \
-     && mv terraform /usr/local/bin/ \
-     && rm -rf terraform_${TERRAFORM_VERSION}_linux_arm64.zip
+ARG TERRAFORM_VERSION="1.7.5"
+
+# RUN curl "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip" -o "terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip" \
+#     && unzip "terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip" \
+#     && mv terraform /usr/local/bin/ \
+#     && rm -rf "terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip"
+
+# Install terraform
+RUN curl "https://releases.hashicorp.com/terraform/1.7.5/terraform_1.7.5_linux_arm64.zip" -o "terraform_1.7.5_linux_arm64.zip" \
+    && unzip terraform_1.7.5_linux_arm64.zip \
+    && mv terraform /usr/local/bin/ \
+    && rm -rf terraform_1.7.5_linux_arm64.zip
 
 # Update and install dependencies
 RUN apt-get update && \
@@ -35,28 +48,27 @@ RUN apt-get update && \
     apt-get clean
 
 # Install AWS CLI v2
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && \
-    ./aws/install && \
-    rm -rf aws && rm awscliv2.zip
+RUN if [ "${TARGETARCH}" == "arm64" ]; then \
+    export AWS_CLI_ARCH="aarch64"; \
+    else \
+        export AWS_CLI_ARCH="x86_64"; \
+    fi
+RUN echo :"*******  ${AWS_CLI_ARCH}    ***************"
+
+# Install AWS CLI
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscli-exe-linux-aarch64.zip" \
+    && unzip awscli-exe-linux-aarch64.zip \
+    && ./aws/install \
+    && rm -rf aws && rm awscli-exe-linux-aarch64.zip
 
 # Install AWS SAM CLI
 RUN pip install aws-sam-cli
-
-# Verify the installation
-RUN aws --version && sam --version
 
 # Install Localstack and Localstack cli tools
 RUN pip install localstack
 RUN pip install awscli-local
 ENV PATH="${PATH}:~/.local/bin"
 
-# DebugPy
-EXPOSE 5678
-
-# Add a non-root user for better security
-RUN useradd -m developer && chown -R developer /workspace
-USER developer
-
-
+# making git case sensetive, so rename from File.js to file.js will be makred as a change
+RUN git config --global core.ignorecase false
 

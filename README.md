@@ -43,6 +43,7 @@ This requires *all of our developers* to use docker and Visual Studio Code, to g
 ### Initial Setup
 1. Clone the [DevContainer](https://github.com/vox-studio/dev-container) repo.
 2. Open the repo in visual studio code
+3. Create and edit .devcontainer/.env based on the .env.sample file. Set TARGETARCH and VARIANT based on your computer architecture, as explaind in the comments on .env.sample.
 3. Press `CMD SHIFT P` and then type `reopen in container`
 4. Once the container is ready you should have a working dev-environment.
 5. If you are running into `Remote-Containers CLI: RPC pipe not configured` error, please [follow this fix](https://rexbytes.com/2022/08/23/visual-studio-docker-container-target-stop-importing-local-git-config/)
