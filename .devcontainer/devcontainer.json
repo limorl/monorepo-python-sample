@@ -6,7 +6,6 @@
     "service": "devcontainer",
     "workspaceFolder": "${localWorkspaceFolder}",
     "runArgs": ["--env-file",".devcontainer/.env"],
-    "remoteUser": "vscode",
     "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",
         "python.pythonPath": "/usr/local/bin/python",
@@ -35,6 +34,7 @@
         "ms-python.vscode-pylance",
         "hashicorp.terraform",
         "davidanson.vscode-markdownlint",
+        "be5invis.toml",
         "ms-toolsai.jupyter",
         "ms-toolsai.jupyter-keymap",
         "ms-toolsai.jupyter-renderers",
@@ -46,5 +46,5 @@
     // "forwardPorts": [],
 
     // Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt && pre-commit install && pre-commit install --hook-type pre-push"
+    "postCreateCommand": "poetry install && poetry run pre-commit install && poetry run pre-commit install --hook-type pre-push"
 }

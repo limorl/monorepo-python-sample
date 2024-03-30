@@ -1,18 +1,10 @@
 
-# Variant suitable fo Apple Silicone
-#ARG VARIANT=3.10-bullseye 
-#FROM mcr.microsoft.com/vscode/devcontainers/python:${VARIANT}
-
 # Default image for DevContainer: Python 3.10 for Apple Silicone
 ARG IMAGE="mcr.microsoft.com/vscode/devcontainers/python"
 ARG VERSION="3.10"
 ARG VARIANT="-bullseye"
 
 FROM ${IMAGE}:${VERSION}${VARIANT}
-
-# Node.js version: none, lts/*, 16, 14, 12, 10
-#ARG NODE_VERSION="lts/*"
-#RUN su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"
 
 # Default target architecture. For another architecture, change .env file
 ARG TARGETARCH="arm64"
@@ -65,6 +57,11 @@ RUN pip install aws-sam-cli
 RUN pip install localstack
 RUN pip install awscli-local
 ENV PATH="${PATH}:~/.local/bin"
+
+# Install Poetry
+RUN pip install poetry
+# No need to create virtual env since we are running inside a dev container
+# RUN poetry config virtualenvs.create false --local
 
 # making git case sensetive, so rename from File.js to file.js will be makred as a change
 RUN git config --global core.ignorecase false

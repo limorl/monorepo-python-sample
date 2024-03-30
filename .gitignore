@@ -189,3 +189,6 @@ client-apps/editor/test-results/**
 data/
 
 .DS_STORE
+
+# Node
+node_modules/

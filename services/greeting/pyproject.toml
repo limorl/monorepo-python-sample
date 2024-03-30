@@ -1,0 +1,15 @@
+[tool.poetry]
+inherit = "../../pyproject.toml"
+
+[tool.poetry.name]
+name = "greeting"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+flask = "3.0.2"
+jsonify = "0.5"
+serverless-wsgi = "3.0.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "7.0.0"

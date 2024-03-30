@@ -1,0 +1,14 @@
+Ini, TOML
+[tool.poetry]
+inherit = "../../pyproject.toml"
+
+[tool.poetry.name]
+name = "scripts"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.devdependencies]
+pathspec = "0.12.1"
+

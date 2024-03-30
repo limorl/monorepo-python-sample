@@ -48,7 +48,73 @@ This requires *all of our developers* to use docker and Visual Studio Code, to g
 4. Once the container is ready you should have a working dev-environment.
 5. If you are running into `Remote-Containers CLI: RPC pipe not configured` error, please [follow this fix](https://rexbytes.com/2022/08/23/visual-studio-docker-container-target-stop-importing-local-git-config/)
 
+### Dependency Management, Packaging and Versioning 
+[Poetry](https://python-poetry.org/) is used for dependency management in the monorepo instead of `pip`.
+Potery settings and list of dependencies is managed in `pyproject.toml` file for each package, in addition to the root.
+To install a package, add  `<package-name> = "<verion>"` to the `pyproject.toml` file and install using `poetry install`.
+Make sure you distinguish dev and prod dependencies.
+
+In the long run, we aim to release packages into a private Github package registry and install them from the registry.
+In the short term, we'll keep it simple and won't publish the packages, but rather install them locally.
+For example:
+```python
+[tool.poetry.dependencies]
+python = "^3.10"
+my_local_package = { path = "../packages/my_local_package", develop = false }
+```
+
+#### Package versioning
+We will use [python-semantic-release](https://python-semantic-release.readthedocs.io/en/latest/) to automatically manage package versioning per package.
+The configuration of `python-semantic-release` this will be centralized in the root's `pyproject.toml` file.
+
+There are several approaches to bumping versions:
+1. **Manual Bumping** - Manually bumping version in the `pyproject.toml` file
+2. **Selective Release Rules** - Use python-semantic-release configuration options for selective release rules.
+3. **Custom Release Script** - For more control, a custom release script using the semantic_release library.
+
+**We will start with option 2**
+This approach will help starting with a basic `release_rules` configuration.
+As the project grows, we will refine the rules to handle more complex scenarios, and consider using a custom script for intricate versioning logic if needed.
+
+Following the [Semantic Versioning Convention](https://semver.org/) this is how version is incremented:
+Given a version number MAJOR.MINOR.PATCH, increment the:
+* MAJOR version when you make incompatible API changes
+* MINOR version when you add functionality in a backward compatible manner
+* PATCH version when you make backward compatible bug fixes
+
+#### Commit Messages Format (to be inforced through Code Review):
+To allow automatic versioning, we'll need to follow commit message format.
+
+1. **Commit Message Format:** `<type>(<scope>): <short summary>`.
+  * **type**: This denotes the kind of change the commit introduces. Common types include **feat** (new feature), **fix** (bug fix), **docs** (documentation changes), **style** (style changes that do not affect the meaning of the code), **refactor** (code change that neither fixes a bug nor adds a feature), **test** (adding missing tests or correcting existing ones), **chore** (updates to the build process, auxiliary tools, and libraries such as documentation generation).
+  * **scope**  (optional): A scope may be provided to indicate a more specific part of the codebase the change affects.
+  * **short summary**: A concise description of the changes.
+
+  * Examples:
+    feat(authentication): add jwt support
+    fix(database): resolve connection leak
+
+2. **Automated Version Management**
+ python-semantic-release will analyze these commit messages from the main branch (or whichever branch is configured) to automatically determine the type of version bump required for the next release:
+  Commits with **feat** will trigger a minor version bump.
+  Commits with **fix** will trigger a patch version bump.
+  Commits that include a **BREAKING CHANGE** footer will trigger a major version bump, regardless of the commit type.
+  Custom rules in the [tool.semantic_release.release_rules] section can further refine how other types of commits (like docs, style, or chore) influence the version bump.
+
+3. **Release Process**
+Upon merging changes into the release branch (e.g., main), the CI pipeline should include a step that runs python-semantic-release. This tool will:
+- Analyze commits since the last release.
+- Determine the next version number based on the commit messages.
+- Update the version in pyproject.toml and any other configured version_variable files.
+- Generate or update the CHANGELOG.md.
+- Tag the release in the VCS (Version Control System, e.g., Git).
+- Optionally, upload the package to PyPI or another package repository if configured.
+
+
 ## Running Locally
+By default, poetry creates a python virtualenv.
+It can be access either through `poetry run <command>` or `poetry shell` from the repo root.
+
 ### Local Dev environment
 We're using VS Code DevContainer to run our dockerized development environment.
 To run the development environment locally, click `Shift+Command+p -> Reopen in Container`
@@ -59,17 +125,36 @@ To do so, we are using docker-compose to setup the DevContainer and the Localsta
 
 ### Running lambda locally
 * On MacOS
-   Make sure your workspace folder is shared from the docker host. 
-  * Lambda handler with API: ```cd services/<service-folder>  sam build && sudo sam local start-api --container-host host.docker.internal```
-  * Lambda handler without API: ```cd services/<service-folder>  sam build && sudo sam local invoke --container-host host.docker.internal```
+   Make sure your workspace folder is shared from the docker host.
+  * Lambda handler with API:
+    ```shell
+    poetry shell
+    cd services/<service-folder>  
+    sam build
+    sudo sam local start-api --container-host host.docker.internal
+   ```
+  * Lambda handler without API:
+  ```shell
+  poetry shell
+  cd services/<service-folder>
+  sam build
+  sudo sam local invoke --container-host host.docker.internal
+  ```
 
 * On Windows
-  * Lambda handler with API: ```cd services/<service-folder>  sam build && sudo sam local start-api```
-  * Lambda handler without  API: ```cd services/<service-folder>  sam build && sudo sam  local invoke```
+  * Lambda handler with API:
+  ```shell
+  poetry shell
+  cd services/<service-folder>
+  sam build
+  sudo sam local start-api
+  ```
+  * Lambda handler without  API:
+  ```shell
+  poetry shell
+  cd services/<service-folder>
+  sam build
+  sudo sam local invoke
+  ```
 
 You can also run the flask application directly without invoking the lambda: `flask --app <file-with-flask-app> run --debug`
-
-## Package and project versioning
-TBD
-## Release a new Solution version
-TBD

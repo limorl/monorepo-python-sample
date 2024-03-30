@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "monorepo-python-sample"
+version = "0.1.0"
+description = "A sample of python monorepo"
+authors = ["limorl"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pre-commit = "3.6.2"
+
+[tool.poetry.dev-dependencies]
+python-semantic-release = "9.3.1"
+nox-poetry = "1.0.3"
+pytest = "7.2.1"
+pytest-cov = "3.0.0"
+flake8 = "7.0.0"
+pylint = "2.17.7"
+pyright = "1.1.296"
+pre-commit = "3.6.2"
+debugpy = "1.8.1"
+localstack = "3.3.0"
+
+[tool.semantic_release]
+version_variable = "pyproject.toml:tool.poetry.version"
+branch = "main"
+upload_to_pypi = "false"    # We're not publishing all packages yet
+commit_parser = "angular"
+commit_subject = "{{type}}({{scope}}): {{subject}}"
+commit_message = "{{type}}({{scope}}): {{subject}}\n\n{{body}}"
+changelog_file = "CHANGELOG.md"
+
+[tool.semantic_release.release_rules]
+breaking = "major"
+feat = "minor"
+fix = "patch"
+docs = "patch"
+style = "patch"
+chore = "patch"
+
+
+
+
