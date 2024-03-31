@@ -8,7 +8,6 @@ authors = ["limorl"]
 # Installs packages for all sub projects: run poetry run install_sub
 install_all = "poetry_run:run_script install_all"
 
-
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

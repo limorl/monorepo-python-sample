@@ -31,15 +31,13 @@ def find_and_install_packages(start_directory: Path):
             if is_service_path(pyproject_path):
                 export_requirements_to_directory(pyproject_path.parent)
 
-# if __name__ == "__main__":
-#     root_path = Path(os.getcwd())
-#     print(f"Starting installation of all packages...")
-#     find_and_install_packages(root_path)
-#     print("Finished installing dependencies for all packages.")
-
 
 def install_all():
     root_path = Path(os.getcwd())
     print("Starting installation of all packages...")
     find_and_install_packages(root_path)
     print("Finished installing dependencies for all packages.")
+
+
+if __name__ == "__main__":
+    install_all()
