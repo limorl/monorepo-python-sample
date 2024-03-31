@@ -192,3 +192,9 @@ data/
 
 # Node
 node_modules/
+
+# Ignore requirements.txt, they will be auto-exported by poetry for the lambda services
+requirements.txt
+
+# AWS SAM
+.aws-sam/

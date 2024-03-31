@@ -14,8 +14,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: "hello-world"
-      CodeUri: ./src
-      Handler: app.lambda_handler
+      CodeUri: .
+      Handler: src.app.lambda_handler
       Runtime: python3.10
       Architectures:
         - arm64

@@ -113,7 +113,6 @@ Upon merging changes into the release branch (e.g., main), the CI pipeline shoul
 
 ## Running Locally
 By default, poetry creates a python virtualenv.
-It can be access either through `poetry run <command>` or `poetry shell` from the repo root.
 
 ### Local Dev environment
 We're using VS Code DevContainer to run our dockerized development environment.

@@ -11,6 +11,8 @@ Resources:
     Properties:
       Handler: src.lambda_handler.handler
       Runtime: python3.10
+      Architectures:
+        - arm64
       CodeUri: .
       Events:
         HelloNamePath:

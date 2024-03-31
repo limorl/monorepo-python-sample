@@ -1,5 +1,5 @@
 import sys
-from packages.utils.poetry.poetry_install_all import install_all as install_all
+from packages.utils.src.poetry.poetry_install_all import install_all as install_all
 
 
 def run_script(script_name):
