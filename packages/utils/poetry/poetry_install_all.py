@@ -2,7 +2,8 @@ import os
 import subprocess
 from pathlib import Path
 
-excluded_paths = [ ".aws-sam"]
+excluded_paths = [".aws-sam"]
+
 
 def is_excluded(path: Path):
     return any(excluded_folder in path.parts for excluded_folder in excluded_paths)
@@ -11,6 +12,7 @@ def is_excluded(path: Path):
 def install_dependencies_in_directory(directory: Path):
     print(f"Installing dependencies in: {directory}")
     subprocess.run(["poetry", "install"], cwd=directory)
+
 
 def find_and_install_packages(start_directory: Path):
     for pyproject_path in start_directory.glob('**/pyproject.toml'):
@@ -23,8 +25,9 @@ def find_and_install_packages(start_directory: Path):
 #     find_and_install_packages(root_path)
 #     print("Finished installing dependencies for all packages.")
 
+
 def install_all():
     root_path = Path(os.getcwd())
-    print(f"Starting installation of all packages...")
+    print("Starting installation of all packages...")
     find_and_install_packages(root_path)
     print("Finished installing dependencies for all packages.")
