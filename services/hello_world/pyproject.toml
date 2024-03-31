@@ -1,9 +1,12 @@
 [tool.poetry]
-inherit = "../../pyproject.toml"
-
-[tool.poetry.name]
 name = "hello_world"
 version = "0.1.0"
+description = "Hello World Service"
+authors = ["Limor Lahiani"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 python = "^3.10"

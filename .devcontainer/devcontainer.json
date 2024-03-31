@@ -46,5 +46,5 @@
     // "forwardPorts": [],
 
     // Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": "poetry install && poetry run pre-commit install && poetry run pre-commit install --hook-type pre-push"
+    "postCreateCommand": "poetry install && python poetry_run.py install_all && poetry run pre-commit install && poetry run pre-commit install --hook-type pre-push"
 }

@@ -12,7 +12,7 @@ This is a sample monorepo that can be used as a reference to get familiar with t
 It's partial and still a few TODOS to complete the sample:
 1. Adding Docker file for windows environment (currently for Mac with Apple Silicone) and update Wiki acordingly
 2. Extract configuration-provide.py into a dedicated package under packages/
-3. Use Poetry to manage package versions and to manage scripts reunning recursively (similarly to pnpm for javascript).
+3. [Done] [Still need to fix folder structure for poetry packaging]Use Poetry to manage package versions and to manage scripts reunning recursively (similarly to pnpm for javascript).
    Once done, the pre-commit hook for unit tests can be updated to run pytest recursively.
 4. Use Terraform to deploy infra on local stack and on AWS
 5. Add a deployment.yml workflow to deploy to AWS

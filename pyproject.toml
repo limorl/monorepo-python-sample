@@ -4,9 +4,18 @@ version = "0.1.0"
 description = "A sample of python monorepo"
 authors = ["limorl"]
 
+[tool.poetry.scripts]
+# Installs packages for all sub projects: run poetry run install_sub
+install_all = "poetry_run:run_script install_all"
+install_all2 = "poetry_run2:install_all"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry.dependencies]
 python = "^3.10"
-pre-commit = "3.6.2"
 
 [tool.poetry.dev-dependencies]
 python-semantic-release = "9.3.1"
