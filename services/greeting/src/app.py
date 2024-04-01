@@ -26,7 +26,7 @@ def create_app(configProvider: IConfigurationProvider):
 
     @app.route('/bye')
     def bye():
-        # Says bye !
+        # Says bye !!
         return greeting.bye('', numOfExclamations)
 
     return app
