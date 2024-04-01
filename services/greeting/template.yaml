@@ -25,3 +25,8 @@ Resources:
           Properties:
             Path: /hello
             Method: GET
+        ByePath:
+          Type: Api
+          Properties:
+            Path: /bye
+            Method: GET

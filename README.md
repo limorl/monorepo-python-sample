@@ -9,8 +9,9 @@ This is a sample monorepo that can be used as a reference to get familiar with t
 * Terraform
 
 ### TODO
+
 It's partial and still a few TODOS to complete the sample:
-1. Adding Docker file for windows environment (currently for Mac with Apple Silicone) and update Wiki acordingly
+1. Adding Docker file for linux environment (currently for Mac with Apple Silicone) and update Wiki acordingly
 2. Extract configuration-provide.py into a dedicated package under packages/
 3. [Done] [Still need to fix folder structure for poetry packaging]Use Poetry to manage package versions and to manage scripts reunning recursively (similarly to pnpm for javascript).
    Once done, the pre-commit hook for unit tests can be updated to run pytest recursively.
@@ -38,7 +39,7 @@ This requires *all of our developers* to use docker and Visual Studio Code, to g
 1. Install [Git](https://git-scm.com/download/)
 2. Install [Visual Studio Code](https://code.visualstudio.com/) and install the [Dev Containers Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 3. Setup your git credentials by completing: [set](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) [](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)[credentials](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token), and [cache credentials](https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git)
-4. Install [Docker for Mac](https://docs.docker.com/desktop/mac/release-notes/) or [Docker for Windows](https://docs.docker.com/desktop/install/windows-install/) and make sure the docker daemon is started
+4. Install [Docker for Mac](https://docs.docker.com/desktop/mac/release-notes/) or [Docker for linux](https://docs.docker.com/desktop/install/linux-install/) and make sure the docker daemon is started
 
 ### Initial Setup
 1. Clone the [DevContainer](https://github.com/vox-studio/dev-container) repo.
@@ -124,36 +125,12 @@ To do so, we are using docker-compose to setup the DevContainer and the Localsta
 
 ### Running lambda locally
 * On MacOS
-   Make sure your workspace folder is shared from the docker host.
-  * Lambda handler with API:
-    ```shell
-    poetry shell
-    cd services/<service-folder>  
-    sam build
-    sudo sam local start-api --container-host host.docker.internal
-   ```
-  * Lambda handler without API:
-  ```shell
-  poetry shell
-  cd services/<service-folder>
-  sam build
-  sudo sam local invoke --container-host host.docker.internal
-  ```
+   Make sure your workspace folder is shared from the docker host. 
+  * Lambda handler with API: ```cd services/<service-folder>  sam build && sam local start-api --container-host host.docker.internal```
+  * Lambda handler without API: ```cd services/<service-folder>  sam build && sam local invoke --container-host host.docker.internal```
 
-* On Windows
-  * Lambda handler with API:
-  ```shell
-  poetry shell
-  cd services/<service-folder>
-  sam build
-  sudo sam local start-api
-  ```
-  * Lambda handler without  API:
-  ```shell
-  poetry shell
-  cd services/<service-folder>
-  sam build
-  sudo sam local invoke
-  ```
+* On linux
+  * Lambda handler with API: ```cd services/<service-folder>  sam build && sudo sam local start-api```
+  * Lambda handler without  API: ```cd services/<service-folder>  sam build && sudo sam  local invoke```
 
 You can also run the flask application directly without invoking the lambda: `flask --app <file-with-flask-app> run --debug`

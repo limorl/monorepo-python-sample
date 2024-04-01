@@ -24,6 +24,11 @@ def create_app(configProvider: IConfigurationProvider):
     def hello_name(name):
         return greeting.hello(name, numOfExclamations)
 
+    @app.route('/bye')
+    def bye():
+        return greeting.bye('', numOfExclamations)
+
+
     return app
 
 
