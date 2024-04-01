@@ -28,7 +28,6 @@ def create_app(configProvider: IConfigurationProvider):
     def bye():
         return greeting.bye('', numOfExclamations)
 
-
     return app
 
 
