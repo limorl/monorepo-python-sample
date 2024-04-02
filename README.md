@@ -127,14 +127,12 @@ To do so, we are using docker-compose to setup the DevContainer and the Localsta
    Make sure your workspace folder is shared from the docker host.
   * Lambda handler with API:
     ```shell
-    poetry shell
     cd services/<service-folder>  
     sam build
     sudo sam local start-api --container-host host.docker.internal
    ```
   * Lambda handler without API:
   ```shell
-  poetry shell
   cd services/<service-folder>
   sam build
   sudo sam local invoke --container-host host.docker.internal
@@ -143,14 +141,12 @@ To do so, we are using docker-compose to setup the DevContainer and the Localsta
 * On Windows
   * Lambda handler with API:
   ```shell
-  poetry shell
   cd services/<service-folder>
   sam build
   sudo sam local start-api
   ```
   * Lambda handler without  API:
   ```shell
-  poetry shell
   cd services/<service-folder>
   sam build
   sudo sam local invoke
