@@ -6,31 +6,23 @@ on:
       - main
 
 jobs:
-  linting:
-    runs-on: ubuntu-latest
-    name: Lint
-
-    steps:
-      - name: Check out source repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python environment
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-    
-      - name: flake8 Lint
-        uses: py-actions/flake8@v2
-
-  testing:
-    name: Run Test Suite
+  ci-checks:
+    name: Run CI Checks
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out code
+    - name: Check-out Code
       uses: actions/checkout@v3
+    
+    - name: Set-up Python Environment
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
 
-    - name: Set PWD Environment Variable
+    - name: Lint (flask8)
+      uses: py-actions/flake8@v2
+
+    - name: Set-up PWD Environment Variable
       run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
 
 
