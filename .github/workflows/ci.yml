@@ -22,3 +22,8 @@ jobs:
       uses: devcontainers/ci@v0.3
       with:
         runCmd: pytest
+    
+    - name: Capture Docker Compose Logs
+      if: failure() # Only run this step if previous steps failed
+      run: |
+        docker-compose --project-name monorepo-python-sample_devcontainer -f /home/runner/work/monorepo-python-sample/monorepo-python-sample/.devcontainer/docker-compose.yml logs
