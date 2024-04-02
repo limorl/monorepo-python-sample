@@ -2,12 +2,12 @@
 # Default image for DevContainer: Python 3.10 for Apple Silicone
 ARG IMAGE="mcr.microsoft.com/vscode/devcontainers/python"
 ARG VERSION="3.10"
-ARG VARIANT="-bullseye"
+ARG VARIANT="-buster"
 
 FROM ${IMAGE}:${VERSION}${VARIANT}
 
 # Default target architecture. For another architecture, change .env file
-ARG TARGETARCH="arm64"
+ARG TARGETARCH="amd64"
 
 # Install Docker CE CLI
 RUN apt-get update \
@@ -65,4 +65,3 @@ RUN pip install poetry
 
 # making git case sensetive, so rename from File.js to file.js will be makred as a change
 RUN git config --global core.ignorecase false
-

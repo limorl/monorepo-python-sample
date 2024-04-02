@@ -23,7 +23,7 @@ repos:
       hooks:
         - id: unit-tests
           name: unit-tests
-          entry: python ./packages/utils/src/test/run_pytest_on_impacted_folders.py
+          entry: poetry run python ./packages/utils/src/test/run_pytest_on_impacted_folders.py
           language: system
           stages: [push]
           pass_filenames: false

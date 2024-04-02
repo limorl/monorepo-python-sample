@@ -148,20 +148,17 @@ To do so, we are using docker-compose to setup the DevContainer and the Localsta
     ```
   * Lambda handler without API:
   * ```shell
-    poetry shell
     cd services/<service-folder>
       sam build && sam local invoke --container-host host.docker.internal
     ```
   * On linux
 * * Lambda handler with API:
   * ```shell
-    poetry shell
     cd services/<service-folder>
     sam build && sudo sam local start-api
     ```
   * Lambda handler without  API:
   * ```shell
-    poetry shell
     cd services/<service-folder>
     sam build && sudo sam  local invoke
     ```

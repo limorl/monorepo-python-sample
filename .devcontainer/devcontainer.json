@@ -41,7 +41,8 @@
         "vscode-icons-team.vscode-icons",
         "wayou.vscode-todo-highlight",
         "timonwong.shellcheck",
-        "eamodio.gitlens"
+        "eamodio.gitlens",
+        "cweijan.vscode-office"
     ],
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
