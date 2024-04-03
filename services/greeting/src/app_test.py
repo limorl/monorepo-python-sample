@@ -35,7 +35,7 @@ class TestLambdaFunction(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
 
             # Check if the response contains the expected greeting
-            expected_greeting = 'Hadar says: Hello there!' 
+            expected_greeting = 'Hadar says: Hello there!'
             self.assertIn(expected_greeting, response.get_data(as_text=True))
 
 

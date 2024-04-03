@@ -31,10 +31,8 @@ def create_app(configProvider: IConfigurationProvider):
     @app.route('/hadar/<name>')
     def hadar(name):
         return greeting.hadar(name, numOfExclamations)
-
     
     return app
-
 
 config_provider = get_configuration_provider()
 app = create_app(config_provider)
