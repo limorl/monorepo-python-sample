@@ -21,4 +21,4 @@ class GreetingService(IGreetingService):
         return f"Hello {name}{'!' * numOfExclamations}"
 
     def bye(self, name: str, numOfExclamations: int = 1) -> str:
-        return f"BYE {name}{'!' * numOfExclamations}"
+        return f"Bye {name}{'!' * numOfExclamations}"
