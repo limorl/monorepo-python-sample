@@ -25,3 +25,4 @@ class GreetingService(IGreetingService):
 
     def hadar(self, name: str, numOfExclamations: int = 1) -> str:
         return f"Hadar says: Hello, {name}{'!' * numOfExclamations}"
+    
