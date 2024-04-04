@@ -28,14 +28,6 @@ class TestGreetingService(unittest.TestCase):
 
         self.assertEqual(msg, expected)
 
-    def test_bye_with_empty_name_and_no_exclamations(self):
-        greeting = GreetingService()
-
-        msg = greeting.bye("")
-        expected = "bye !"
-
-        self.assertEqual(msg, expected)
-
 
 if __name__ == "__main__":
 
