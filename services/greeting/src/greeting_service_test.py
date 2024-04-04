@@ -28,6 +28,13 @@ class TestGreetingService(unittest.TestCase):
 
         self.assertEqual(msg, expected)
 
+    def test_dumpster_fire(self):
+        greeting = GreetingService()
+
+        msg = greeting.dumpsterFire('', 3)
+        expected = " is in a dampster fire###"
+        self.assertEqual(msg, expected)
+
 
 if __name__ == '__main__':
     unittest.main()
