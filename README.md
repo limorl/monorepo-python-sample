@@ -41,8 +41,7 @@ This requires *all of our developers* to use docker and Visual Studio Code, to g
 
 1. Install [Git](https://git-scm.com/download/)
 2. Install [Visual Studio Code](https://code.visualstudio.com/) and install the [Dev Containers Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-3. Setup your git credentials by completing: [set](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) [](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)[credentials](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token), and [cache credentials](https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git)
-4. Install [Docker for Mac](https://docs.docker.com/desktop/mac/release-notes/) or [Docker for linux](https://docs.docker.com/desktop/install/linux-install/) and make sure the docker daemon is started
+3. Install [Docker for Mac](https://docs.docker.com/desktop/mac/release-notes/) or [Docker for linux](https://docs.docker.com/desktop/install/linux-install/) and make sure the docker daemon is started
 
 ### Initial Setup
 
