@@ -33,9 +33,9 @@ class TestGreetingService(unittest.TestCase):
 
         msg = greeting.dumpsterFire('', 3)
         expected = " is in a dampster fire###"
-
         self.assertEqual(msg, expected)
 
 
 if __name__ == '__main__':
     unittest.main()
+    
