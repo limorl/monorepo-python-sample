@@ -14,7 +14,7 @@ class IConfigurationProvider(ABC):
 class LocalConfigurationProvider(IConfigurationProvider):
     def __init__(self):
         self.config = {}
-        config_path = os.path.join(os.getcwd(), 'config/config.local.json')
+        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config/config.local.json')
 
         with open(config_path, 'r') as file:
             self.config = json.load(file)
@@ -26,7 +26,7 @@ class LocalConfigurationProvider(IConfigurationProvider):
 class AppConfigurationProvider(IConfigurationProvider):
     def __init__(self):
         self.config = {}
-        config_path = os.path.join(os.getcwd(), 'config/config.prod.us-east-1.json')
+        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config/config.prod.us-east-1.json')
 
         with open(config_path, 'r') as file:
             self.config = json.load(file)
