@@ -1,5 +1,5 @@
 import unittest
-from greeting_service import GreetingService
+from .greeting_service import GreetingService
 
 
 class TestGreetingService(unittest.TestCase):
