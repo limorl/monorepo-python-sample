@@ -3,6 +3,7 @@ from .greeting_service import GreetingService
 from configuration.configuration_provider import IConfigurationProvider, get_configuration_provider
 from flask import Flask
 
+
 def create_app(configProvider: IConfigurationProvider):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)

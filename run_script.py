@@ -1,6 +1,7 @@
 import subprocess
 import sys
 
+
 def run_script(script_name):
     poetry_path = "/usr/local/bin/poetry"
     command = f"{poetry_path} run {script_name}"
@@ -9,6 +10,7 @@ def run_script(script_name):
         # subprocess.run(command, shell=True, executable='/bin/bash', check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error running script {script_name}: {e}")
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

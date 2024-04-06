@@ -8,7 +8,7 @@ def run_script(script_name):
         case "install_all":
             install_all()
         case "build_all":
-            build_all();
+            build_all()
         case _:
             print(f"Unknown script: {script_name}")
 

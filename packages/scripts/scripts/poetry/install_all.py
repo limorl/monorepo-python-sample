@@ -8,6 +8,7 @@ def export_requirements_to_directory(directory: Path):
     print(f"Exporting dependencies to: {directory}/requirments.txt")
     subprocess.run(["poetry", "export", "-f", "requirements.txt", "--output", "./requirements.txt", "--without-hashes"], cwd=directory)
 
+
 def install_dependencies_in_directory(directory: Path):
     print(f"Installing dependencies in: {directory}")
     subprocess.run(["poetry", "install"], cwd=directory)

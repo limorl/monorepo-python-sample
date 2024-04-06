@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import Mock
-from  greeting.app import create_app 
+from greeting.app import create_app
 
 
 class TestLambdaFunction(unittest.TestCase):
