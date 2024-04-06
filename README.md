@@ -120,6 +120,29 @@ By default, poetry creates a python virtualenv.
 We're using VS Code DevContainer to run our dockerized development environment.
 To run the development environment locally, click `Shift+Command+p -> Reopen in Container`
 
+### Local Packages
+To install, build and test a local package, do the following from the repo root:
+```shell
+cd packages/<your-package>
+poetry install
+poetry run pytest
+```
+
+If you have package sependency, such as packages.package-a dependes on package-b, poetry can install the local packages and they can be imported. See package-a and package-b examples.
+
+>> NOTE: When running on S code, you may see that the dependency local package is not recognized by pylance. Please ignore it.
+
+To install *all packages* run from the monorepo root:
+
+```shell
+python run_script.py install-all
+```
+
+In general, every script defined in `packages/scripts` pyproject.toml can be run similarly:
+```shell
+python run_script.py <script-name>
+```
+
 ### Running cloud resources locally
 We're leveraging AWS Localstack to emulate a cloud environment locally.
 To do so, we are using docker-compose to setup the DevContainer and the Localstack container.
@@ -129,13 +152,17 @@ To do so, we are using docker-compose to setup the DevContainer and the Localsta
    Make sure your workspace folder is shared from the docker host.
   * Lambda handler with API:
     ```shell
-    cd services/<service-folder>  
+    cd services/<service-folder> 
+    poetry install
+    poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
     sam build
     sudo sam local start-api --container-host host.docker.internal
    ```
   * Lambda handler without API:
   ```shell
   cd services/<service-folder>
+  poetry install
+  poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
   sam build
   sudo sam local invoke --container-host host.docker.internal
   ```
@@ -144,12 +171,16 @@ To do so, we are using docker-compose to setup the DevContainer and the Localsta
   * Lambda handler with API:
   ```shell
   cd services/<service-folder>
+  poetry install
+  poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
   sam build
   sudo sam local start-api
   ```
   * Lambda handler without  API:
   ```shell
   cd services/<service-folder>
+  poetry install
+  poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py 
   sam build
   sudo sam local invoke
   ```

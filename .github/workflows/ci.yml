@@ -33,4 +33,4 @@ jobs:
     - name: Run Tests
       uses: devcontainers/ci@v0.3
       with:
-        runCmd: pytest
+        runCmd: python run_script.py pytest_all
