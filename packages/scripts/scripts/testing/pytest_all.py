@@ -2,7 +2,7 @@ import os
 import pathspec
 import subprocess
 
-from .packages import get_package_paths
+from scripts.utils.packages import get_package_paths
 
 
 def load_gitignore(root_dir):

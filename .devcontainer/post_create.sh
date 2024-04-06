@@ -17,7 +17,7 @@ poetry config virtualenvs.in-project true
 
 # Install all dependencies
 poetry install
-python poetry_run.py install_all
+python run_script.py install-all
 
 # Install pre-commit and pre-push hooks
 poetry run pre-commit install

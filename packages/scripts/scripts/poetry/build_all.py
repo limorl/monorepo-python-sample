@@ -1,7 +1,7 @@
 import os
 import subprocess
 from pathlib import Path
-from .packages import get_package_paths
+from scripts.utils.packages import get_package_paths
 
 def build_package(directory: Path):
     print(f"Building package: {directory}")

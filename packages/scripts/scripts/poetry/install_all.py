@@ -1,9 +1,12 @@
 import os
 import subprocess
 from pathlib import Path
-from .packages import get_package_paths, is_service_path
-from .export_requirements import export_requirements_to_directory
+from scripts.utils.packages import get_package_paths, is_service_path
 
+
+def export_requirements_to_directory(directory: Path):
+    print(f"Exporting dependencies to: {directory}/requirments.txt")
+    subprocess.run(["poetry", "export", "-f", "requirements.txt", "--output", "./requirements.txt", "--without-hashes"], cwd=directory)
 
 def install_dependencies_in_directory(directory: Path):
     print(f"Installing dependencies in: {directory}")
