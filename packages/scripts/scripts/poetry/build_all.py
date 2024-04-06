@@ -8,7 +8,7 @@ def build_package(directory: Path):
     subprocess.run(["poetry", "build"], cwd=directory)
 
 
-def build_all():    
+def build_all():
     print("Starting building of all packages...")
 
     package_paths = get_package_paths()

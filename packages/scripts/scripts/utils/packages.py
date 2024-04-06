@@ -10,12 +10,12 @@ def is_excluded(path: Path):
 
     # for now we are not treating the root as a package
     is_root = is_root_pyproject(path)
-    
+
     return is_excluded or is_root
 
 
 def is_service_path(path: Path):
-    return any(folder in path.parts for folder in service_directories)       
+    return any(folder in path.parts for folder in service_directories)
 
 
 def is_root_pyproject(path: Path):
