@@ -9,7 +9,7 @@ Resources:
   GreetingFlaskLambda:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src.lambda_handler.handler
+      Handler: greeting.lambda_handler.handler
       Runtime: python3.10
       Architectures:
         - arm64

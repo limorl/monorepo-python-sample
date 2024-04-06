@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "configuration"
+version = "0.1.0"
+description = "Configuration Provider based on configuration file"
+authors = ["Limor Lahiani"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+jsonify = "0.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
