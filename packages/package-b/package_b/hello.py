@@ -7,4 +7,3 @@ def greet():
 
 def say_hello():
     return "Hello, World B!"
-

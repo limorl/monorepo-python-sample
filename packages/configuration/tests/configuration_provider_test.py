@@ -2,6 +2,7 @@ import unittest
 # from unittest.mock import Mock
 # from  configuration.configuration_provider import  get_configuration_provider, IConfigurationProvider
 
+
 # TODO @limor: add test
 class TestConfigurationProvider(unittest.TestCase):
     def test_get_configuration_provider(self):
@@ -10,4 +11,3 @@ class TestConfigurationProvider(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    

@@ -31,6 +31,7 @@ def git_changed_files(directory):
     )
     return changed_files.splitlines()
 
+
 # TODO @limorl: Fix to comply with new package structure
 def identify_impacted_files(changed_files):
     impacted_files = []

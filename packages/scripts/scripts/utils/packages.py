@@ -1,5 +1,4 @@
 import os
-import subprocess
 from pathlib import Path
 
 excluded_directories = [".aws-sam", "__pycache__"]
@@ -8,7 +7,10 @@ service_directories = ["services"]
 
 def is_excluded(path: Path):
     is_excluded = any(excluded_folder in path.parts for excluded_folder in excluded_directories)
-    is_root = is_root_pyproject(path) # for now we are not treating the root as a package
+
+    # for now we are not treating the root as a package
+    is_root = is_root_pyproject(path)
+    
     return is_excluded or is_root
 
 
