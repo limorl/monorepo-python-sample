@@ -1,0 +1,3 @@
+[pytest]
+addopts = --rootdir=monorepo
+pythonpath = ./packages/package-a/tests ./packages/package-b/tests

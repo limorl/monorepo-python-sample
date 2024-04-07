@@ -6,6 +6,7 @@
     "service": "devcontainer",
     "workspaceFolder": "${localWorkspaceFolder}",
     "runArgs": ["--env-file",".devcontainer/.env"],
+            // Set *default* container specific settings.json values on container create.
     "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",
         "python.pythonPath": "/usr/local/bin/python",
@@ -21,6 +22,10 @@
         "python.linting.pylintPath": "/usr/local/py-utils/bin/pylint",
         "python.testing.unittestEnabled": false,
         "python.testing.pytestEnabled": true,
+        "editor.formatOnPaste": false, // required
+        "editor.formatOnType": false, // required
+        "editor.formatOnSave": true, // optional
+        "editor.formatOnSaveMode": "file", // required to format on save
         "python.testing.pytestArgs": [
             "api_app"
         ],
@@ -42,7 +47,8 @@
         "wayou.vscode-todo-highlight",
         "timonwong.shellcheck",
         "eamodio.gitlens",
-        "cweijan.vscode-office"
+        "cweijan.vscode-office",
+        "ms-python.black-formatter"
     ],
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
