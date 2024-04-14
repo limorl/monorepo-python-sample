@@ -1,16 +1,17 @@
 import unittest
 from unittest.mock import Mock
-from greeting.app import create_app
+from greeting.app import create_app, GreetingService
 
 
 class TestLambdaFunction(unittest.TestCase):
-    def test_hello_name_with_mock(self):
+    def test_hello_name(self):
         # Create a mock configuration provider
         mock_config_provider = Mock()
-        mock_config_provider.get_config.return_value = 2  # Mock return value for numOfExclamations
+        mock_config_provider.get_configuration.return_value = 2  # Mock return value for numOfExclamations
+        greeting_service = GreetingService()
 
         # Create the app with the mocked configuration provider
-        test_app = create_app(mock_config_provider)
+        test_app = create_app(mock_config_provider, greeting_service)
         test_app.testing = True
         with test_app.test_client() as client:
             # Make a test request to the hello_name endpoint

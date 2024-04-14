@@ -14,7 +14,6 @@ python = "^3.10"
 flask = "3.0.2"
 jsonify = "0.5"
 serverless-wsgi = "3.0.3"
-#configuration_provider = { file = "../../packages/configuration_provider/dist/configuration_provider-0.1.0.tar.gz" }
 configuration = { path = "../../packages/configuration", develop = true }
 
 [tool.poetry.dev-dependencies]
