@@ -1,5 +1,6 @@
 from configuration.app.configuration_provider import IConfigurationProvider
 
+
 class RemoteConfigurationProvider(IConfigurationProvider):
     """TODO: Implement
     AppConfigurationProvider consumes configuration from AWS App Config.
@@ -10,7 +11,6 @@ class RemoteConfigurationProvider(IConfigurationProvider):
 
     def init_configuration(self):
         pass
-
 
     def get_config(self, key: str) -> str:
         return self.config.get(key, '')
