@@ -1,6 +1,3 @@
-import json
-import os
-from typing import Any
 from configuration.app.configuration_provider import IConfigurationProvider
 
 class RemoteConfigurationProvider(IConfigurationProvider):
@@ -10,9 +7,10 @@ class RemoteConfigurationProvider(IConfigurationProvider):
     def __init__(self):
         super().init()
         self.config = None
-        
+
     def init_configuration(self):
         pass
+
 
     def get_config(self, key: str) -> str:
         return self.config.get(key, '')

@@ -1,8 +1,6 @@
 import os
 import unittest
-from unittest.mock import Mock
 from configuration.app.local_configuration_provider import  LocalConfigurationProvider
-
 
 class TestLocalConfigurationProvider(unittest.TestCase):
     def setUp(self):
@@ -29,6 +27,7 @@ class TestLocalConfigurationProvider(unittest.TestCase):
         self.assertEqual(config1['str1'], 'val1')
         self.assertEqual(config10['num10'], 10)
         self.assertEqual(config10['str10'], 'val10')
+
 
 if __name__ == '__main__':
     unittest.main()
