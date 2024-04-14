@@ -14,7 +14,6 @@ class LocalConfigurationProvider(IConfigurationProvider):
         self._local_config_path = os.path.join(local_config_folder, 'config.local.json')
         self.config = None
 
-
     def init_configuration(self):
         try:
             with open(self._local_config_path, 'r') as file:
@@ -25,7 +24,6 @@ class LocalConfigurationProvider(IConfigurationProvider):
         except json.JSONDecodeError:
             print(f"Failed to decode JSON from configuration: {self._local_config_path}")
             return None
-
 
     def get_configuration(self, key: str) -> Any:
         return super().get_configuration(key)
