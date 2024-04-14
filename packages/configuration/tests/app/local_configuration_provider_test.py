@@ -1,6 +1,6 @@
 import os
 import unittest
-from configuration.app.local_configuration_provider import  LocalConfigurationProvider
+from configuration.app.local_configuration_provider import LocalConfigurationProvider
 
 
 class TestLocalConfigurationProvider(unittest.TestCase):
