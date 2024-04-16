@@ -21,13 +21,13 @@ class LocalConfigurationProvider(IConfigurationProvider):
             self._local_config_path = os.path.join(local_config_folder, 'config.dev.json')
         elif env_variables.environment == Environment.PROD and env_variables.region:
             self._local_config_path = os.path.join(local_config_folder, f'config.prod.{env_variables.region}.json')
-   
+
     def init_configuration(self):
         super().init_configuration()
 
     def get_configuration(self, key: str) -> Any:
         return super().get_configuration(key)
-    
+
     def _get_configuration(self):
         print("*** LOCAL:: _init_configuration")
         try:

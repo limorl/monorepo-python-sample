@@ -37,7 +37,6 @@ class TestLocalConfigurationProvider(unittest.TestCase):
         self.assertEqual(config10['num10'], 10)
         self.assertEqual(config10['str10'], 'val10')
 
-
     def test_get_raw_configuration_prod(self):
         os.environ['PLATFORM'] = 'AWS'
         os.environ['ENVIRONMENT'] = 'prod'
@@ -71,9 +70,8 @@ class TestLocalConfigurationProvider(unittest.TestCase):
         os.environ['PLATFORM'] = 'AWS'
         os.environ['ENVIRONMENT'] = 'prod'
         os.environ['REGION'] = 'east-us-1'
-        
-        self.assertRaises(ValueError, EnvironmentVariables)
 
+        self.assertRaises(ValueError, EnvironmentVariables)
 
 if __name__ == '__main__':
     unittest.main()

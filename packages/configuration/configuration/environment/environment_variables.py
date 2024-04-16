@@ -13,8 +13,10 @@ class Environment(Enum):
     STAGING = 'staging'     # remote staging env
     DEV = 'dev'             # local dev/ci environment
 
+
 def is_cloud_platform(platform: Platform):
     return platform == Platform.AWS
+
 
 class EnvironmentVariables:
 
@@ -34,15 +36,15 @@ class EnvironmentVariables:
 
 
 def reset_environment_variables():
-    if os.getenv('PLATFORM'): 
+    if os.getenv('PLATFORM'):
         del os.environ['PLATFORM']
-    if os.getenv('REGION'): 
+    if os.getenv('REGION'):
         del os.environ['REGION']
-    if os.getenv('CLOUD_ENDPOINT_OVERRIDE'): 
+    if os.getenv('CLOUD_ENDPOINT_OVERRIDE'):
         del os.environ['CLOUD_ENDPOINT_OVERRIDE']
-    if os.getenv('SERVICE_NAME'): 
+    if os.getenv('SERVICE_NAME'):
         del os.environ['SERVICE_NAME']
-    if os.getenv('ENVIRONMENT'): 
+    if os.getenv('ENVIRONMENT'):
         del os.environ['ENVIRONMENT']
-    if os.getenv('LOCAL_CONFIGURATION_FOLDER'): 
+    if os.getenv('LOCAL_CONFIGURATION_FOLDER'):
         del os.environ['LOCAL_CONFIGURATION_FOLDER']

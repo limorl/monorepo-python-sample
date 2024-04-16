@@ -29,7 +29,7 @@ class IConfigurationProvider(ABC):
         config = self.__config.get(key, None)
         if not config:
             raise KeyError(f'Configuration ${key} was not found')
-        
+
         return config
 
     @abstractmethod

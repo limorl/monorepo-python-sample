@@ -48,7 +48,6 @@ class TestEnvironmentVariables(unittest.TestCase):
         self.assertEqual(env.service_name, 'hello')
         self.assertEqual(env.environment, Environment.DEV)
 
-
     def test_init_environment_variables_prod_dotenv_path(self):
         dotnev_path = os.path.join(os.getcwd(), 'tests/__data__/.prod.env')
         env = EnvironmentVariables(dotnev_path)
@@ -57,7 +56,6 @@ class TestEnvironmentVariables(unittest.TestCase):
         self.assertEqual(env.region, 'east-us-1')
         self.assertEqual(env.service_name, 'hello')
         self.assertEqual(env.environment, Environment.PROD)
-
 
     def test_init_environment_variables_empty_dotenv_path(self):
         dotnev_path = os.path.join(os.getcwd(), 'tests/__data__/.empty.env')
