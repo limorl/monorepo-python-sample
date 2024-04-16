@@ -71,7 +71,7 @@ class TestEnvironmentVariables(unittest.TestCase):
     def test_init_environment_variables_unknown_platform_should_throw(self):
         dotnev_path = os.path.join(os.getcwd(), 'tests/__data__/.unknown.platform.env')
         self.assertRaises(ValueError, EnvironmentVariables, dotnev_path)
-    
+
     def test_init_environment_variables_unknown_environment_should_throw(self):
         dotnev_path = os.path.join(os.getcwd(), 'tests/__data__/.unknown.environment.env')
         self.assertRaises(ValueError, EnvironmentVariables, dotnev_path)
