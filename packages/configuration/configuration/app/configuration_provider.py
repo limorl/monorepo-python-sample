@@ -9,7 +9,7 @@ class IConfigurationProvider(ABC):
 
     @abstractmethod
     def init_configuration(self):
-        if (self.__initiated or self.__initiating): 
+        if (self.__initiated or self.__initiating):
             return
 
         self.__initiating = True
@@ -18,7 +18,6 @@ class IConfigurationProvider(ABC):
         self.__initiated = True
 
         print(f"init_configuration: __confg: {self.__config}")
-
 
     @abstractmethod
     def get_configuration(self, key: str) -> Any:
@@ -32,7 +31,7 @@ class IConfigurationProvider(ABC):
             raise KeyError(f'Configuration ${key} was not found')
         
         return config
-    
+
     @abstractmethod
     def _get_configuration(self) -> Any:
         pass
