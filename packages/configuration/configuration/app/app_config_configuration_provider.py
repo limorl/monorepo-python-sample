@@ -1,10 +1,10 @@
 from configuration.app.configuration_provider import IConfigurationProvider
 
 
-class RemoteConfigurationProvider(IConfigurationProvider):
+class AppConfigConfigurationProvider(IConfigurationProvider):
     """TODO: Implement
-    AppConfigurationProvider consumes configuration from AWS App Config.
-    As part of the deployment, the configuration files under /config are deployes per service and initialized here"""
+    Configuration Provider based on AWS App Config.
+    When deploying services, the configuration files under the service's /config folders are deployed"""
     def __init__(self):
         super().init()
         self.config = None

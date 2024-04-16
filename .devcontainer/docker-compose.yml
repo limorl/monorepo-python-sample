@@ -6,9 +6,9 @@ services:
       dockerfile: Dockerfile
     env_file: .env  # Defines variables based on platform architecture
     environment:
-      - ENVIRONMENT=Local
+      - PLATFORM=local
+      - ENVIRONMENT=dev
       - CLOUD_ENDPOINT_OVERRIDE=http://localhost:4566
-      - AWS_REGION=us-east-1
     volumes:
       - ${PWD}/:${PWD} # Paths has to match wince we are starting containers from within the dev container when invoking lambda using SAM CLI
       - /var/run/docker.sock:/var/run/docker.sock

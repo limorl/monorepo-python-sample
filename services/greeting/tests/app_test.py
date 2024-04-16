@@ -1,9 +1,16 @@
 import unittest
 from unittest.mock import Mock
+import os
 from greeting.app import create_app, GreetingService
+from configuration.environment.environment_variables import reset_environment_variables
 
 
 class TestLambdaFunction(unittest.TestCase):
+    def setUp(self):
+         reset_environment_variables()
+         os.environ['PLATFORM'] = 'local'
+         os.environ['ENVIRONMENT'] = 'dev'
+
     def test_hello_name(self):
         # Create a mock configuration provider
         mock_config_provider = Mock()

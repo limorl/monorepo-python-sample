@@ -2,7 +2,8 @@ import os
 from .greeting_service import IGreetingService, GreetingService
 from configuration.app.configuration_provider import IConfigurationProvider
 from configuration.app.local_configuration_provider import LocalConfigurationProvider
-from configuration.app.remote_configuration_provider import RemoteConfigurationProvider
+from configuration.environment.environment_variables import EnvironmentVariables, Platform, Environment
+from configuration.app.app_config_configuration_provider import AppConfigConfigurationProvider
 from flask import Flask
 
 
@@ -29,13 +30,14 @@ def create_app(configProvider: IConfigurationProvider, greeting_service: IGreeti
     return app
 
 
-environment = os.getenv('ENVIRONMENT', 'Local')
+env_variables = EnvironmentVariables()
 config_provider: IConfigurationProvider = None
 
-if environment == 'Local':
-    config_provider = LocalConfigurationProvider()
+if env_variables.environment == Environment.DEV:
+    config_provider = LocalConfigurationProvider(env_variables)
 
 else:
-    config_provider = RemoteConfigurationProvider()
+    # TODO: Replace prod configuration with AppConfigConfigurationProvider
+    config_provider = AppConfigConfigurationProvider()
 
 app = create_app(config_provider, GreetingService())
