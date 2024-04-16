@@ -2,7 +2,7 @@ import os
 from .greeting_service import IGreetingService, GreetingService
 from configuration.app.configuration_provider import IConfigurationProvider
 from configuration.app.local_configuration_provider import LocalConfigurationProvider
-from configuration.environment.environment_variables import EnvironmentVariables, Platform, Environment
+from configuration.environment.environment_variables import EnvironmentVariables, Environment
 from configuration.app.app_config_configuration_provider import AppConfigConfigurationProvider
 from flask import Flask
 

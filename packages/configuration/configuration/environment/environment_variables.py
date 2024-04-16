@@ -22,7 +22,7 @@ class EnvironmentVariables:
 
     def __init__(self, dotenvpath: str = None):
         if dotenvpath:
-            load_dotenv(dotenvpath) # loads environment variables from .env file under project's folder
+            load_dotenv(dotenvpath)  # loads environment variables from .env file under project's folder
 
         self.platform = Platform(os.getenv('PLATFORM')) if os.getenv('PLATFORM') else None
         self.region: str = os.getenv('REGION')

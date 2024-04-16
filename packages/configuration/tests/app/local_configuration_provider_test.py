@@ -65,13 +65,14 @@ class TestLocalConfigurationProvider(unittest.TestCase):
 
         self.assertEqual(config['num100'], 100)
         self.assertEqual(config['str200'], '200')
-    
+
     def test_get_configuration_section_prod_missing_service_name_should_throw_value_error(self):
         os.environ['PLATFORM'] = 'AWS'
         os.environ['ENVIRONMENT'] = 'prod'
         os.environ['REGION'] = 'east-us-1'
 
         self.assertRaises(ValueError, EnvironmentVariables)
+
 
 if __name__ == '__main__':
     unittest.main()
