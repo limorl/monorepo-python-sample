@@ -1,5 +1,5 @@
 import unittest
-from .greeting_service import GreetingService
+from greeting_service import GreetingService
 
 
 class TestGreetingService(unittest.TestCase):
@@ -31,8 +31,16 @@ class TestGreetingService(unittest.TestCase):
     def test_dumpster_fire(self):
         greeting = GreetingService()
 
-        msg = greeting.dumpsterFire('', 3)
-        expected = " is in a dampster fire###"
+        msg = greeting.dumpsterFire("", 3)
+        expected = "blabla !!!"
+        self.assertEqual(msg, expected)
+
+    def test_blabla(self):
+        greeting = GreetingService()
+
+        msg = greeting.blalba("John")
+        expected = "blabla John!"
+
         self.assertEqual(msg, expected)
 
 

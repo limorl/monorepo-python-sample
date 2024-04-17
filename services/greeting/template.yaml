@@ -1,10 +1,10 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: SAM Template for Greeting Service
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
-    Function:
-        Timeout: 5
+  Function:
+    Timeout: 5
 Resources:
   GreetingFlaskLambda:
     Type: AWS::Serverless::Function
@@ -12,7 +12,7 @@ Resources:
       Handler: greeting.lambda_handler.handler
       Runtime: python3.10
       Architectures:
-        - arm64
+        - x86_64
       CodeUri: .
       Events:
         HelloNamePath:
@@ -29,4 +29,9 @@ Resources:
           Type: Api
           Properties:
             Path: /bye
+            Method: GET
+        DolevPath:
+          Type: Api
+          Properties:
+            Path: /dolev
             Method: GET
