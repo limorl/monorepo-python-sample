@@ -23,4 +23,8 @@ python run_script.py install-all
 poetry run pre-commit install
 poetry run pre-commit install --hook-type pre-push
 
+# Localstack - Validate config and define alias
+localstack config validate --file .devcontainer/docker-compose.yml
+alias aws-localstack="AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE aws"
+
 echo "pre_create DONE!"

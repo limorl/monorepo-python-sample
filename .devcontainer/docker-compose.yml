@@ -16,7 +16,7 @@ services:
     network_mode: host
 
   localstack:
-    container_name: localstack
+    container_name: localstack-main
     image: localstack/localstack
     ports:
       - "127.0.0.1:53:53"                # only required for Pro (DNS)

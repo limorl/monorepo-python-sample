@@ -14,7 +14,7 @@ The monorepo will be extendedt to support:
 3. [Done] [Still need to fix folder structure for poetry packaging]Use Poetry to manage package versions and to manage scripts reunning recursively (similarly to pnpm for javascript).
    Once done, the pre-commit hook for unit tests can be updated to run pytest recursively.
 4. Use Terraform to deploy infra on local stack and on AWS
-5. Add a deployment.yml workflow to deploy to AWS
+5. Add a deployment.yml workflow to deploy to AWS and to Localstack
 6. Define Branch policy to require PR approval and squash and rebase merge 
 7. Add e2e.yml workflow with a simple e2e test which runs nightly (every night)
 
@@ -144,7 +144,14 @@ python run_script.py <script-name>
 
 ### Running cloud resources locally
 We're leveraging AWS Localstack to emulate a cloud environment locally.
-To do so, we are using docker-compose to setup the DevContainer and the Localstack container.
+To do so, we are using docker-compose to setup the DevContainer and the Localstack container on your host machine.
+
+Run the following to define `aws-localstack` alias to run all aws cli commands against the localstack container.In addition, validate that localstack is set up correctly by listing all S3 buckets on localstack.
+
+```shell
+alias aws-localstack="AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE aws"
+aws-localstack s3api list-buckets
+```
 
 ### Running lambda locally
 * On MacOS
