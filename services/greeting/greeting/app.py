@@ -29,6 +29,7 @@ def create_app(configProvider: IConfigurationProvider, greeting_service: IGreeti
 
     return app
 
+
 env_variables = EnvironmentVariables()
 config_provider: IConfigurationProvider = None
 
