@@ -29,15 +29,13 @@ def create_app(configProvider: IConfigurationProvider, greeting_service: IGreeti
 
     return app
 
-
 env_variables = EnvironmentVariables()
 config_provider: IConfigurationProvider = None
 
 if env_variables.environment == Environment.DEV:
     config_provider = LocalConfigurationProvider(env_variables)
-
 else:
-    # TODO: Replace prod configuration with AppConfigConfigurationProvider
+    # TODO: Implement AppConfigConfigurationProvider using AWS AppConfig
     config_provider = AppConfigConfigurationProvider()
 
 app = create_app(config_provider, GreetingService())

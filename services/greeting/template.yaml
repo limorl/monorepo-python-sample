@@ -13,6 +13,11 @@ Resources:
       Runtime: python3.10
       Architectures:
         - arm64
+      Environment:
+        Variables:
+          PLATFORM: AWS
+          ENVIRONMENT: prod
+          SERVICE_NAME: greeting
       CodeUri: .
       Events:
         HelloNamePath:

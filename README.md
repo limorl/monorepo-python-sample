@@ -1,6 +1,6 @@
 # Sample Python Monorepo [A work in progress]
 
-This is a sample monorepo that can be used as a reference to get familiar with the concept of:
+This is a sample monorepo that can be used as a starting point for a python project, to ramp up on the following concepts:
 * Developing inside Devcontainer (dockerized development environment)
 * Python monorepo and solution structure
 * pre-commit hooks
@@ -8,10 +8,9 @@ This is a sample monorepo that can be used as a reference to get familiar with t
 * Unit testing lambda services
 * Terraform
 
-### TODO
-It's partial and still a few TODOS to complete the sample:
-1. Adding Docker file for windows environment (currently for Mac with Apple Silicone) and update Wiki acordingly
-2. Extract configuration-provide.py into a dedicated package under packages/
+### Next Steps
+The monorepo will be extendedt to support:
+1. Extract configuration-provider.py into a dedicated package under packages/
 3. [Done] [Still need to fix folder structure for poetry packaging]Use Poetry to manage package versions and to manage scripts reunning recursively (similarly to pnpm for javascript).
    Once done, the pre-commit hook for unit tests can be updated to run pytest recursively.
 4. Use Terraform to deploy infra on local stack and on AWS
@@ -156,7 +155,7 @@ To do so, we are using docker-compose to setup the DevContainer and the Localsta
     poetry install
     poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
     sam build
-    sudo sam local start-api --container-host host.docker.internal
+    sudo sam local start-api --container-host host.docker.internal --env-vars local.env.json 
    ```
   * Lambda handler without API:
   ```shell
@@ -164,17 +163,17 @@ To do so, we are using docker-compose to setup the DevContainer and the Localsta
   poetry install
   poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
   sam build
-  sudo sam local invoke --container-host host.docker.internal
+  sudo sam local invoke --container-host host.docker.internal --env-vars local.env.json 
   ```
 
-* On Windows
+* Other Linux machines
   * Lambda handler with API:
   ```shell
   cd services/<service-folder>
   poetry install
   poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
   sam build
-  sudo sam local start-api
+  sudo sam local start-api --env-vars local.env.json 
   ```
   * Lambda handler without  API:
   ```shell
@@ -182,7 +181,7 @@ To do so, we are using docker-compose to setup the DevContainer and the Localsta
   poetry install
   poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py 
   sam build
-  sudo sam local invoke
+  sudo sam local invoke --env-vars local.env.json 
   ```
 
 You can also run the flask application directly without invoking the lambda: `flask --app <file-with-flask-app> run --debug`
