@@ -9,7 +9,7 @@ class TestLambdaFunction(unittest.TestCase):
     def setUp(self):
         reset_environment_variables()
         os.environ['PLATFORM'] = 'local'
-        os.environ['ENVIRONMENT'] = 'dev'
+        os.environ['STAGE'] = 'dev'
 
     def test_hello_name(self):
         # Create a mock configuration provider

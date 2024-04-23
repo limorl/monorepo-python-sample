@@ -2,7 +2,7 @@ import json
 import os
 from typing import Any
 from configuration.app.configuration_provider import IConfigurationProvider
-from configuration.environment.environment_variables import EnvironmentVariables, Environment
+from configuration.environment.environment_variables import EnvironmentVariables, Stage
 
 
 class LocalConfigurationProvider(IConfigurationProvider):
@@ -17,9 +17,9 @@ class LocalConfigurationProvider(IConfigurationProvider):
         default_config_folder = os.path.join(os.getcwd(), 'config')
         local_config_folder = env_variables.local_configuration_folder or default_config_folder
 
-        if env_variables.environment == Environment.DEV:
+        if env_variables.stage == Stage.DEV:
             self._local_config_path = os.path.join(local_config_folder, 'config.dev.json')
-        elif env_variables.environment == Environment.PROD and env_variables.region:
+        elif env_variables.stage == Stage.PROD and env_variables.region:
             self._local_config_path = os.path.join(local_config_folder, f'config.prod.{env_variables.region}.json')
 
     def init_configuration(self):

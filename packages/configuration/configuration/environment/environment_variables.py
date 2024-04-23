@@ -8,7 +8,7 @@ class Platform(Enum):
     LOCAL = 'local'
 
 
-class Environment(Enum):
+class Stage(Enum):
     PROD = 'prod'           # production
     STAGING = 'staging'     # remote staging env
     DEV = 'dev'             # local dev/ci environment
@@ -28,7 +28,7 @@ class EnvironmentVariables:
         self.region: str = os.getenv('REGION')
         self.cloud_endpoint_override: str = os.getenv('CLOUD_ENDPOINT_OVERRIDE')
         self.service_name: str = os.getenv('SERVICE_NAME')
-        self.environment = Environment(os.getenv('ENVIRONMENT')) if os.getenv('ENVIRONMENT') else None
+        self.stage = Stage(os.getenv('STAGE')) if os.getenv('STAGE') else None
         self.local_configuration_folder = os.getenv('LOCAL_CONFIGURATION_FOLDER')
 
         if is_cloud_platform(self.platform) and not self.service_name:
@@ -44,7 +44,7 @@ def reset_environment_variables():
         del os.environ['CLOUD_ENDPOINT_OVERRIDE']
     if os.getenv('SERVICE_NAME'):
         del os.environ['SERVICE_NAME']
-    if os.getenv('ENVIRONMENT'):
-        del os.environ['ENVIRONMENT']
+    if os.getenv('STAGE'):
+        del os.environ['STAGE']
     if os.getenv('LOCAL_CONFIGURATION_FOLDER'):
         del os.environ['LOCAL_CONFIGURATION_FOLDER']

@@ -18,6 +18,8 @@ The monorepo will be extendedt to support:
 6. Define Branch policy to require PR approval and squash and rebase merge 
 7. Add e2e.yml workflow with a simple e2e test which runs nightly (every night)
 
+## Issues
+* !!! Deployment to Localstack using sam deploy fails. Dependencies are not packaged correctly.
 
 ## Sample
 The sample includes two lambda services:
@@ -146,31 +148,44 @@ python run_script.py <script-name>
 We're leveraging AWS Localstack to emulate a cloud environment locally.
 To do so, we are using docker-compose to setup the DevContainer and the Localstack container on your host machine.
 
-Run the following to define `aws-localstack` alias to run all aws cli commands against the localstack container.In addition, validate that localstack is set up correctly by listing all S3 buckets on localstack.
+Run the following to define `aws-localstack` and `sam-localstack` aliased to run `aws cli` and `sam cli` commands against the localstack container.In addition, validate that localstack is set up correctly by listing all S3 buckets on localstack.
 
 ```shell
 alias aws-localstack="AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE aws"
+alias sam-localstack="AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE sam"
 aws-localstack s3api list-buckets
 ```
 
-### Running lambda locally
+There are several options to run services locally:
+1. Run the flask app
+2. Run local lambda using sam cli
+3. Deploy the lambda to localstack 
+
+#### 1. Running the flask application directly
+
+```shell
+cd services/<my-service>
+flask --app app.py run --debug
+```
+
+#### 2.Running lambda locally using SAM CLI
 * On MacOS
    Make sure your workspace folder is shared from the docker host.
   * Lambda handler with API:
-    ```shell
-    cd services/<service-folder> 
-    poetry install
-    poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
-    sam build
-    sudo sam local start-api --container-host host.docker.internal --env-vars local.env.json 
-   ```
+  ```shell
+  cd services/<service-folder> 
+  poetry install
+  poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
+  sam build
+  sudo sam local start-api --container-host host.docker.internal --env-vars local.dev.env.json
+  ```
   * Lambda handler without API:
   ```shell
   cd services/<service-folder>
   poetry install
   poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
   sam build
-  sudo sam local invoke --container-host host.docker.internal --env-vars local.env.json 
+  sudo sam local invoke --container-host host.docker.internal --env-vars local.dev.env.json
   ```
 
 * Other Linux machines
@@ -180,7 +195,7 @@ aws-localstack s3api list-buckets
   poetry install
   poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
   sam build
-  sudo sam local start-api --env-vars local.env.json 
+  sudo sam local start-api --env-vars local.dev.env.json
   ```
   * Lambda handler without  API:
   ```shell
@@ -188,7 +203,60 @@ aws-localstack s3api list-buckets
   poetry install
   poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py 
   sam build
-  sudo sam local invoke --env-vars local.env.json 
+  sudo sam local invoke --env-vars local.dev.env.json
   ```
 
-You can also run the flask application directly without invoking the lambda: `flask --app <file-with-flask-app> run --debug`
+#### 3. Deploying lambda locally to Localstack using SAM CLI
+To deploy using SAM CLI to LocalStack, set the --endpoint-url parameter to point to LocalStack for all service commands. Here's how you can package and deploy your application (Greeting service for example).
+
+First, create an S3 bucket in local stack for the lambdas packaged using sam cli:
+```shell
+aws-localstack s3api create-bucket --bucket sam-lambdas
+```
+
+Then, package the lambda:
+```shell
+cd services/greeting
+sam build
+sam-localstack package \
+    --template-file template.yaml \
+    --output-template-file packaged.yaml \
+    --config-env local.dev.env.json \
+    --s3-bucket sam-lambdas \
+    --s3-prefix greeting \
+    --region us-east-1
+```
+
+Then, deploy using sam deploy:
+```shell
+sam-localstack deploy \
+    --template-file packaged.yaml \
+    --stack-name GreetingApp \
+    --capabilities CAPABILITY_IAM \
+    --region us-east-1 \
+    --parameter-overrides StageName=dev
+```
+
+Once deployed to localstack, all lambdas are available on a single endpoint and can be invoked using function name.
+You can list all lambda APIs using:
+```shell
+aws-localstack apigateway get-rest-apis --region us-east-1
+```
+
+Here's an example result:
+```json
+{
+    "items": [
+        {
+            "id": "10-chars-id",
+            "name": "GreetingApp-ServerlessRestApi-...",
+            "createdDate": "2024-04-20T12:41:41+00:00",
+            "version": "1.0",
+            ...
+        }
+    ]
+}
+
+```
+Get the id of your service and your service is available on this endpoint:
+`http://localhost:4566/restapis/<service-id>/dev/_user_request_/hello`

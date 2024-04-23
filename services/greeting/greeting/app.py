@@ -2,7 +2,7 @@ import os
 from .greeting_service import IGreetingService, GreetingService
 from configuration.app.configuration_provider import IConfigurationProvider
 from configuration.app.local_configuration_provider import LocalConfigurationProvider
-from configuration.environment.environment_variables import EnvironmentVariables, Environment
+from configuration.environment.environment_variables import EnvironmentVariables, Stage
 from configuration.app.app_config_configuration_provider import AppConfigConfigurationProvider
 from flask import Flask
 
@@ -33,7 +33,7 @@ def create_app(configProvider: IConfigurationProvider, greeting_service: IGreeti
 env_variables = EnvironmentVariables()
 config_provider: IConfigurationProvider = None
 
-if env_variables.environment == Environment.DEV:
+if env_variables.stage == Stage.DEV:
     config_provider = LocalConfigurationProvider(env_variables)
 else:
     # TODO: Implement AppConfigConfigurationProvider using AWS AppConfig

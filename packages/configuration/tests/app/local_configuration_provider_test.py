@@ -11,7 +11,7 @@ class TestLocalConfigurationProvider(unittest.TestCase):
 
     def test_get_raw_configuration_dev(self):
         os.environ['PLATFORM'] = 'local'
-        os.environ['ENVIRONMENT'] = 'dev'
+        os.environ['STAGE'] = 'dev'
         env_variables = EnvironmentVariables()
 
         config_provider = LocalConfigurationProvider(env_variables)
@@ -24,7 +24,7 @@ class TestLocalConfigurationProvider(unittest.TestCase):
 
     def test_get_configuration_section_dev(self):
         os.environ['PLATFORM'] = 'local'
-        os.environ['ENVIRONMENT'] = 'dev'
+        os.environ['STAGE'] = 'dev'
         env_variables = EnvironmentVariables()
         config_provider = LocalConfigurationProvider(env_variables)
 
@@ -39,7 +39,7 @@ class TestLocalConfigurationProvider(unittest.TestCase):
 
     def test_get_raw_configuration_prod(self):
         os.environ['PLATFORM'] = 'AWS'
-        os.environ['ENVIRONMENT'] = 'prod'
+        os.environ['STAGE'] = 'prod'
         os.environ['REGION'] = 'east-us-1'
         os.environ['SERVICE_NAME'] = 'hello'
         env_variables = EnvironmentVariables()
@@ -54,7 +54,7 @@ class TestLocalConfigurationProvider(unittest.TestCase):
 
     def test_get_configuration_section_prod(self):
         os.environ['PLATFORM'] = 'AWS'
-        os.environ['ENVIRONMENT'] = 'prod'
+        os.environ['STAGE'] = 'prod'
         os.environ['REGION'] = 'east-us-1'
         os.environ['SERVICE_NAME'] = 'hello'
         env_variables = EnvironmentVariables()
@@ -68,7 +68,7 @@ class TestLocalConfigurationProvider(unittest.TestCase):
 
     def test_get_configuration_section_prod_missing_service_name_should_throw_value_error(self):
         os.environ['PLATFORM'] = 'AWS'
-        os.environ['ENVIRONMENT'] = 'prod'
+        os.environ['STAGE'] = 'prod'
         os.environ['REGION'] = 'east-us-1'
 
         self.assertRaises(ValueError, EnvironmentVariables)

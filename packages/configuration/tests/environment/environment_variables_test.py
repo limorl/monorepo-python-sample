@@ -1,6 +1,6 @@
 import os
 import unittest
-from configuration.environment.environment_variables import EnvironmentVariables, Platform, Environment, reset_environment_variables
+from configuration.environment.environment_variables import EnvironmentVariables, Platform, Stage, reset_environment_variables
 
 
 class TestEnvironmentVariables(unittest.TestCase):
@@ -9,25 +9,25 @@ class TestEnvironmentVariables(unittest.TestCase):
 
     def test_init_environment_variables_dev_env(self):
         os.environ['PLATFORM'] = 'local'
-        os.environ['ENVIRONMENT'] = 'dev'
+        os.environ['STAGE'] = 'dev'
         os.environ['CLOUD_ENDPOINT_OVERRIDE'] = 'http://localhost:4566'
         env = EnvironmentVariables()
 
         self.assertEqual(env.platform, Platform.LOCAL)
         self.assertEqual(env.cloud_endpoint_override, 'http://localhost:4566')
-        self.assertEqual(env.environment, Environment.DEV)
+        self.assertEqual(env.stage, Stage.DEV)
 
     def test_init_environment_variables_prod_env(self):
         os.environ['PLATFORM'] = 'AWS'
         os.environ['REGION'] = 'east-us-1'
-        os.environ['ENVIRONMENT'] = 'prod'
+        os.environ['STAGE'] = 'prod'
         os.environ['SERVICE_NAME'] = 'hello'
         env = EnvironmentVariables()
 
         self.assertEqual(env.platform, Platform.AWS)
         self.assertEqual(env.region, 'east-us-1')
         self.assertEqual(env.service_name, 'hello')
-        self.assertEqual(env.environment, Environment.PROD)
+        self.assertEqual(env.stage, Stage.PROD)
 
     def test_init_environment_variables_empty_env_should_not_fail(self):
         env = EnvironmentVariables()
@@ -37,7 +37,7 @@ class TestEnvironmentVariables(unittest.TestCase):
         self.assertEqual(env.service_name, None)
         self.assertEqual(env.cloud_endpoint_override, None)
         self.assertEqual(env.local_configuration_folder, None)
-        self.assertEqual(env.environment, None)
+        self.assertEqual(env.stage, None)
 
     def test_init_environment_variables_dev_dotenv_path(self):
         dotnev_path = os.path.join(os.getcwd(), 'tests/__data__/.dev.env')
@@ -46,7 +46,7 @@ class TestEnvironmentVariables(unittest.TestCase):
         self.assertEqual(env.platform, Platform.LOCAL)
         self.assertEqual(env.cloud_endpoint_override, 'http://localhost:4566')
         self.assertEqual(env.service_name, 'hello')
-        self.assertEqual(env.environment, Environment.DEV)
+        self.assertEqual(env.stage, Stage.DEV)
 
     def test_init_environment_variables_prod_dotenv_path(self):
         dotnev_path = os.path.join(os.getcwd(), 'tests/__data__/.prod.env')
@@ -55,7 +55,7 @@ class TestEnvironmentVariables(unittest.TestCase):
         self.assertEqual(env.platform, Platform.AWS)
         self.assertEqual(env.region, 'east-us-1')
         self.assertEqual(env.service_name, 'hello')
-        self.assertEqual(env.environment, Environment.PROD)
+        self.assertEqual(env.stage, Stage.PROD)
 
     def test_init_environment_variables_empty_dotenv_path(self):
         dotnev_path = os.path.join(os.getcwd(), 'tests/__data__/.empty.env')
@@ -66,7 +66,7 @@ class TestEnvironmentVariables(unittest.TestCase):
         self.assertEqual(env.service_name, None)
         self.assertEqual(env.cloud_endpoint_override, None)
         self.assertEqual(env.local_configuration_folder, None)
-        self.assertEqual(env.environment, None)
+        self.assertEqual(env.stage, None)
 
     def test_init_environment_variables_unknown_platform_should_throw(self):
         dotnev_path = os.path.join(os.getcwd(), 'tests/__data__/.unknown.platform.env')

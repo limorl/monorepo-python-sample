@@ -7,7 +7,7 @@ services:
     env_file: .env  # Defines variables based on platform architecture
     environment:
       - PLATFORM=local
-      - ENVIRONMENT=dev
+      - STAGE=dev
       - CLOUD_ENDPOINT_OVERRIDE=http://localhost:4566
     volumes:
       - ${PWD}/:${PWD} # Paths has to match wince we are starting containers from within the dev container when invoking lambda using SAM CLI
@@ -26,11 +26,13 @@ services:
       - "127.0.0.1:4566:4566"            # LocalStack Edge Proxy
     environment:
       # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
-      - DEBUG=${DEBUG-}
+      - DEBUG=1
       - DATA_DIR=${DATA_DIR-}
       - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR-}
       - HOST_TMP_FOLDER=${TMPDIR:-/tmp/}localstack
       - DOCKER_HOST=unix:///var/run/docker.sock
+      - SERVICES=lambda,apigateway,s3,cloudformation,iam  # Specify the services you need. Not specifying will start all services.
+
     volumes:
       # - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"

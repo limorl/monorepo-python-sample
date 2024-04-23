@@ -2,10 +2,27 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: SAM Template for Greeting Service
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+
 Globals:
-    Function:
-        Timeout: 5
+  Function:
+    Timeout: 5
+
+Parameters:
+  StageName:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Deployment stage of the application
+
 Resources:
+  GreetingApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+
   GreetingFlaskLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -16,7 +33,7 @@ Resources:
       Environment:
         Variables:
           PLATFORM: AWS
-          ENVIRONMENT: prod
+          STAGE: prod
           SERVICE_NAME: greeting
       CodeUri: .
       Events:
@@ -25,8 +42,12 @@ Resources:
           Properties:
             Path: /hello/{name}
             Method: GET
+            RestApiId:
+              Ref: GreetingApi
         HelloPath:
           Type: Api
           Properties:
             Path: /hello
             Method: GET
+            RestApiId:
+              Ref: GreetingApi
