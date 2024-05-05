@@ -19,10 +19,6 @@ def is_cloud_platform(platform: Platform):
 
 
 class EnvironmentVariables:
-    #_default_platform: Platform = Platform.AWS
-    #_default_region: str = 'us-east-1'
-    #_default_stage: str = 'prod'
-
     def __init__(self, dotenvpath: str = None):
         if dotenvpath:
             load_dotenv(dotenvpath)  # loads environment variables from .env file under project's folder
@@ -43,7 +39,6 @@ class EnvironmentVariables:
         
     def __str__(self):
         return str(self.__class__.__name__) + ": " + str(self.__dict__)
-
 
 def reset_environment_variables():
     if os.getenv('PLATFORM'):
