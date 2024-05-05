@@ -1,5 +1,6 @@
 import logging
 
+
 def get_logger() -> logging.Logger:
     logger = logging.getLogger()
     if len(logger.handlers) > 0:
