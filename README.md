@@ -115,11 +115,18 @@ Upon merging changes into the release branch (e.g., main), the CI pipeline shoul
 
 
 ## Running Locally
-By default, poetry creates a python virtualenv.
-
 ### Local Dev environment
 We're using VS Code DevContainer to run our dockerized development environment.
 To run the development environment locally, click `Shift+Command+p -> Reopen in Container`
+
+We're leveraging AWS Localstack to emulate a cloud environment locally.
+To do so, we are using docker-compose to setup the DevContainer and Localstack containers on your host machine.
+
+After the DevContainer is created, we run the script `./devcontainer/post_create.sh` in which we install all the dependencies and build the packages.
+In addition, it creates two aliases, which allows running aws and sam commands against the local stack.
+So instead of `aws` or `sam`, you can use `aws-localstack` and `sam-localstack`.
+
+Once we add terraform files to create the infrastructure, we'll be able to deploy the infra on our localstack.
 
 ### Local Packages
 To install, build and test a local package, do the following from the repo root:
@@ -143,18 +150,7 @@ In general, every script defined in `packages/scripts` pyproject.toml can be run
 ```shell
 python run_script.py <script-name>
 ```
-
-### Running cloud resources locally
-We're leveraging AWS Localstack to emulate a cloud environment locally.
-To do so, we are using docker-compose to setup the DevContainer and the Localstack container on your host machine.
-
-Run the following to define `aws-localstack` and `sam-localstack` aliased to run `aws cli` and `sam cli` commands against the localstack container.In addition, validate that localstack is set up correctly by listing all S3 buckets on localstack.
-
-```shell
-alias aws-localstack="AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE aws"
-alias sam-localstack="AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE sam"
-aws-localstack s3api list-buckets
-```
+### Running Service Locally
 
 There are several options to run services locally:
 1. Run the flask app
@@ -206,35 +202,29 @@ flask --app app.py run --debug
   sudo sam local invoke --env-vars local.dev.env.json
   ```
 
-#### 3. Deploying lambda locally to Localstack using SAM CLI
+#### 3. Deploying lambda to Localstack using SAM CLI
 To deploy using SAM CLI to LocalStack, set the --endpoint-url parameter to point to LocalStack for all service commands. Here's how you can package and deploy your application (Greeting service for example).
 
 First, create an S3 bucket in local stack for the lambdas packaged using sam cli:
 ```shell
-aws-localstack s3api create-bucket --bucket sam-lambdas
+aws-localstack s3api create-bucket --bucket sam-build-lambdas
 ```
 
-Then, package the lambda:
+Here's an example on how to build and deploy the greeting service:
+
 ```shell
 cd services/greeting
 sam build
-sam-localstack package \
-    --template-file template.yaml \
-    --output-template-file packaged.yaml \
-    --config-env local.dev.env.json \
-    --s3-bucket sam-lambdas \
-    --s3-prefix greeting \
-    --region us-east-1
 ```
 
 Then, deploy using sam deploy:
 ```shell
 sam-localstack deploy \
-    --template-file packaged.yaml \
-    --stack-name GreetingApp \
-    --capabilities CAPABILITY_IAM \
-    --region us-east-1 \
-    --parameter-overrides StageName=dev
+--stack-name greeting-service \
+--capabilities CAPABILITY_IAM \
+--region us-east-1 \
+--s3-bucket sam-build-lambdas \
+--parameter-overrides StageName=dev
 ```
 
 Once deployed to localstack, all lambdas are available on a single endpoint and can be invoked using function name.
@@ -249,7 +239,7 @@ Here's an example result:
     "items": [
         {
             "id": "10-chars-id",
-            "name": "GreetingApp-ServerlessRestApi-...",
+            "name": "GreetingService-ServerlessRestApi-...",
             "createdDate": "2024-04-20T12:41:41+00:00",
             "version": "1.0",
             ...
@@ -260,3 +250,46 @@ Here's an example result:
 ```
 Get the id of your service and your service is available on this endpoint:
 `http://localhost:4566/restapis/<service-id>/dev/_user_request_/hello`
+
+To view localstack logs run:
+```shell
+sudo docker logs localstack-main
+```
+
+To view the lamda functions deployed to localstack run:
+```shell
+sudo aws-localstack lambda list-functions
+```
+
+## Deploying service using Sam CLI
+
+Make sure you are logged in to AWS:
+```shell
+    aws configure sso
+```
+
+Skip SSO session name and set the profile name to default.
+If you are using multiple profiles, add `--profile-name <profile>` to each command.
+
+Then build and deploy:
+```shell
+sam build
+sam deploy \
+--stack-name greeting-service \
+--capabilities CAPABILITY_IAM \
+--region us-east-1 \
+--s3-bucket sam-build-lambdas
+```
+
+Deploy will [automatically use the template under .aws-sam/build](https://stackoverflow.com/questions/59815363/aws-sam-cli-ignoring-my-python-dependencies-during-build-package-and-deplo).
+
+You can issue an http request against the lambda:
+```shell
+curl https://8fwcdbjd95.execute-api.us-east-1.amazonaws.com/prod/hello
+```
+
+```shell
+curl https://8fwcdbjd95.execute-api.us-east-1.amazonaws.com/prod/hello/Danny
+```
+
+ Notice how when deployed remotely, the message returns with 5 exclamation points, according to the remote config. 

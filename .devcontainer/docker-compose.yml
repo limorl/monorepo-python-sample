@@ -24,6 +24,8 @@ services:
       - "127.0.0.1:443:443"              # only required for Pro (LocalStack HTTPS Edge Proxy)
       - "127.0.0.1:4510-4559:4510-4559"  # external service port range
       - "127.0.0.1:4566:4566"            # LocalStack Edge Proxy
+      - "5678:5678"                      # Debug port
+
     environment:
       # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
       - DEBUG=1

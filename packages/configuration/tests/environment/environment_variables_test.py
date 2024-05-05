@@ -19,13 +19,13 @@ class TestEnvironmentVariables(unittest.TestCase):
 
     def test_init_environment_variables_prod_env(self):
         os.environ['PLATFORM'] = 'AWS'
-        os.environ['REGION'] = 'east-us-1'
+        os.environ['REGION'] = 'us-east-1'
         os.environ['STAGE'] = 'prod'
         os.environ['SERVICE_NAME'] = 'hello'
         env = EnvironmentVariables()
 
         self.assertEqual(env.platform, Platform.AWS)
-        self.assertEqual(env.region, 'east-us-1')
+        self.assertEqual(env.region, 'us-east-1')
         self.assertEqual(env.service_name, 'hello')
         self.assertEqual(env.stage, Stage.PROD)
 
@@ -53,7 +53,7 @@ class TestEnvironmentVariables(unittest.TestCase):
         env = EnvironmentVariables(dotnev_path)
 
         self.assertEqual(env.platform, Platform.AWS)
-        self.assertEqual(env.region, 'east-us-1')
+        self.assertEqual(env.region, 'us-east-1')
         self.assertEqual(env.service_name, 'hello')
         self.assertEqual(env.stage, Stage.PROD)
 

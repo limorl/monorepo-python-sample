@@ -1,6 +1,8 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import Any
 
+logger = logging.getLogger()
 
 class IConfigurationProvider(ABC):
     __initiated = False
@@ -13,11 +15,11 @@ class IConfigurationProvider(ABC):
             return
 
         self.__initiating = True
-        self.__config = self._get_configuration()
+        self.__config = self._load_configuration()
         self.__initiating = False
         self.__initiated = True
 
-        print(f"init_configuration: __confg: {self.__config}")
+        logger.debug(f"init_configuration: __confg: {self.__config}")
 
     @abstractmethod
     def get_configuration(self, key: str) -> Any:
@@ -25,7 +27,6 @@ class IConfigurationProvider(ABC):
         if not self.__initiated:
             raise RuntimeError('Configuration provider is not initiated.')
 
-        print(f"get_configuration: __confg: {self.__config}")
         config = self.__config.get(key, None)
         if not config:
             raise KeyError(f'Configuration ${key} was not found')
@@ -33,5 +34,5 @@ class IConfigurationProvider(ABC):
         return config
 
     @abstractmethod
-    def _get_configuration(self) -> Any:
+    def _load_configuration(self) -> Any:
         pass

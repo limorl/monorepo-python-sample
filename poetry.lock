@@ -1334,6 +1334,16 @@ files = [
 typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
 [[package]]
+name = "pydevd-pycharm"
+version = "241.15989.155"
+description = "PyCharm Debugger (used in PyCharm and PyDev)"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pydevd-pycharm-241.15989.155.tar.gz", hash = "sha256:428d98047ecbd7f347fb5e443869dead42aa0b389d8b64fc2034bb1cedae3609"},
+]
+
+[[package]]
 name = "pyflakes"
 version = "3.2.0"
 description = "passive checker of Python programs"
@@ -1989,4 +1999,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "90da8b3e0b2cecdd79f8d1e23607e295baa8ef5dabb6282c59371ffe2971c15c"
+content-hash = "5afc8168df82bf4834e882f8b8dc61c65497b9ac7b4d453e8f39ac54169b3511"
