@@ -126,13 +126,12 @@ After the DevContainer is created, we run the script `./devcontainer/post_create
 In addition, it creates two aliases, which allows running aws and sam commands against the local stack.
 So instead of `aws` or `sam`, you can use `aws-localstack` and `sam-localstack`.
 
-**NOTE:** In order for these aliases to be available, open anew bash terminal and try them.
-If for some reason it's not working, you can define them naually as follows:
+**NOTE:** In order for these aliases to be available, open a new bash terminal and try them.
+If for some reason the aliases are not recognized, you can set them up naually as follows:
 ```shell
 echo "alias aws-localstack='AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE aws'" >> ~/.bash_aliases
 echo "alias sam-localstack='AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE sam'" >> ~/.bash_aliases
 ```
-
 
 Once we add terraform files to create the infrastructure, we'll be able to deploy the infra on our localstack.
 
@@ -261,7 +260,7 @@ To view localstack logs run:
 sudo docker logs localstack-main
 ```
 
-## Deploying service to AWS using Sam CLI
+## Deploying services to AWS using Sam CLI
 
 Make sure you are logged in to AWS:
 ```shell
