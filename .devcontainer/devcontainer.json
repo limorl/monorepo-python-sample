@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.202.5/containers/typescript-node
 {
-    "name": "Urecsys - Dev container",
+    "name": "Python Monorepo Sample - Dev container",
     "dockerComposeFile": "docker-compose.yml",
     "service": "devcontainer",
     "workspaceFolder": "${localWorkspaceFolder}",

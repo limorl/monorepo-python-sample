@@ -1,6 +1,6 @@
 # Sample Python Monorepo [A work in progress]
 
-This is a sample monorepo that can be used as a reference to get familiar with the concept of:
+This is a sample monorepo that can be used as a starting point for a python project, to ramp up on the following concepts:
 * Developing inside Devcontainer (dockerized development environment)
 * Python monorepo and solution structure
 * pre-commit hooks
@@ -8,17 +8,18 @@ This is a sample monorepo that can be used as a reference to get familiar with t
 * Unit testing lambda services
 * Terraform
 
-### TODO
-It's partial and still a few TODOS to complete the sample:
-1. Adding Docker file for windows environment (currently for Mac with Apple Silicone) and update Wiki acordingly
-2. Extract configuration-provide.py into a dedicated package under packages/
+### Next Steps
+The monorepo will be extendedt to support:
+1. Extract configuration-provider.py into a dedicated package under packages/
 3. [Done] [Still need to fix folder structure for poetry packaging]Use Poetry to manage package versions and to manage scripts reunning recursively (similarly to pnpm for javascript).
    Once done, the pre-commit hook for unit tests can be updated to run pytest recursively.
 4. Use Terraform to deploy infra on local stack and on AWS
-5. Add a deployment.yml workflow to deploy to AWS
+5. Add a deployment.yml workflow to deploy to AWS and to Localstack
 6. Define Branch policy to require PR approval and squash and rebase merge 
 7. Add e2e.yml workflow with a simple e2e test which runs nightly (every night)
 
+## Issues
+* !!! Deployment to Localstack using sam deploy fails. Dependencies are not packaged correctly.
 
 ## Sample
 The sample includes two lambda services:
@@ -114,11 +115,18 @@ Upon merging changes into the release branch (e.g., main), the CI pipeline shoul
 
 
 ## Running Locally
-By default, poetry creates a python virtualenv.
-
 ### Local Dev environment
 We're using VS Code DevContainer to run our dockerized development environment.
 To run the development environment locally, click `Shift+Command+p -> Reopen in Container`
+
+We're leveraging AWS Localstack to emulate a cloud environment locally.
+To do so, we are using docker-compose to setup the DevContainer and Localstack containers on your host machine.
+
+After the DevContainer is created, we run the script `./devcontainer/post_create.sh` in which we install all the dependencies and build the packages.
+In addition, it creates two aliases, which allows running aws and sam commands against the local stack.
+So instead of `aws` or `sam`, you can use `aws-localstack` and `sam-localstack`.
+
+Once we add terraform files to create the infrastructure, we'll be able to deploy the infra on our localstack.
 
 ### Local Packages
 To install, build and test a local package, do the following from the repo root:
@@ -142,39 +150,48 @@ In general, every script defined in `packages/scripts` pyproject.toml can be run
 ```shell
 python run_script.py <script-name>
 ```
+### Running Service Locally
 
-### Running cloud resources locally
-We're leveraging AWS Localstack to emulate a cloud environment locally.
-To do so, we are using docker-compose to setup the DevContainer and the Localstack container.
+There are several options to run services locally:
+1. Run the flask app
+2. Run local lambda using sam cli
+3. Deploy the lambda to localstack 
 
-### Running lambda locally
+#### 1. Running the flask application directly
+
+```shell
+cd services/<my-service>
+flask --app app.py run --debug
+```
+
+#### 2.Running lambda locally using SAM CLI
 * On MacOS
    Make sure your workspace folder is shared from the docker host.
   * Lambda handler with API:
-    ```shell
-    cd services/<service-folder> 
-    poetry install
-    poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
-    sam build
-    sudo sam local start-api --container-host host.docker.internal
-   ```
+  ```shell
+  cd services/<service-folder> 
+  poetry install
+  poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
+  sam build
+  sudo sam local start-api --container-host host.docker.internal --env-vars local.dev.env.json
+  ```
   * Lambda handler without API:
   ```shell
   cd services/<service-folder>
   poetry install
   poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
   sam build
-  sudo sam local invoke --container-host host.docker.internal
+  sudo sam local invoke --container-host host.docker.internal --env-vars local.dev.env.json
   ```
 
-* On Windows
+* Other Linux machines
   * Lambda handler with API:
   ```shell
   cd services/<service-folder>
   poetry install
   poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
   sam build
-  sudo sam local start-api
+  sudo sam local start-api --env-vars local.dev.env.json
   ```
   * Lambda handler without  API:
   ```shell
@@ -182,7 +199,97 @@ To do so, we are using docker-compose to setup the DevContainer and the Localsta
   poetry install
   poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py 
   sam build
-  sudo sam local invoke
+  sudo sam local invoke --env-vars local.dev.env.json
   ```
 
-You can also run the flask application directly without invoking the lambda: `flask --app <file-with-flask-app> run --debug`
+#### 3. Deploying lambda to Localstack using SAM CLI
+To deploy using SAM CLI to LocalStack, set the --endpoint-url parameter to point to LocalStack for all service commands. Here's how you can package and deploy your application (Greeting service for example).
+
+First, create an S3 bucket in local stack for the lambdas packaged using sam cli:
+```shell
+aws-localstack s3api create-bucket --bucket sam-build-lambdas
+```
+
+Here's an example on how to build and deploy the greeting service:
+
+```shell
+cd services/greeting
+sam build
+```
+
+Then, deploy using sam deploy:
+```shell
+sam-localstack deploy \
+--stack-name greeting-service \
+--capabilities CAPABILITY_IAM \
+--region us-east-1 \
+--s3-bucket sam-build-lambdas \
+--parameter-overrides StageName=dev
+```
+
+Once deployed to localstack, all lambdas are available on a single endpoint and can be invoked using function name.
+You can list all lambda APIs using:
+```shell
+aws-localstack apigateway get-rest-apis --region us-east-1
+```
+
+Here's an example result:
+```json
+{
+    "items": [
+        {
+            "id": "10-chars-id",
+            "name": "GreetingService-ServerlessRestApi-...",
+            "createdDate": "2024-04-20T12:41:41+00:00",
+            "version": "1.0",
+            ...
+        }
+    ]
+}
+
+```
+Get the id of your service and your service is available on this endpoint:
+`http://localhost:4566/restapis/<service-id>/dev/_user_request_/hello`
+
+To view localstack logs run:
+```shell
+sudo docker logs localstack-main
+```
+
+To view the lamda functions deployed to localstack run:
+```shell
+sudo aws-localstack lambda list-functions
+```
+
+## Deploying service using Sam CLI
+
+Make sure you are logged in to AWS:
+```shell
+    aws configure sso
+```
+
+Skip SSO session name and set the profile name to default.
+If you are using multiple profiles, add `--profile-name <profile>` to each command.
+
+Then build and deploy:
+```shell
+sam build
+sam deploy \
+--stack-name greeting-service \
+--capabilities CAPABILITY_IAM \
+--region us-east-1 \
+--s3-bucket sam-build-lambdas
+```
+
+Deploy will [automatically use the template under .aws-sam/build](https://stackoverflow.com/questions/59815363/aws-sam-cli-ignoring-my-python-dependencies-during-build-package-and-deplo).
+
+You can issue an http request against the lambda:
+```shell
+curl https://8fwcdbjd95.execute-api.us-east-1.amazonaws.com/prod/hello
+```
+
+```shell
+curl https://8fwcdbjd95.execute-api.us-east-1.amazonaws.com/prod/hello/Danny
+```
+
+ Notice how when deployed remotely, the message returns with 5 exclamation points, according to the remote config. 

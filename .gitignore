@@ -198,3 +198,4 @@ requirements.txt
 
 # AWS SAM
 .aws-sam/
+packaged.yaml
