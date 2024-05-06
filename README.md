@@ -224,68 +224,44 @@ sam-localstack deploy \
 --capabilities CAPABILITY_IAM \
 --region us-east-1 \
 --s3-bucket sam-build-lambdas \
---parameter-overrides 'StageName=dev PLATFORM=local'
+--parameter-overrides 'Stage=dev Platform=local'
 ```
 
-if you want to deploy the lambda functions with production configuration, then use `--parameter-overrides StageName=dev`
-
-<!--Once deployed to localstack, all lambdas are available on a single endpoint and can be invoked using function name.
-You can list all lambda APIs using:
-```shell
-aws-localstack apigateway get-rest-apis --region us-east-1
-aws-localstack lambda list-dunctions
-```-->
+**NOTE:** If you want to deploy the lambda functions with production configuration, then use `--parameter-overrides Stage=prod Platform=AWS`
 
 Once deployed to localstack, all lambdas are available on a single endpoint and can be invoked using function name.
-You can list all functions using:
+
+You can list all functions by running:
 ```shell
 aws-localstack lambda list-functions
 ```
 
+Use the function name in the returned list when invoking the lambda.
 For example, for greeting service, invoke the lambda function:
 ```shell
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingFlaskLambda-670bdb4a \
+--function-name greeting-service-GreetingFlaskLambda-XXXXXXXX \
 --payload '{"headers": {}, "path": "/hello", "httpMethod": "GET"}' \
 --cli-binary-format raw-in-base64-out \
 output.txt
 
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingFlaskLambda-670bdb4a \
+--function-name greeting-service-GreetingFlaskLambda-XXXXXXXX \
 --payload '{"headers": {}, "path": "/hello/Danny", "httpMethod": "GET"}' \
 --cli-binary-format raw-in-base64-out \
 output.txt
 ```
 
-Here's an example result:
-```json
-{
-    "items": [
-        {
-            "id": "10-chars-id",
-            "name": "GreetingService-ServerlessRestApi-...",
-            "createdDate": "2024-04-20T12:41:41+00:00",
-            "version": "1.0",
-            ...
-        }
-    ]
-}
-
-```
-Get the id of your service and your service is available on this endpoint:
+<!--Get the id of your service and your service is available on this endpoint:
 `http://localhost:4566/restapis/<restapi-id>/dev/_user_request_/hello`
+-->
 
 To view localstack logs run:
 ```shell
 sudo docker logs localstack-main
 ```
 
-To view the lamda functions deployed to localstack run:
-```shell
-sudo aws-localstack lambda list-functions
-```
-
-## Deploying service using Sam CLI
+## Deploying service to AWS using Sam CLI
 
 Make sure you are logged in to AWS:
 ```shell
