@@ -126,6 +126,14 @@ After the DevContainer is created, we run the script `./devcontainer/post_create
 In addition, it creates two aliases, which allows running aws and sam commands against the local stack.
 So instead of `aws` or `sam`, you can use `aws-localstack` and `sam-localstack`.
 
+**NOTE:** In order for these aliases to be available, open anew bash terminal and try them.
+If for some reason it's not working, you can define them naually as follows:
+```shell
+echo "alias aws-localstack='AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE aws'" >> ~/.bash_aliases
+echo "alias sam-localstack='AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE sam'" >> ~/.bash_aliases
+```
+
+
 Once we add terraform files to create the infrastructure, we'll be able to deploy the infra on our localstack.
 
 ### Local Packages
@@ -170,16 +178,12 @@ flask --app app.py run --debug
   * Lambda handler with API:
   ```shell
   cd services/<service-folder> 
-  poetry install
-  poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
   sam build
   sudo sam local start-api --container-host host.docker.internal --env-vars local.dev.env.json
   ```
   * Lambda handler without API:
   ```shell
-  cd services/<service-folder>
-  poetry install
-  poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
+  cd services/<service-folder>  
   sam build
   sudo sam local invoke --container-host host.docker.internal --env-vars local.dev.env.json
   ```
@@ -188,16 +192,12 @@ flask --app app.py run --debug
   * Lambda handler with API:
   ```shell
   cd services/<service-folder>
-  poetry install
-  poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py  
   sam build
   sudo sam local start-api --env-vars local.dev.env.json
   ```
   * Lambda handler without  API:
   ```shell
   cd services/<service-folder>
-  poetry install
-  poetry run python ../../packages/scripts/scripts/poetry/export_requirements.py 
   sam build
   sudo sam local invoke --env-vars local.dev.env.json
   ```
@@ -224,13 +224,37 @@ sam-localstack deploy \
 --capabilities CAPABILITY_IAM \
 --region us-east-1 \
 --s3-bucket sam-build-lambdas \
---parameter-overrides StageName=dev
+--parameter-overrides 'StageName=dev PLATFORM=local'
 ```
 
-Once deployed to localstack, all lambdas are available on a single endpoint and can be invoked using function name.
+if you want to deploy the lambda functions with production configuration, then use `--parameter-overrides StageName=dev`
+
+<!--Once deployed to localstack, all lambdas are available on a single endpoint and can be invoked using function name.
 You can list all lambda APIs using:
 ```shell
 aws-localstack apigateway get-rest-apis --region us-east-1
+aws-localstack lambda list-dunctions
+```-->
+
+Once deployed to localstack, all lambdas are available on a single endpoint and can be invoked using function name.
+You can list all functions using:
+```shell
+aws-localstack lambda list-functions
+```
+
+For example, for greeting service, invoke the lambda function:
+```shell
+aws-localstack lambda invoke \
+--function-name greeting-service-GreetingFlaskLambda-670bdb4a \
+--payload '{"headers": {}, "path": "/hello", "httpMethod": "GET"}' \
+--cli-binary-format raw-in-base64-out \
+output.txt
+
+aws-localstack lambda invoke \
+--function-name greeting-service-GreetingFlaskLambda-670bdb4a \
+--payload '{"headers": {}, "path": "/hello/Danny", "httpMethod": "GET"}' \
+--cli-binary-format raw-in-base64-out \
+output.txt
 ```
 
 Here's an example result:
@@ -249,7 +273,7 @@ Here's an example result:
 
 ```
 Get the id of your service and your service is available on this endpoint:
-`http://localhost:4566/restapis/<service-id>/dev/_user_request_/hello`
+`http://localhost:4566/restapis/<restapi-id>/dev/_user_request_/hello`
 
 To view localstack logs run:
 ```shell
