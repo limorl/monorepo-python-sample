@@ -15,7 +15,7 @@ pydevd-pycharm = "^241.15989.155"
 [tool.poetry.dev-dependencies]
 python-semantic-release = "9.3.1"
 nox-poetry = "1.0.3"
-pytest = "7.0.0"
+pytest = "8.2.0"
 pytest-cov = "3.0.0"
 flake8 = "7.0.0"
 pydevd-pycharm = "241.15989.155"
