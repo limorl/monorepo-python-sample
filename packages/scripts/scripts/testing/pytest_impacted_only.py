@@ -9,14 +9,15 @@ from typing import List, Any
 def _is_python_file(file_path: str) -> bool:
     return file_path.endswith('.py')
 
+
 def _get_test_file(file_path: str, package_paths: List[str]) -> str:
     file_name = os.path.basename(file_path)
     test_file_name_1 = file_name.replace('.py', '_test.py')
-    test_file_name_2 =  f'test_{file_name}'
+    test_file_name_2 = f'test_{file_name}'
 
     for package_path in package_paths:
         if file_path.startswith(package_path):
-            package_name = os.path.basename(package_path).replace('-','_')
+            package_name = os.path.basename(package_path).replace('-', '_')
             package_code_dir = os.path.join(package_path, package_name)
             package_test_dir = os.path.join(package_path, 'tests')
 
@@ -27,6 +28,7 @@ def _get_test_file(file_path: str, package_paths: List[str]) -> str:
                 return test_file_path_1
             if os.path.exists(test_file_path_2):
                 return test_file_path_2
+
 
 def _file_ignored(file_path: str, spec: Any) -> bool:
     dir_path = os.path.dirname(file_path)
