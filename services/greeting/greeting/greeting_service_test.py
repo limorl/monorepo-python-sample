@@ -54,8 +54,8 @@ class TestGreetingService(unittest.TestCase):
     def test_hi_there_with_three_questionmarks(self):
         greeting = GreetingService()
 
-        msg = greeting.hi_there("Yakov", 3)
-        expected = "hi Yakov, how you doin' ???"
+        msg = greeting.hi_there("Jack", 3)
+        expected = "hi Jack, how you doin' ???"
 
         self.assertEqual(msg, expected)
 
