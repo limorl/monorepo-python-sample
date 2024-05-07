@@ -30,7 +30,7 @@ def run_pytest_for_package(package_dir):
         subprocess.run(["pytest"], cwd=package_dir)
 
 
-def main():
+def pytest_all():
     package_paths = get_package_paths()
     for path in package_paths:
         print("Runnin Pytest for package: ", path)
@@ -38,4 +38,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    pytest_all()
