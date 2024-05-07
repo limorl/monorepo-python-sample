@@ -14,7 +14,7 @@ This is a sample monorepo that can be used as a starting point for a python proj
 ### Next Steps
 The monorepo will be extendedt to support:
 1. Implement AppConfigConfigurationProvider
-2. Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/
+2. Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/)
 4. Terraform to deploy infra on localstack and on AWS
 5. Add a deployment.yml workflow to deploy to AWS and to Localstack
 7. Add e2e.yml workflow with a simple e2e test which runs nightly (every night)
