@@ -43,6 +43,23 @@ class TestGreetingService(unittest.TestCase):
 
         self.assertEqual(msg, expected)
 
+    def test_blabla_with_four_exclamations(self):
+        greeting = GreetingService()
+
+        msg = greeting.dumpsterFire("Yakov", 4)
+        expected = "blabla Yakov!!!!"
+
+        self.assertEqual(msg, expected)
+
+    def test_hi_there_with_three_questionmarks(self):
+        greeting = GreetingService()
+
+        msg = greeting.hi_there("Yakov", 3)
+        expected = "hi Yakov, how you doin' ???"
+
+        self.assertEqual(msg, expected)
+
+
 
 if __name__ == "__main__":
 
