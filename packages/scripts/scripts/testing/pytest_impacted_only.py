@@ -1,65 +1,76 @@
 import os
-import pathspec
 import subprocess
 
-
-def load_gitignore(root_dir):
-    gitignore_path = os.path.join(root_dir, '.gitignore')
-    patterns = []
-    if os.path.exists(gitignore_path):
-        with open(gitignore_path, 'r') as file:
-            patterns = file.readlines()
-    return pathspec.PathSpec.from_lines('gitwildmatch', patterns)
+from scripts.utils.packages import get_package_paths
+from scripts.utils.git import load_gitignore, get_changed_files
+from typing import List, Any
 
 
-def find_packages_not_ignored(root_dir, spec):
-    for dirpath, dirnames, filenames in os.walk(root_dir):
-        if spec.match_file(dirpath):
-            continue
-        if "__init__.py" in filenames:
-            yield dirpath
-
-        # Remove ignored directories
-        dirnames[:] = [d for d in dirnames if not spec.match_file(os.path.join(dirpath, d))]
+def _is_python_file(file_path: str) -> bool:
+    return file_path.endswith('.py')
 
 
-def git_changed_files(directory):
-    changed_files = subprocess.check_output(
-        ["git", "diff", "--name-only", "origin/main"],
-        cwd=directory,
-        text=True
-    )
-    return changed_files.splitlines()
+def _get_test_file(file_path: str, package_paths: List[str]) -> str:
+    file_name = os.path.basename(file_path)
+    test_file_name_1 = file_name.replace('.py', '_test.py')
+    test_file_name_2 = f'test_{file_name}'
+
+    for package_path in package_paths:
+        if file_path.startswith(package_path):
+            package_name = os.path.basename(package_path).replace('-', '_')
+            package_code_dir = os.path.join(package_path, package_name)
+            package_test_dir = os.path.join(package_path, 'tests')
+
+            test_file_path_1 = file_path.replace(package_code_dir, package_test_dir).replace(file_name, test_file_name_1)
+            test_file_path_2 = file_path.replace(package_code_dir, package_test_dir).replace(file_name, test_file_name_2)
+
+            if os.path.exists(test_file_path_1):
+                return test_file_path_1
+            if os.path.exists(test_file_path_2):
+                return test_file_path_2
 
 
-# TODO @limorl: Fix to comply with new package structure
-def identify_impacted_files(changed_files):
-    impacted_files = []
+def _file_ignored(file_path: str, spec: Any) -> bool:
+    dir_path = os.path.dirname(file_path)
+
+    return spec.match_file(file_path) or spec.match_file(dir_path)
+
+
+def get_impacted_test_files(changed_files: List[str], package_paths: List[str]) -> List[str]:
+    impacted_test_files = []
+
     for file in changed_files:
-        if file.endswith("_test.py") or file.endswith(".py"):
-            impacted_files.append(file)
-            if not file.endswith("_test.py"):
-                test_file = file.replace(".py", "_test.py")
-                if os.path.exists(test_file):
-                    impacted_files.append(test_file)
-    return impacted_files
+        if file.endswith('_test.py') or file.startswith('test_'):
+            impacted_test_files.append(file)
+        else:
+            test_file = _get_test_file(file, package_paths)
+            if test_file:
+                impacted_test_files.append(test_file)
+    return impacted_test_files
 
 
-def run_pytest_on_files(directory, files):
+def run_pytest_on_files(dir: str, files) -> List[str]:
     if files:
-        parent_directory = os.path.dirname(directory)
-        print("Runnin tests on impacted files under: ", parent_directory)
-        subprocess.run(["pytest"], cwd=parent_directory)
+        subprocess.run(['pytest', '-vs', ' '.join(files)], cwd=dir)
 
 
-def main(root_dir):
+def _get_relative_path(full_path: str, relative_path: str) -> str:
+    return os.path.relpath(full_path, relative_path)
+
+
+def pytest_impacted_only():
+    root_dir = os.getcwd()
     spec = load_gitignore(root_dir)
-    for package in find_packages_not_ignored(root_dir, spec):
-        changed_files = git_changed_files(package)
-        impacted_files = identify_impacted_files(changed_files)
-        run_pytest_on_files(package, impacted_files)
+    package_paths = list(map(lambda x: _get_relative_path(str(x), root_dir), get_package_paths()))
+    changed_py_files = list(filter(_is_python_file, get_changed_files(root_dir)))
+    changed_py_files_not_ignored = list(filter(lambda x: not _file_ignored(x, spec), changed_py_files))
+
+    impacted_test_files = get_impacted_test_files(changed_py_files_not_ignored, package_paths)
+
+    if impacted_test_files:
+        print(f'Running {len(impacted_test_files)} impacted tests under {root_dir}')
+        run_pytest_on_files(root_dir, impacted_test_files)
 
 
 if __name__ == "__main__":
-    root_dir = os.getcwd()
-    main(root_dir)
+    pytest_impacted_only()
