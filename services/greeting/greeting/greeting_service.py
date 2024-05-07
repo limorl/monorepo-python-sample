@@ -32,5 +32,5 @@ class GreetingService(IGreetingService):
     def dumpsterFire(self, name: str, numOfExclamations: int = 1) -> str:
         return f"blabla {name}{'!' * numOfExclamations}"
     
-    def hi_there(self, name:str, numofquestionmarks: int = 1) -> str:
+    def hi_there(self, name:str, numofquestionmarks: int = 1) -> str: 
         return f"hi {name}, how you doin' {'?' * numofquestionmarks}"
