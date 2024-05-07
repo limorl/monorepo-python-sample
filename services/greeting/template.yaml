@@ -8,7 +8,7 @@ Globals:
     Timeout: 5
 
 Parameters:
-  StageName:
+  Stage:
     Type: String
     Default: prod
     AllowedValues:
@@ -17,11 +17,19 @@ Parameters:
       - prod
     Description: Deployment stage of the application
 
+  Platform:
+    Type: String
+    Default: AWS
+    AllowedValues:
+      - AWS
+      - local
+    Description: Platform where the Lambda function is deployed
+
 Resources:
   GreetingApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: prod
+      StageName: !Ref Stage
 
   GreetingFlaskLambda:
     Type: AWS::Serverless::Function
@@ -32,8 +40,8 @@ Resources:
         - arm64
       Environment:
         Variables:
-          PLATFORM: AWS
-          STAGE: prod
+          PLATFORM: !Ref Platform
+          STAGE: !Ref Stage
           SERVICE_NAME: greeting
       CodeUri: .
       Events:

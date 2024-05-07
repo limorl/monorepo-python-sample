@@ -3,7 +3,7 @@ from .lambda_logging import get_logger
 from .greeting_service import IGreetingService, GreetingService
 from configuration.app.configuration_provider import IConfigurationProvider
 from configuration.app.local_configuration_provider import LocalConfigurationProvider
-from configuration.environment.environment_variables import EnvironmentVariables, Stage
+from configuration.environment.environment_variables import EnvironmentVariables, Platform
 # from configuration.app.app_config_configuration_provider import AppConfigConfigurationProvider
 from flask import Flask
 
@@ -38,7 +38,7 @@ logger.debug(f"greeting-service app created with env_variables: {env_variables}"
 
 config_provider: IConfigurationProvider = None
 
-if env_variables.stage == Stage.DEV:
+if env_variables.platform == Platform.LOCAL:
     config_provider = LocalConfigurationProvider(env_variables)
 else:
     # TODO: Implement AppConfigConfigurationProvider using AWS AppConfig and then uncomment instead of LocalConfigurationProvider
