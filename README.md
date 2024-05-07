@@ -2,24 +2,25 @@
 
 This is a sample monorepo that can be used as a starting point for a python project, to ramp up on the following concepts:
 * Developing inside Devcontainer (dockerized development environment)
-* Python monorepo and solution structure
+* Working with Localstack
+* Building and running serverlass apps locally using sam cli
+* Poetry for dependency management and packaging
 * pre-commit hooks
-* Building and running locally
 * Unit testing lambda services
 * Terraform
+* Github wrkflows
+* Changeset for package versions
 
 ### Next Steps
 The monorepo will be extendedt to support:
-1. Extract configuration-provider.py into a dedicated package under packages/
-3. [Done] [Still need to fix folder structure for poetry packaging]Use Poetry to manage package versions and to manage scripts reunning recursively (similarly to pnpm for javascript).
-   Once done, the pre-commit hook for unit tests can be updated to run pytest recursively.
-4. Use Terraform to deploy infra on local stack and on AWS
+1. Implement AppConfigConfigurationProvider
+2. Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/
+4. Terraform to deploy infra on localstack and on AWS
 5. Add a deployment.yml workflow to deploy to AWS and to Localstack
-6. Define Branch policy to require PR approval and squash and rebase merge 
 7. Add e2e.yml workflow with a simple e2e test which runs nightly (every night)
 
 ## Issues
-* !!! Deployment to Localstack using sam deploy fails. Dependencies are not packaged correctly.
+* Semantic released was not tested / verified
 
 ## Sample
 The sample includes two lambda services:
