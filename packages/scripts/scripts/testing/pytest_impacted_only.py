@@ -38,7 +38,7 @@ def _file_ignored(file_path: str, spec: Any) -> bool:
 
 def get_impacted_test_files(changed_files: List[str], package_paths: List[str]) -> List[str]:
     impacted_test_files = []
-  
+
     for file in changed_files:
         if file.endswith('_test.py') or file.startswith('test_'):
             impacted_test_files.append(file)
@@ -51,7 +51,7 @@ def get_impacted_test_files(changed_files: List[str], package_paths: List[str]) 
 
 def run_pytest_on_files(dir: str, files) -> List[str]:
     if files:
-        subprocess.run(['pytest', '-vs', ' '.join(files) ], cwd=dir)
+        subprocess.run(['pytest', '-vs', ' '.join(files)], cwd=dir)
 
 
 def _get_relative_path(full_path: str, relative_path: str) -> str:
