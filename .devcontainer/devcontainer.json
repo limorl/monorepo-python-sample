@@ -5,6 +5,9 @@
     "dockerComposeFile": "docker-compose.yml",
     "service": "devcontainer",
     "workspaceFolder": "${localWorkspaceFolder}",
+    "mounts": [
+        "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached",
+    ],
     "runArgs": ["--env-file",".devcontainer/.env"],
             // Set *default* container specific settings.json values on container create.
     "settings": {
