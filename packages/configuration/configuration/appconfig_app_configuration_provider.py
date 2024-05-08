@@ -1,7 +1,7 @@
-from configuration.app.configuration_provider import IConfigurationProvider
+from configuration.app_configuration_provider import IAppConfigurationProvider
 
 
-class AppConfigConfigurationProvider(IConfigurationProvider):
+class AppConfigAppConfigurationProvider(IAppConfigurationProvider):
     """TODO: Implement
     Configuration Provider based on AWS App Config.
     When deploying services, the configuration files under the service's /config folders are deployed"""

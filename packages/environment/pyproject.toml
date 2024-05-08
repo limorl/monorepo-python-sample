@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "configuration"
+name = "environment"
 version = "0.1.0"
-description = "Configuration Provider based on configuration file"
+description = "Environment Variables"
 authors = ["Limor Lahiani"]
 readme = "README.md"
 
@@ -9,7 +9,6 @@ readme = "README.md"
 python = "^3.10"
 python-dotenv="1.0.1"
 jsonify = "0.5"
-environment = { path = "../environment" }
 
 [build-system]
 requires = ["poetry-core"]

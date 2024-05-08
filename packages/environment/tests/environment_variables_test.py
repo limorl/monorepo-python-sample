@@ -1,6 +1,6 @@
 import os
 import unittest
-from configuration.environment.environment_variables import EnvironmentVariables, Platform, Stage, reset_environment_variables
+from environment.environment_variables import EnvironmentVariables, Platform, Stage, reset_environment_variables
 
 
 class TestEnvironmentVariables(unittest.TestCase):
