@@ -1,6 +1,6 @@
 import os
 import pytest
-from configuration.local_app_configuration_provider import LocalAppConfigurationProvider
+from configuration.local_configuration_provider import LocalConfigurationProvider
 from environment.environment_variables import EnvironmentVariables, reset_environment_variables
 
 
@@ -16,11 +16,11 @@ def test_get_raw_configuration_dev(reset_env):
     os.environ['STAGE'] = 'dev'
 
     env_variables = EnvironmentVariables()
-    app_config_provider = LocalAppConfigurationProvider(env_variables)
-    app_config_provider.init_configuration()
+    config_provider = LocalConfigurationProvider(env_variables)
+    config_provider.init_configuration()
 
-    assert app_config_provider.get_configuration('raw1') == 1
-    assert app_config_provider.get_configuration('raw2') == 2
+    assert config_provider.get_configuration('raw1') == 1
+    assert config_provider.get_configuration('raw2') == 2
 
 
 def test_get_configuration_section_dev(reset_env):
@@ -28,11 +28,11 @@ def test_get_configuration_section_dev(reset_env):
     os.environ['STAGE'] = 'dev'
 
     env_variables = EnvironmentVariables()
-    app_config_provider = LocalAppConfigurationProvider(env_variables)
+    config_provider = LocalConfigurationProvider(env_variables)
 
-    app_config_provider.init_configuration()
-    config1 = app_config_provider.get_configuration('section1')
-    config10 = app_config_provider.get_configuration('section10')
+    config_provider.init_configuration()
+    config1 = config_provider.get_configuration('section1')
+    config10 = config_provider.get_configuration('section10')
 
     assert config1['num1'] == 1
     assert config1['str1'] == 'val1'
@@ -47,11 +47,11 @@ def test_get_raw_configuration_prod(reset_env):
     os.environ['SERVICE_NAME'] = 'hello'
 
     env_variables = EnvironmentVariables()
-    app_config_provider = LocalAppConfigurationProvider(env_variables)
-    app_config_provider.init_configuration()
+    config_provider = LocalConfigurationProvider(env_variables)
+    config_provider.init_configuration()
 
-    assert app_config_provider.get_configuration('raw100') == 100
-    assert app_config_provider.get_configuration('raw200') == 200
+    assert config_provider.get_configuration('raw100') == 100
+    assert config_provider.get_configuration('raw200') == 200
 
 
 def test_get_configuration_section_prod(reset_env):
@@ -61,10 +61,10 @@ def test_get_configuration_section_prod(reset_env):
     os.environ['SERVICE_NAME'] = 'hello'
 
     env_variables = EnvironmentVariables()
-    app_config_provider = LocalAppConfigurationProvider(env_variables)
+    config_provider = LocalConfigurationProvider(env_variables)
 
-    app_config_provider.init_configuration()
-    config = app_config_provider.get_configuration('section100')
+    config_provider.init_configuration()
+    config = config_provider.get_configuration('section100')
 
     assert config['num100'] == 100
     assert config['str200'] == '200'

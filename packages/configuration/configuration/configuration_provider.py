@@ -5,7 +5,7 @@ from typing import Any
 logger = logging.getLogger()
 
 
-class IAppConfigurationProvider(ABC):
+class IConfigurationProvider(ABC):
     __initiated = False
     __initiating = False
     __config: Any = {}

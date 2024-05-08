@@ -1,8 +1,8 @@
 import os
 from .lambda_logging import get_logger
 from .greeting_service import IGreetingService, GreetingService
-from configuration.app_configuration_provider import IAppConfigurationProvider
-from configuration.local_app_configuration_provider import LocalAppConfigurationProvider
+from configuration.configuration_provider import IConfigurationProvider
+from configuration.local_configuration_provider import LocalConfigurationProvider
 from environment.environment_variables import EnvironmentVariables, Platform
 # from configuration.app.app_config_configuration_provider import AppConfigConfigurationProvider
 from flask import Flask
@@ -10,7 +10,7 @@ from flask import Flask
 logger = get_logger()
 
 
-def create_app(configProvider: IAppConfigurationProvider, greeting_service: IGreetingService):
+def create_app(configProvider: IConfigurationProvider, greeting_service: IGreetingService):
     app = Flask(__name__, instance_relative_config=True)
 
     greeting = greeting_service
@@ -36,13 +36,13 @@ def create_app(configProvider: IAppConfigurationProvider, greeting_service: IGre
 env_variables = EnvironmentVariables()
 logger.debug(f"greeting-service app created with env_variables: {env_variables}")
 
-config_provider: IAppConfigurationProvider = None
+config_provider: IConfigurationProvider = None
 
 if env_variables.platform == Platform.LOCAL:
-    config_provider = LocalAppConfigurationProvider(env_variables)
+    config_provider = LocalConfigurationProvider(env_variables)
 else:
     # TODO: Implement AppConfigConfigurationProvider using AWS AppConfig and then uncomment instead of LocalConfigurationProvider
     # config_provider = AppConfigConfigurationProvider()
-    config_provider = LocalAppConfigurationProvider(env_variables)
+    config_provider = LocalConfigurationProvider(env_variables)
 
 app = create_app(config_provider, GreetingService())

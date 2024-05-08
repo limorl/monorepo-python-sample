@@ -2,13 +2,13 @@ import json
 import logging
 import os
 from typing import Any
-from configuration.app_configuration_provider import IAppConfigurationProvider
+from configuration.configuration_provider import IConfigurationProvider
 from environment.environment_variables import EnvironmentVariables, Stage
 
 logger = logging.getLogger()
 
 
-class LocalAppConfigurationProvider(IAppConfigurationProvider):
+class LocalConfigurationProvider(IConfigurationProvider):
     """ Local Configuration Provider.
         Provides configuration based on local configuration file and Environment Variables"""
     _env_variables = {}
