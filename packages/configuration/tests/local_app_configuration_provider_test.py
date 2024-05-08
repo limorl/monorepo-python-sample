@@ -76,6 +76,6 @@ def test_get_configuration_section_prod_missing_service_name_should_throw_value_
     os.environ['REGION'] = 'us-east-1'
 
     with pytest.raises(ValueError) as exc_info:
-        env_variables = EnvironmentVariables()
+        EnvironmentVariables()
 
     assert "Missing service name" in str(exc_info.value)
