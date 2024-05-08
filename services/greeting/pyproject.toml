@@ -17,4 +17,4 @@ serverless-wsgi = "3.0.3"
 configuration = { path = "../../packages/configuration", develop = true }
 
 [tool.poetry.dev-dependencies]
-pytest = "7.0.0"
+pytest = "8.2.0"

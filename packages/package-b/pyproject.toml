@@ -10,7 +10,7 @@ python = "^3.10"
 package-a = { path = "../package-a" }
 
 [tool.poetry.dev-dependencies]
-pytest = "7.0.0"
+pytest = "8.2.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
