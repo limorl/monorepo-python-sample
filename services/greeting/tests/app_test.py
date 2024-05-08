@@ -5,11 +5,13 @@ import pytest
 from greeting.app import create_app, GreetingService
 from environment.environment_variables import reset_environment_variables
 
+
 @pytest.fixture(params=[2, 5, 0])
 def app_config_provider(request):
     mock_config_provider = Mock()
     mock_config_provider.get_configuration.return_value = request.param
     return mock_config_provider
+
 
 @pytest.fixture
 def app(app_config_provider):
@@ -25,12 +27,13 @@ def app(app_config_provider):
 
     return app
 
+
 def test_hello_name(app, app_config_provider):
     num_exclamations = app_config_provider.get_configuration()
     expected_greeting = f'Hello John{"!"*num_exclamations}'
 
     with app.test_client() as client:
         response = client.get('/hello/John')
-        
+
         assert response.status_code == 200
         assert expected_greeting in response.get_data(as_text=True)

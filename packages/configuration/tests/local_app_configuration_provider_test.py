@@ -22,6 +22,7 @@ def test_get_raw_configuration_dev(reset_env):
     assert app_config_provider.get_configuration('raw1') == 1
     assert app_config_provider.get_configuration('raw2') == 2
 
+
 def test_get_configuration_section_dev(reset_env):
     os.environ['PLATFORM'] = 'local'
     os.environ['STAGE'] = 'dev'
@@ -75,7 +76,6 @@ def test_get_configuration_section_prod_missing_service_name_should_throw_value_
     os.environ['REGION'] = 'us-east-1'
 
     with pytest.raises(ValueError) as exc_info:
-         env_variables = EnvironmentVariables()
-    
-    exception_raised = exc_info.value
+        env_variables = EnvironmentVariables()
+
     assert "Missing service name" in str(exc_info.value)
