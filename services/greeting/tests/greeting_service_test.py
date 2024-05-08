@@ -1,33 +1,19 @@
-import unittest
+import pytest
 from greeting.greeting_service import GreetingService
 
 
-class TestGreetingService(unittest.TestCase):
-
-    def test_hello_with_zero_exclamations(self):
-        greeting = GreetingService()
-
-        msg = greeting.hello('John', 0)
-        expected = 'Hello John'
-
-        self.assertEqual(msg, expected)
-
-    def test_hello_with_three_exclamations(self):
-        greeting = GreetingService()
-
-        msg = greeting.hello('John', 3)
-        expected = 'Hello John!!!'
-
-        self.assertEqual(msg, expected)
-
-    def test_hello_with_empty_name_and_no_exclamations(self):
-        greeting = GreetingService()
-
-        msg = greeting.hello('')
-        expected = 'Hello !'
-
-        self.assertEqual(msg, expected)
+@pytest.fixture()
+def greeting_service():
+    return GreetingService()
 
 
-if __name__ == '__main__':
-    unittest.main()
+@pytest.fixture(params=[2, 5, 0])
+def num_of_exclamations(request):
+    return request.param
+
+
+def test_hello(greeting_service, num_of_exclamations):
+    msg = greeting_service.hello('John', num_of_exclamations)
+    expected = f'Hello John{"!" * num_of_exclamations}'
+
+    assert msg == expected

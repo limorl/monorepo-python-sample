@@ -1,4 +1,4 @@
-from package_b.hello import say_hello, greet  # Adjust the import for package-b
+from package_b.hello import say_hello, greet
 
 
 def test_greet():
