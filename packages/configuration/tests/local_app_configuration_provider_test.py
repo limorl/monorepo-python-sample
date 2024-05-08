@@ -3,6 +3,7 @@ import pytest
 from configuration.local_app_configuration_provider import LocalAppConfigurationProvider
 from environment.environment_variables import EnvironmentVariables, reset_environment_variables
 
+
 @pytest.fixture()
 def reset_env():
     reset_environment_variables()
@@ -11,20 +12,20 @@ def reset_env():
 
 
 def test_get_raw_configuration_dev(reset_env):
-        os.environ['PLATFORM'] = 'local'
-        os.environ['STAGE'] = 'dev'
-       
-        env_variables = EnvironmentVariables()
-        app_config_provider = LocalAppConfigurationProvider(env_variables)
-        app_config_provider.init_configuration()
-        
-        assert app_config_provider.get_configuration('raw1') == 1
-        assert app_config_provider.get_configuration('raw2') == 2
+    os.environ['PLATFORM'] = 'local'
+    os.environ['STAGE'] = 'dev'
+
+    env_variables = EnvironmentVariables()
+    app_config_provider = LocalAppConfigurationProvider(env_variables)
+    app_config_provider.init_configuration()
+
+    assert app_config_provider.get_configuration('raw1') == 1
+    assert app_config_provider.get_configuration('raw2') == 2
 
 def test_get_configuration_section_dev(reset_env):
     os.environ['PLATFORM'] = 'local'
     os.environ['STAGE'] = 'dev'
-        
+
     env_variables = EnvironmentVariables()
     app_config_provider = LocalAppConfigurationProvider(env_variables)
 
@@ -39,17 +40,17 @@ def test_get_configuration_section_dev(reset_env):
 
 
 def test_get_raw_configuration_prod(reset_env):
-        os.environ['PLATFORM'] = 'AWS'
-        os.environ['STAGE'] = 'prod'
-        os.environ['REGION'] = 'us-east-1'
-        os.environ['SERVICE_NAME'] = 'hello'
-        
-        env_variables = EnvironmentVariables()
-        app_config_provider = LocalAppConfigurationProvider(env_variables)
-        app_config_provider.init_configuration()
-        
-        assert app_config_provider.get_configuration('raw100') == 100
-        assert app_config_provider.get_configuration('raw200') == 200
+    os.environ['PLATFORM'] = 'AWS'
+    os.environ['STAGE'] = 'prod'
+    os.environ['REGION'] = 'us-east-1'
+    os.environ['SERVICE_NAME'] = 'hello'
+
+    env_variables = EnvironmentVariables()
+    app_config_provider = LocalAppConfigurationProvider(env_variables)
+    app_config_provider.init_configuration()
+
+    assert app_config_provider.get_configuration('raw100') == 100
+    assert app_config_provider.get_configuration('raw200') == 200
 
 
 def test_get_configuration_section_prod(reset_env):
@@ -57,7 +58,7 @@ def test_get_configuration_section_prod(reset_env):
     os.environ['STAGE'] = 'prod'
     os.environ['REGION'] = 'us-east-1'
     os.environ['SERVICE_NAME'] = 'hello'
-        
+
     env_variables = EnvironmentVariables()
     app_config_provider = LocalAppConfigurationProvider(env_variables)
 

@@ -28,7 +28,6 @@ class LocalAppConfigurationProvider(IAppConfigurationProvider):
         elif env_variables.stage == Stage.PROD and env_variables.region:
             self._local_config_path = os.path.join(local_config_folder, f'config.prod.{env_variables.region}.json')
 
-
     def init_configuration(self):
         super().init_configuration()
 
