@@ -16,3 +16,4 @@ jsonify = "0.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "8.2.0"
+pytest-asyncio = "0.23.6"

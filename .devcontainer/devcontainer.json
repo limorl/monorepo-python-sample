@@ -21,9 +21,6 @@
         "python.linting.pylintPath": "/usr/local/py-utils/bin/pylint",
         "python.testing.unittestEnabled": false,
         "python.testing.pytestEnabled": true,
-        "python.testing.pytestArgs": [
-            "api_app"
-        ],
     },
     "extensions": [
         "rangav.vscode-thunder-client",

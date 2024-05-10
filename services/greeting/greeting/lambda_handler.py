@@ -1,4 +1,3 @@
-# import pydevd_pycharm
 import os
 import sys
 from .app import app
@@ -10,5 +9,4 @@ sys.path.append(package_root)
 
 
 def handler(event, context):
-    # pydevd_pycharm.settrace('host.docker.internal', port=5678, stdoutToServer=True, stderrToServer=True)
     return handle_request(app, event, context)

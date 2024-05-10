@@ -19,20 +19,23 @@ def is_cloud_platform(platform: Platform):
 
 
 class EnvironmentVariables:
+
     def __init__(self, dotenvpath: str = None):
         if dotenvpath:
             load_dotenv(dotenvpath)  # loads environment variables from .env file under project's folder
 
-        self.platform = Platform(os.getenv('PLATFORM')) if os.getenv('PLATFORM') else None
-        self.region: str = os.getenv('REGION')
+        self.platform: Platform = os.getenv('PLATFORM') and Platform(os.getenv('PLATFORM'))
+        self.stage: Stage = os.getenv('STAGE') and Stage(os.getenv('STAGE'))
 
+        self.region: str = os.getenv('REGION')
         if not self.region and self.platform == Platform.AWS:
             self.region: str = os.getenv('AWS_REGION')
 
         self.cloud_endpoint_override: str = os.getenv('CLOUD_ENDPOINT_OVERRIDE')
         self.service_name: str = os.getenv('SERVICE_NAME')
-        self.stage = Stage(os.getenv('STAGE')) if os.getenv('STAGE') else None
-        self.local_configuration_folder = os.getenv('LOCAL_CONFIGURATION_FOLDER')
+
+        default_configuration_folder = os.path.join(os.getcwd(), 'config')
+        self.local_configuration_folder = os.getenv('LOCAL_CONFIGURATION_FOLDER') or default_configuration_folder
 
         if is_cloud_platform(self.platform) and not self.service_name:
             raise ValueError('Missing service name for cloud platform')

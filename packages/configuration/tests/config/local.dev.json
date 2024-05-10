@@ -1,0 +1,14 @@
+{
+    "BarConfiguration": {
+        "int1": 1,
+        "int2": 2,
+        "section1": {
+            "int1": 1,
+            "str1": "1"
+        },
+        "section10": {
+            "int10": 10,
+            "str10": "10"
+        }
+    }
+}
