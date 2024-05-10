@@ -8,7 +8,7 @@ For example, a configuration file as follows:
         "numOfExclamations": 1
     },
     "DummyConfiguration1": {
-        "configuration": "fake",
+        "AppConfiguration": "fake",
         "int100": 100,
         "int200": 200,
         "section100": {
