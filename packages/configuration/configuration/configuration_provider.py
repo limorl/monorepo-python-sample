@@ -1,39 +1,38 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Dict, TypeVar, Type
+from configuration.configuration import Configuration, ConfigurationDict, ConfigT
 
 logger = logging.getLogger()
-
 
 class IConfigurationProvider(ABC):
     __initiated = False
     __initiating = False
-    __config: Any = {}
+    __configuration: Dict[str, ConfigurationDict] = {}
 
-    @abstractmethod
-    def init_configuration(self):
-        if (self.__initiated or self.__initiating):
+    async def init_configuration(self) -> None:
+        if self.__initiated or self.__initiating:
             return
 
         self.__initiating = True
-        self.__config = self._load_configuration()
+        self.__configuration = self._read_configuration()
         self.__initiating = False
         self.__initiated = True
 
-        logger.debug(f"init_configuration: __confg: {self.__config}")
+        logger.debug(f"init_configuration: __config_dict: {self.__configuration}")
 
-    @abstractmethod
-    def get_configuration(self, key: str) -> Any:
-        """Retrieves the value of a configuration setting by key."""
+
+    def get_configuration(self, config_type: Type[ConfigT]) -> ConfigT:
         if not self.__initiated:
             raise RuntimeError('Configuration provider is not initiated.')
 
-        config = self.__config.get(key, None)
-        if not config:
-            raise KeyError(f'Configuration ${key} was not found')
+        config_data = self.__configuration.get(config_type.__name__, None)
+        if not config_data:
+            raise KeyError(f'Configuration ${config_type.__name__} was not found')
 
-        return config
+        return config_type(config_data)
+
 
     @abstractmethod
-    def _load_configuration(self) -> Any:
+    def _read_configuration(self) -> Dict[str, ConfigurationDict]:
         pass

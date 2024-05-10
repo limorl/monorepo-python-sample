@@ -11,6 +11,10 @@ python-dotenv="1.0.1"
 jsonify = "0.5"
 environment = { path = "../environment" }
 
+[tool.poetry.dev-dependencies]
+pytest = "8.2.0"
+pytest-asyncio = "0.23.6"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

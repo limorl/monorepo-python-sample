@@ -1,36 +1,36 @@
 import os
 from unittest.mock import Mock
 import pytest
-
 from greeting.app import create_app, GreetingService
+from greeting.app_configuration import AppConfiguration
 from environment.environment_variables import reset_environment_variables
 
 
 @pytest.fixture(params=[2, 5, 0])
-def app_config_provider(request):
+def mock_config_provider(request):
     mock_config_provider = Mock()
-    mock_config_provider.get_configuration.return_value = request.param
+    app_configuration = AppConfiguration({ 'numOfExclamations': request.param })
+    mock_config_provider.get_configuration.return_value = app_configuration
     return mock_config_provider
 
 
 @pytest.fixture
-def app(app_config_provider):
+def app(mock_config_provider):
     reset_environment_variables()
     os.environ['PLATFORM'] = 'local'
     os.environ['STAGE'] = 'dev'
 
     greeting_service = GreetingService()
 
-    # Create the app with the mocked configuration provider
-    app = create_app(app_config_provider, greeting_service)
+    app = create_app(mock_config_provider, greeting_service)
     app.testing = True
 
     return app
 
 
-def test_hello_name(app, app_config_provider):
-    num_exclamations = app_config_provider.get_configuration()
-    expected_greeting = f'Hello John{"!"*num_exclamations}'
+def test_hello_name(app, mock_config_provider):
+    app_configuration: AppConfiguration = mock_config_provider.get_configuration(AppConfiguration)
+    expected_greeting = f'Hello John{"!" * app_configuration.numOfExclamations}'
 
     with app.test_client() as client:
         response = client.get('/hello/John')

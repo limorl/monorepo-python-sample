@@ -1,0 +1,10 @@
+{
+    "DummyConfiguration1": {
+        "int100": 100,
+        "int200": 200,
+        "section100": {
+            "str100": "100",
+            "str200": "200"
+        }
+    }
+}

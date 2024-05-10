@@ -1,81 +1,68 @@
 import os
 import pytest
+import pathlib
+from configuration.configuration_provider import Configuration, ConfigurationDict, ConfigT
 from configuration.local_configuration_provider import LocalConfigurationProvider
 from environment.environment_variables import EnvironmentVariables, reset_environment_variables
-
+from typing import Dict, Any
 
 @pytest.fixture()
 def reset_env():
     reset_environment_variables()
-    config_folder = os.path.join(os.getcwd(), 'tests/config')
+    #config_folder = os.path.join(os.getcwd(), 'tests/config')
+    config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
     os.environ['LOCAL_CONFIGURATION_FOLDER'] = config_folder
 
+class DummyConfiguration1(Configuration):
+    def __init__(self, config_dict: ConfigurationDict):
+        self.int100 = config_dict['int100']
+        self.int200 = config_dict['int200']
+        self.section100 = config_dict.get('section100', {})
 
-def test_get_raw_configuration_dev(reset_env):
+
+class DummyConfiguration2(Configuration):
+
+    def __init__(self, config_dict: ConfigurationDict):
+        self.int1 = config_dict.get('int1')
+        self.int2 = config_dict.get('int2')
+        self.section1 = config_dict.get('section1', {})
+        self.section10 = config_dict.get('section10', {})
+
+
+@pytest.mark.asyncio
+async def test_get_configuration_local_dev(reset_env):
     os.environ['PLATFORM'] = 'local'
     os.environ['STAGE'] = 'dev'
 
     env_variables = EnvironmentVariables()
     config_provider = LocalConfigurationProvider(env_variables)
-    config_provider.init_configuration()
+    await config_provider.init_configuration()
 
-    assert config_provider.get_configuration('raw1') == 1
-    assert config_provider.get_configuration('raw2') == 2
+    config: DummyConfiguration2 = config_provider.get_configuration(DummyConfiguration2)
 
+    assert config.int1 == 1
+    assert config.int1 == 1
+    assert config.int2 == 2
+    assert config.section1.get('int1') == 1
+    assert config.section1.get('str1') == '1'
+    assert config.section10.get('int10') == 10
+    assert config.section10.get('str10') == '10'
 
-def test_get_configuration_section_dev(reset_env):
-    os.environ['PLATFORM'] = 'local'
-    os.environ['STAGE'] = 'dev'
-
-    env_variables = EnvironmentVariables()
-    config_provider = LocalConfigurationProvider(env_variables)
-
-    config_provider.init_configuration()
-    config1 = config_provider.get_configuration('section1')
-    config10 = config_provider.get_configuration('section10')
-
-    assert config1['num1'] == 1
-    assert config1['str1'] == 'val1'
-    assert config10['num10'] == 10
-    assert config10['str10'] == 'val10'
-
-
-def test_get_raw_configuration_prod(reset_env):
-    os.environ['PLATFORM'] = 'AWS'
+@pytest.mark.asyncio
+async def test_get_configuration_aws_prod(reset_env):
+    os.environ['PLATFORM'] = 'aws'
     os.environ['STAGE'] = 'prod'
     os.environ['REGION'] = 'us-east-1'
     os.environ['SERVICE_NAME'] = 'hello'
 
     env_variables = EnvironmentVariables()
     config_provider = LocalConfigurationProvider(env_variables)
-    config_provider.init_configuration()
+    await config_provider.init_configuration()
 
-    assert config_provider.get_configuration('raw100') == 100
-    assert config_provider.get_configuration('raw200') == 200
+    config: DummyConfiguration1 = config_provider.get_configuration(DummyConfiguration1)
+    
+    assert config.int100 == 100
+    assert config.int200 == 200
+    assert config.section100.get('str100') == '100'
+    assert config.section100.get('str200') == '200'
 
-
-def test_get_configuration_section_prod(reset_env):
-    os.environ['PLATFORM'] = 'AWS'
-    os.environ['STAGE'] = 'prod'
-    os.environ['REGION'] = 'us-east-1'
-    os.environ['SERVICE_NAME'] = 'hello'
-
-    env_variables = EnvironmentVariables()
-    config_provider = LocalConfigurationProvider(env_variables)
-
-    config_provider.init_configuration()
-    config = config_provider.get_configuration('section100')
-
-    assert config['num100'] == 100
-    assert config['str200'] == '200'
-
-
-def test_get_configuration_section_prod_missing_service_name_should_throw_value_error(reset_env):
-    os.environ['PLATFORM'] = 'AWS'
-    os.environ['STAGE'] = 'prod'
-    os.environ['REGION'] = 'us-east-1'
-
-    with pytest.raises(ValueError) as exc_info:
-        EnvironmentVariables()
-
-    assert "Missing service name" in str(exc_info.value)
