@@ -31,7 +31,7 @@ def test_init_environment_variables_dev_env(reset_env):
 
 
 def test_init_environment_variables_prod_env(reset_env, default_local_config_folder):
-    os.environ['PLATFORM'] = 'aws'
+    os.environ['PLATFORM'] = 'AWS'
     os.environ['REGION'] = 'us-east-1'
     os.environ['STAGE'] = 'prod'
     os.environ['SERVICE_NAME'] = 'hello'
@@ -115,7 +115,7 @@ def test_init_environment_variables_dotenv_unknown_stage_should_throw(reset_env,
 
 
 def test_get_configuration_aws_prod_missing_service_name_should_throw_value_error(reset_env):
-    os.environ['PLATFORM'] = 'aws'
+    os.environ['PLATFORM'] = 'AWS'
     os.environ['STAGE'] = 'prod'
     os.environ['REGION'] = 'us-east-1'
 

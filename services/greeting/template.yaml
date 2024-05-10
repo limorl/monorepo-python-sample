@@ -5,7 +5,7 @@ Description: SAM Template for Greeting Service
 
 Globals:
   Function:
-    Timeout: 5
+    Timeout: 10
 
 Parameters:
   Stage:

@@ -4,7 +4,7 @@ import os
 
 
 class Platform(Enum):
-    AWS = 'aws'
+    AWS = 'AWS'
     LOCAL = 'local'
 
 

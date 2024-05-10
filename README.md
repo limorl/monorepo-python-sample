@@ -13,7 +13,8 @@ This is a sample monorepo that can be used as a starting point for a python proj
 
 ### Next Steps
 The monorepo will be extendedt to support:
-1. Implement AppConfigConfigurationProvider
+1. Implement AppConfigConfigurationProvider based on AWS AppConfig and SSM
+2. Logging using [aws-powertools] (https://github.com/aws-powertools/powertools-lambda-python)
 2. Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/
 4. Terraform to deploy infra on localstack and on AWS
 5. Add a deployment.yml workflow to deploy to AWS and to Localstack
@@ -227,7 +228,7 @@ sam-localstack deploy \
 --parameter-overrides 'Stage=dev Platform=local'
 ```
 
-**NOTE:** If you want to deploy the lambda functions with production configuration, then use `--parameter-overrides Stage=prod Platform=AWS`
+**NOTE:** If you want to deploy the lambda functions with production configuration, then use `--parameter-overrides Stage=prod Platform=aws`
 
 Once deployed to localstack, all lambdas are available on a single endpoint and can be invoked using function name.
 
@@ -236,17 +237,17 @@ You can list all functions by running:
 aws-localstack lambda list-functions
 ```
 
-Use the function name in the returned list when invoking the lambda.
+Use the `FunctionName` in the returned list when invoking the lambda.
 For example, for greeting service, invoke the lambda function:
 ```shell
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingFlaskLambda-XXXXXXXX \
+--function-name greeting-service-GreetingFlaskLambda-3497da7d \
 --payload '{"headers": {}, "path": "/hello", "httpMethod": "GET"}' \
 --cli-binary-format raw-in-base64-out \
 output.txt
 
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingFlaskLambda-XXXXXXXX \
+--function-name greeting-service-GreetingFlaskLambda-3497da7d \
 --payload '{"headers": {}, "path": "/hello/Danny", "httpMethod": "GET"}' \
 --cli-binary-format raw-in-base64-out \
 output.txt
@@ -268,7 +269,7 @@ Make sure you are logged in to AWS:
     aws configure sso
 ```
 
-Skip SSO session name and set the profile name to default.
+Skip SSO session name and set the profile name to `default`.
 If you are using multiple profiles, add `--profile-name <profile>` to each command.
 
 Then build and deploy:
@@ -292,4 +293,4 @@ curl https://8fwcdbjd95.execute-api.us-east-1.amazonaws.com/prod/hello
 curl https://8fwcdbjd95.execute-api.us-east-1.amazonaws.com/prod/hello/Danny
 ```
 
- Notice how when deployed remotely, the message returns with 5 exclamation points, according to the remote config. 
+**NOTE:** When deployed remotely, the greeting message returns with 5 exclamation points, according to the remote config, but when running locally or on local stack, it is returned with a single exclamation point. 

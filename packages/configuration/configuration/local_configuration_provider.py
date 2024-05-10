@@ -42,8 +42,8 @@ class LocalConfigurationProvider(IConfigurationProvider):
         default_config_folder = os.path.join(os.getcwd(), 'config')
         local_config_folder = self._env_variables.local_configuration_folder or default_config_folder
 
-        platform = self._env_variables.platform.value
-        stage = self._env_variables.stage.value
+        platform = self._env_variables.platform.value.lower()
+        stage = self._env_variables.stage.value.lower()
         region = self._env_variables.region
 
         if is_cloud_platform(self._env_variables.platform):

@@ -10,7 +10,7 @@ from typing import Dict, Any
 @pytest.fixture
 def aws_prod_env():
     # reset_environment_variables()
-    os.environ['PLATFORM'] = 'aws'
+    os.environ['PLATFORM'] = 'AWS'
     os.environ['STAGE'] = 'prod'
     os.environ['REGION'] = 'region'
     os.environ['SERVICE_NAME'] = 'service'

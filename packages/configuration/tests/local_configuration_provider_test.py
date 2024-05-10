@@ -50,7 +50,7 @@ async def test_get_configuration_local_dev(reset_env):
 
 @pytest.mark.asyncio
 async def test_get_configuration_aws_prod(reset_env):
-    os.environ['PLATFORM'] = 'aws'
+    os.environ['PLATFORM'] = 'AWS'
     os.environ['STAGE'] = 'prod'
     os.environ['REGION'] = 'us-east-1'
     os.environ['SERVICE_NAME'] = 'hello'
