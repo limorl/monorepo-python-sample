@@ -5,8 +5,6 @@ from .greeting import IGreeting, Greeting
 from configuration.configuration_provider import IConfigurationProvider
 from configuration.local_configuration_provider import LocalConfigurationProvider
 from environment.environment_variables import EnvironmentVariables, Platform
-from .greeting_configuration import GreetingConfiguration
-# from configuration.app.app_config_configuration_provider import AppConfigConfigurationProvider
 from flask import Flask
 
 
@@ -46,13 +44,14 @@ async def create_and_init_configuration_provider_async() -> IConfigurationProvid
         # TODO: Implement AppConfigConfigurationProvider using AWS AppConfig and then uncomment instead of LocalConfigurationProvider
         # config_provider = AppConfigConfigurationProvider()
         config_provider = LocalConfigurationProvider(env_variables)
-    
+
     await config_provider.init_configuration()
     return config_provider
 
 
 def create_and_init_configuration_provider() -> IConfigurationProvider:
     return asyncio.run(create_and_init_configuration_provider_async())
+
 
 configuration_provider = create_and_init_configuration_provider()
 app = create_app(configuration_provider, Greeting(configuration_provider))

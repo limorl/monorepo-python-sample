@@ -2,7 +2,6 @@ import pytest
 from unittest.mock import Mock
 from greeting.greeting import Greeting
 from greeting.greeting_configuration import GreetingConfiguration
-from configuration.configuration_provider import IConfigurationProvider
 
 
 @pytest.fixture(params=[2, 5, 0])
