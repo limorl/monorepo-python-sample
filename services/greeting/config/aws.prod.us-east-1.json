@@ -1,5 +1,5 @@
 {
-    "AppConfiguration": {
-        "numOfExclamations": 5
+    "GreetingConfiguration": {
+        "num_of_exclamations": 5
     }
 }

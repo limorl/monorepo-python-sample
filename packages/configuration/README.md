@@ -5,7 +5,7 @@ For example, a configuration file as follows:
 ```json
 {
     "AppConfiguration": {
-        "numOfExclamations": 1
+        "num_of_exclamations": 1
     },
     "DummyConfiguration1": {
         "int100": 100,

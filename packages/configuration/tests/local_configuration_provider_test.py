@@ -13,15 +13,14 @@ def reset_env():
     os.environ['LOCAL_CONFIGURATION_FOLDER'] = config_folder
 
 
-class TestConfiguration1(Configuration):
+class FooConfiguration(Configuration):
     def __init__(self, config_dict: ConfigurationDict):
         self.int100 = config_dict['int100']
         self.int200 = config_dict['int200']
         self.section100 = config_dict.get('section100', {})
 
 
-class TestConfiguration2(Configuration):
-
+class BarConfiguration(Configuration):
     def __init__(self, config_dict: ConfigurationDict):
         self.int1 = config_dict.get('int1')
         self.int2 = config_dict.get('int2')
@@ -38,7 +37,7 @@ async def test_get_configuration_local_dev(reset_env):
     config_provider = LocalConfigurationProvider(env_variables)
     await config_provider.init_configuration()
 
-    config: TestConfiguration2 = config_provider.get_configuration(TestConfiguration2)
+    config: BarConfiguration = config_provider.get_configuration(BarConfiguration)
 
     assert config.int1 == 1
     assert config.int1 == 1
@@ -60,7 +59,7 @@ async def test_get_configuration_aws_prod(reset_env):
     config_provider = LocalConfigurationProvider(env_variables)
     await config_provider.init_configuration()
 
-    config: TestConfiguration1 = config_provider.get_configuration(TestConfiguration1)
+    config: FooConfiguration = config_provider.get_configuration(FooConfiguration)
 
     assert config.int100 == 100
     assert config.int200 == 200
