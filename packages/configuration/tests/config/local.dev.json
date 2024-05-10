@@ -1,5 +1,5 @@
 {
-    "DummyConfiguration2": {
+    "TestConfiguration2": {
         "int1": 1,
         "int2": 2,
         "section1": {
