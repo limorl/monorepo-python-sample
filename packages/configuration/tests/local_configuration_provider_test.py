@@ -9,7 +9,6 @@ from environment.environment_variables import EnvironmentVariables, reset_enviro
 @pytest.fixture()
 def reset_env():
     reset_environment_variables()
-    #config_folder = os.path.join(os.getcwd(), 'tests/config')
     config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
     os.environ['LOCAL_CONFIGURATION_FOLDER'] = config_folder
 
@@ -48,6 +47,7 @@ async def test_get_configuration_local_dev(reset_env):
     assert config.section1.get('str1') == '1'
     assert config.section10.get('int10') == 10
     assert config.section10.get('str10') == '10'
+
 
 @pytest.mark.asyncio
 async def test_get_configuration_aws_prod(reset_env):

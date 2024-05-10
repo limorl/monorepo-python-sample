@@ -46,12 +46,12 @@ def test_init_environment_variables_prod_env(reset_env, default_local_config_fol
 def test_init_environment_variables_empty_env_should_not_fail(reset_env, default_local_config_folder):
     env = EnvironmentVariables()
 
-    assert env != None
-    assert env.platform == None
-    assert env.stage == None
-    assert env.region == None
-    assert env.service_name == None
-    assert env.cloud_endpoint_override == None
+    assert env is not None
+    assert env.platform is None
+    assert env.stage is None
+    assert env.region is None
+    assert env.service_name is None
+    assert env.cloud_endpoint_override is None
     assert env.local_configuration_folder == default_local_config_folder
 
 
@@ -81,12 +81,12 @@ def test_init_environment_variables_dotenv_empty(reset_env, test_data_dir, defau
     dotnev_path = os.path.join(test_data_dir, '.empty.env')
     env = EnvironmentVariables(dotnev_path)
 
-    assert env.platform == None
-    assert env.region == None
-    assert env.service_name == None
-    assert env.cloud_endpoint_override == None
+    assert env.platform is None
+    assert env.region is None
+    assert env.service_name is None
+    assert env.cloud_endpoint_override is None
     assert env.local_configuration_folder == default_local_config_folder
-    assert env.stage == None
+    assert env.stage is None
 
 
 def test_init_environment_variables_dotenv_with_config_folder(reset_env, test_data_dir, default_local_config_folder):

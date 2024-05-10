@@ -39,6 +39,7 @@ async def create_app_async(configProvider: IConfigurationProvider, greeting_serv
 def create_app(configProvider: IConfigurationProvider, greeting_service: IGreetingService):
     return asyncio.run(create_app_async(configProvider, greeting_service))  # Run asynchronously
 
+
 env_variables = EnvironmentVariables()
 logger.debug(f"greeting-service app created with env_variables: {env_variables}")
 
