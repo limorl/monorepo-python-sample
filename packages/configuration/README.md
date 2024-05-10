@@ -7,7 +7,7 @@ For example, a configuration file as follows:
     "AppConfiguration": {
         "numOfExclamations": 1
     },
-    "LDConfiguration": "abcdefg-aaa-sssdf-seefd-sssa",
+    "API_KEY": "ddhffg-ssdudfh-ddfu-33njd", // pragma: allowlist secret
     "DummyConfiguration1": {
         "int100": 100,
         "int200": 200,
