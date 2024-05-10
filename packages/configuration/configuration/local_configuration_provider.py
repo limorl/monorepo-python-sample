@@ -23,7 +23,6 @@ class LocalConfigurationProvider(IConfigurationProvider):
 
         logger.debug(f"LocalConfigurationProvider _local_config_path set to: {self._config_file_path}")
 
-
     def get_configuration(self, config_type: Type[ConfigT]) -> ConfigT:
         return super().get_configuration(config_type)
 

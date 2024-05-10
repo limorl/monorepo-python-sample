@@ -5,6 +5,7 @@ from configuration.configuration import ConfigurationDict, ConfigT
 
 logger = logging.getLogger()
 
+
 class IConfigurationProvider(ABC):
     __initiated = False
     __initiating = False

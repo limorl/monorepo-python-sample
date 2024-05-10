@@ -9,7 +9,7 @@ from environment.environment_variables import reset_environment_variables
 @pytest.fixture(params=[2, 5, 0])
 def mock_config_provider(request):
     mock_config_provider = Mock()
-    app_configuration = AppConfiguration({ 'numOfExclamations': request.param })
+    app_configuration = AppConfiguration({'numOfExclamations': request.param})
     mock_config_provider.get_configuration.return_value = app_configuration
     return mock_config_provider
 

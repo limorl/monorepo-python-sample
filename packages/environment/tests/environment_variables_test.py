@@ -12,9 +12,11 @@ def reset_env():
 def test_data_dir():
     return os.path.join(pathlib.Path(__file__).parent.resolve(), '__data__')
 
+
 @pytest.fixture
 def default_local_config_folder():
     return os.path.join(os.getcwd(), 'config')
+
 
 def test_init_environment_variables_dev_env(reset_env):
     os.environ['PLATFORM'] = 'local'
@@ -26,6 +28,7 @@ def test_init_environment_variables_dev_env(reset_env):
     assert env.cloud_endpoint_override == 'http://localhost:4566'
     assert env.stage == Stage.DEV
 
+
 def test_init_environment_variables_prod_env(reset_env, default_local_config_folder):
     os.environ['PLATFORM'] = 'aws'
     os.environ['REGION'] = 'us-east-1'
@@ -36,18 +39,21 @@ def test_init_environment_variables_prod_env(reset_env, default_local_config_fol
     assert env.platform == Platform.AWS
     assert env.region == 'us-east-1'
     assert env.service_name == 'hello'
-    assert env.stage ==Stage.PROD
+    assert env.stage == Stage.PROD
     assert env.local_configuration_folder == default_local_config_folder
+
 
 def test_init_environment_variables_empty_env_should_not_fail(reset_env, default_local_config_folder):
     env = EnvironmentVariables()
 
+    assert env != None
     assert env.platform == None
     assert env.stage == None
     assert env.region == None
     assert env.service_name == None
     assert env.cloud_endpoint_override == None
     assert env.local_configuration_folder == default_local_config_folder
+
 
 def test_init_environment_variables_dev_dotenv_path(reset_env, test_data_dir, default_local_config_folder):
     dotnev_path = os.path.join(test_data_dir, '.dev.env')
@@ -59,6 +65,7 @@ def test_init_environment_variables_dev_dotenv_path(reset_env, test_data_dir, de
     assert env.stage == Stage.DEV
     assert env.local_configuration_folder == default_local_config_folder
 
+
 def test_init_environment_variables_prod_dotenv_path(reset_env, test_data_dir, default_local_config_folder):
     dotnev_path = os.path.join(test_data_dir, '.prod.env')
     env = EnvironmentVariables(dotnev_path)
@@ -68,6 +75,7 @@ def test_init_environment_variables_prod_dotenv_path(reset_env, test_data_dir, d
     assert env.service_name == 'hello'
     assert env.stage == Stage.PROD
     assert env.local_configuration_folder == default_local_config_folder
+
 
 def test_init_environment_variables_dotenv_empty(reset_env, test_data_dir, default_local_config_folder):
     dotnev_path = os.path.join(test_data_dir, '.empty.env')
@@ -80,11 +88,13 @@ def test_init_environment_variables_dotenv_empty(reset_env, test_data_dir, defau
     assert env.local_configuration_folder == default_local_config_folder
     assert env.stage == None
 
+
 def test_init_environment_variables_dotenv_with_config_folder(reset_env, test_data_dir, default_local_config_folder):
     dotnev_path = os.path.join(test_data_dir, '.local.config.folder.env')
     env = EnvironmentVariables(dotnev_path)
 
     assert env.local_configuration_folder == 'configfolder'
+
 
 def test_init_environment_variables_dotenv_unknown_platform_should_throw(reset_env, test_data_dir):
     dotnev_path = os.path.join(test_data_dir, '.unknown.platform.env')
@@ -93,6 +103,7 @@ def test_init_environment_variables_dotenv_unknown_platform_should_throw(reset_e
 
     assert "'foo' is not a valid Platform" in str(exc_info.value)
 
+
 def test_init_environment_variables_dotenv_unknown_stage_should_throw(reset_env, test_data_dir):
     dotnev_path = os.path.join(test_data_dir, '.unknown.stage.env')
     
@@ -100,6 +111,7 @@ def test_init_environment_variables_dotenv_unknown_stage_should_throw(reset_env,
         EnvironmentVariables(dotnev_path)
 
     assert "'goo' is not a valid Stage" in str(exc_info.value)
+
 
 def test_get_configuration_aws_prod_missing_service_name_should_throw_value_error(reset_env):
     os.environ['PLATFORM'] = 'aws'

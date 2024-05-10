@@ -1,7 +1,7 @@
 import boto3
 import logging
-from typing import Dict, Any, Type
-from configuration.configuration import Configuration, ConfigurationDict, ConfigT
+from typing import Dict, Type
+from configuration.configuration import ConfigurationDict, ConfigT
 from configuration.configuration_provider import IConfigurationProvider
 from environment.environment_variables import EnvironmentVariables
 
@@ -19,7 +19,7 @@ class AppConfigConfigurationProvider(IConfigurationProvider):
         options = {}
         if env_vars.cloud_endpoint_override:
             options['endpoint_url'] = env_vars.cloud_endpoint_override
-        
+
         self._appconfig = boto3.client('appconfig', **options)
         self._ssm = boto3.client('ssm', **options)
 

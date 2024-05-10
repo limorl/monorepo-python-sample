@@ -4,7 +4,7 @@ import pathlib
 from configuration.configuration import Configuration, ConfigurationDict
 from configuration.local_configuration_provider import LocalConfigurationProvider
 from environment.environment_variables import EnvironmentVariables, reset_environment_variables
-from typing import Dict, Any
+
 
 @pytest.fixture()
 def reset_env():
@@ -12,6 +12,7 @@ def reset_env():
     #config_folder = os.path.join(os.getcwd(), 'tests/config')
     config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
     os.environ['LOCAL_CONFIGURATION_FOLDER'] = config_folder
+
 
 class TestConfiguration1(Configuration):
     def __init__(self, config_dict: ConfigurationDict):
