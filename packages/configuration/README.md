@@ -7,7 +7,7 @@ For example, a configuration file as follows:
     "AppConfiguration": {
         "numOfExclamations": 1
     },
-    "LDConfiguration": "abcdefg",
+    "LDConfiguration": "abcdefg-aaa-sssdf-seefd-sssa",
     "DummyConfiguration1": {
         "int100": 100,
         "int200": 200,
