@@ -26,7 +26,7 @@ class EnvironmentVariables:
 
         self.platform: Platform = os.getenv('PLATFORM') and Platform(os.getenv('PLATFORM'))
         self.stage: Stage = os.getenv('STAGE') and Stage(os.getenv('STAGE'))
-        
+
         self.region: str = os.getenv('REGION')
         if not self.region and self.platform == Platform.AWS:
             self.region: str = os.getenv('AWS_REGION')

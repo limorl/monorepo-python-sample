@@ -8,6 +8,7 @@ from environment.environment_variables import EnvironmentVariables, Platform, St
 def reset_env():
     reset_environment_variables()
 
+
 @pytest.fixture
 def test_data_dir():
     return os.path.join(pathlib.Path(__file__).parent.resolve(), '__data__')
@@ -106,7 +107,7 @@ def test_init_environment_variables_dotenv_unknown_platform_should_throw(reset_e
 
 def test_init_environment_variables_dotenv_unknown_stage_should_throw(reset_env, test_data_dir):
     dotnev_path = os.path.join(test_data_dir, '.unknown.stage.env')
-    
+
     with pytest.raises(ValueError) as exc_info:
         EnvironmentVariables(dotnev_path)
 
