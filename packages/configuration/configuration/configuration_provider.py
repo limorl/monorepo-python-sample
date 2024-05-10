@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, TypeVar, Type
-from configuration.configuration import Configuration, ConfigurationDict, ConfigT
+from typing import Dict, Type
+from configuration.configuration import ConfigurationDict, ConfigT
 
 logger = logging.getLogger()
 
@@ -21,7 +21,6 @@ class IConfigurationProvider(ABC):
 
         logger.debug(f"init_configuration: __config_dict: {self.__configuration}")
 
-
     def get_configuration(self, config_type: Type[ConfigT]) -> ConfigT:
         if not self.__initiated:
             raise RuntimeError('Configuration provider is not initiated.')
@@ -31,7 +30,6 @@ class IConfigurationProvider(ABC):
             raise KeyError(f'Configuration ${config_type.__name__} was not found')
 
         return config_type(config_data)
-
 
     @abstractmethod
     def _read_configuration(self) -> Dict[str, ConfigurationDict]:

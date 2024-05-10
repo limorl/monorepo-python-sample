@@ -1,7 +1,7 @@
 import os
 import pytest
 import pathlib
-from configuration.configuration_provider import Configuration, ConfigurationDict, ConfigT
+from configuration.configuration import Configuration, ConfigurationDict
 from configuration.local_configuration_provider import LocalConfigurationProvider
 from environment.environment_variables import EnvironmentVariables, reset_environment_variables
 from typing import Dict, Any
@@ -13,14 +13,14 @@ def reset_env():
     config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
     os.environ['LOCAL_CONFIGURATION_FOLDER'] = config_folder
 
-class DummyConfiguration1(Configuration):
+class TestConfiguration1(Configuration):
     def __init__(self, config_dict: ConfigurationDict):
         self.int100 = config_dict['int100']
         self.int200 = config_dict['int200']
         self.section100 = config_dict.get('section100', {})
 
 
-class DummyConfiguration2(Configuration):
+class TestConfiguration2(Configuration):
 
     def __init__(self, config_dict: ConfigurationDict):
         self.int1 = config_dict.get('int1')
@@ -38,7 +38,7 @@ async def test_get_configuration_local_dev(reset_env):
     config_provider = LocalConfigurationProvider(env_variables)
     await config_provider.init_configuration()
 
-    config: DummyConfiguration2 = config_provider.get_configuration(DummyConfiguration2)
+    config: TestConfiguration2 = config_provider.get_configuration(TestConfiguration2)
 
     assert config.int1 == 1
     assert config.int1 == 1
@@ -59,10 +59,9 @@ async def test_get_configuration_aws_prod(reset_env):
     config_provider = LocalConfigurationProvider(env_variables)
     await config_provider.init_configuration()
 
-    config: DummyConfiguration1 = config_provider.get_configuration(DummyConfiguration1)
-    
+    config: TestConfiguration1 = config_provider.get_configuration(TestConfiguration1)
+
     assert config.int100 == 100
     assert config.int200 == 200
     assert config.section100.get('str100') == '100'
     assert config.section100.get('str200') == '200'
-

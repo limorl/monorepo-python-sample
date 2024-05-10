@@ -1,11 +1,10 @@
-import asyncio
 import json
 import logging
 import os
-from typing import Dict, Any, Type
-from configuration.configuration import Configuration, ConfigurationDict, ConfigT
+from typing import Dict, Type
+from configuration.configuration import ConfigurationDict, ConfigT
 from configuration.configuration_provider import IConfigurationProvider
-from environment.environment_variables import EnvironmentVariables, Stage, is_cloud_platform
+from environment.environment_variables import EnvironmentVariables, is_cloud_platform
 
 logger = logging.getLogger()
 
@@ -39,7 +38,7 @@ class LocalConfigurationProvider(IConfigurationProvider):
         except json.JSONDecodeError:
             logger.error(f"Failed to decode JSON from configuration: {self._config_file_path}")
             return None
-        
+
     def _get_config_file_path(self) -> str:
         default_config_folder = os.path.join(os.getcwd(), 'config')
         local_config_folder = self._env_variables.local_configuration_folder or default_config_folder
@@ -52,5 +51,5 @@ class LocalConfigurationProvider(IConfigurationProvider):
             return os.path.join(local_config_folder, f'{platform}.{stage}.{region}.json')
         else:
             return os.path.join(local_config_folder, f'{platform}.{stage}.json')
-        
+
         return None
