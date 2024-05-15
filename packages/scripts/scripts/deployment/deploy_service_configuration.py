@@ -1,7 +1,6 @@
 
 import argparse
-import asyncio
-import boto3     
+import boto3
 from botocore.exceptions import ClientError
 from enum import Enum
 import json
@@ -13,12 +12,10 @@ from typing import Any, Callable, Dict, NewType
 logger = logging.getLogger()
 
 DEFAULT_ENVIRONMENT_NAME = 'default'
-SERVICE_DEPLOYMENT_STARTEGY_NAME = 'service-deployment' # This assumes this service deployment strategy was created using Terraform. For now it was created manually.
+SERVICE_DEPLOYMENT_STARTEGY_NAME = 'service-deployment'  # This assumes this service deployment strategy was created using Terraform. For now it was created manually.
 
 Deployment = NewType('Deployment', Dict)
 
-class DeploymentError(Exception):
-    pass
 
 class DeploymentState(Enum):
     BAKING = 'BAKING'
@@ -38,7 +35,7 @@ def deploy_service_configuration(service_name: str, stage: str, region: str) -> 
     if not os.path.exists(config_file):
         logger.warn(f'No configuration file found under {config_folder} folder for service {service_name}')
         return
-    
+
     options = {}
     options['region_name'] = region
     appconfig = boto3.client('appconfig', **options)
@@ -56,30 +53,29 @@ def deploy_service_configuration(service_name: str, stage: str, region: str) -> 
             
             config_profile_id = _get_or_create_app_config_profile(appconfig, app_id, config_name)
             hosted_configuration_version = appconfig.create_hosted_configuration_version(
-                ApplicationId = app_id,
-                ConfigurationProfileId = config_profile_id,
-                Content = config_bytes,
-                ContentType = 'application/json'
+                ApplicationId=app_id,
+                ConfigurationProfileId=config_profile_id,
+                Content=config_bytes,
+                ContentType='application/json'
             )
 
             version_number = str(hosted_configuration_version.get('VersionNumber'))
             logger.info(f'Starting configuration deployment for app: {app_name}, config name: {config_name}, app id: {app_id}, profile: {config_profile_id}, version: {version_number}')
-            
+
             deployment = appconfig.start_deployment(
-                ApplicationId = app_id,
-                ConfigurationProfileId = config_profile_id,
-                ConfigurationVersion = version_number,
-                EnvironmentId = env_id,
-                DeploymentStrategyId = service_deployment_strategy_id
+                ApplicationId=app_id,
+                ConfigurationProfileId=config_profile_id,
+                ConfigurationVersion=version_number,
+                EnvironmentId=env_id,
+                DeploymentStrategyId=service_deployment_strategy_id
             )
 
             deployment = _wait_until_deployment_completes(appconfig, deployment)
-        
-    except json.JSONDecodeError:
-        logger.error(f'Failed to decode JSON from configuration file: {config_file}')
-    except DeploymentError as err:
-        logger.error('Failed to deploy configuration for service: {service_name}, error: {err}')
 
+    except json.JSONDecodeError:
+        logger.error(f'Failed to decode JSON from configuration file: {config_file}')    
+    except ClientError as err:
+        logger.error(f'Failed to deploy configuration for service: {service_name}. Error Code: {err["Error"]["Code"]} error: {err}')
 
 def _get_or_create_app_config_application(appconfig: Any, app_name: str) -> str:
     list_func = lambda next_token: appconfig.list_applications(NextToken = next_token) if next_token else appconfig.list_applications() 
