@@ -85,10 +85,13 @@ def deploy_service_configuration(service_name: str, stage: str, region: str) -> 
 
 
 def _get_or_create_app_config_application(appconfig: Any, app_name: str) -> str:
-    def list_func(next_token): appconfig.list_applications(NextToken=next_token) if next_token else appconfig.list_applications()
-    def create_func(): appconfig.create_application(Name=app_name)
+   # list_func = lambda next_token: appconfig.list_applications(NextToken=next_token) if next_token else appconfig.list_applications()
+   # create_func = lambda: appconfig.create_application(Name=app_name)
 
-    return _get_or_create(app_name, list_func, create_func)
+    return _get_or_create(app_name,
+                          lambda next_token: appconfig.list_applications(NextToken=next_token) if next_token else appconfig.list_applications(),
+                          lambda: appconfig.create_application(Name=app_name)
+                        )
 
 
 def _get_or_create_app_config_environment(appconfig: Any, app_id: str, env_name: str) -> str:
