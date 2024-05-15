@@ -17,6 +17,10 @@ SERVICE_DEPLOYMENT_STARTEGY_NAME = 'service-deployment'  # This assumes this ser
 Deployment = NewType('Deployment', Dict)
 
 
+class DeploymentError(Exception):
+    pass
+
+
 class DeploymentState(Enum):
     BAKING = 'BAKING'
     VALIDATING = 'VALIDATING'
@@ -76,23 +80,26 @@ def deploy_service_configuration(service_name: str, stage: str, region: str) -> 
         logger.error(f'Failed to decode JSON from configuration file: {config_file}')    
     except ClientError as err:
         logger.error(f'Failed to deploy configuration for service: {service_name}. Error Code: {err["Error"]["Code"]} error: {err}')
+    except DeploymentError as err:
+        logger.error(f'Failed to deploy configuration for service: {service_name}. Error: {err}')
+
 
 def _get_or_create_app_config_application(appconfig: Any, app_name: str) -> str:
-    list_func = lambda next_token: appconfig.list_applications(NextToken = next_token) if next_token else appconfig.list_applications() 
-    create_func = lambda: appconfig.create_application(Name = app_name)
+    list_func = lambda next_token: appconfig.list_applications(NextToken=next_token) if next_token else appconfig.list_applications()
+    create_func = lambda: appconfig.create_application(Name=app_name)
 
     return _get_or_create(app_name, list_func, create_func)
 
 
 def _get_or_create_app_config_environment(appconfig: Any, app_id: str, env_name: str) -> str:
-    list_func = lambda next_token: appconfig.list_environments(ApplicationId = app_id, NextToken = next_token) if next_token else appconfig.list_environments(ApplicationId = app_id)
-    create_func = lambda: appconfig.create_environment(ApplicationId = app_id, Name = env_name)
+    list_func = lambda next_token: appconfig.list_environments(ApplicationId=app_id, NextToken=next_token) if next_token else appconfig.list_environments(ApplicationId=app_id)
+    create_func = lambda: appconfig.create_environment(ApplicationId=app_id, Name=env_name)
 
     return _get_or_create(env_name, list_func, create_func)
 
 
 def _get_deployment_strategy_id(appconfig: Any, strategy_name: str) -> str:
-    list_func = lambda next_token: appconfig.list_deployment_strategies(NextToken = next_token) if next_token else appconfig.list_deployment_strategies()
+    list_func = lambda next_token: appconfig.list_deployment_strategies(NextToken=next_token) if next_token else appconfig.list_deployment_strategies()
     id = _get_id_by_name(strategy_name, list_func)
     
     if id:
@@ -102,14 +109,15 @@ def _get_deployment_strategy_id(appconfig: Any, strategy_name: str) -> str:
 
 
 def _get_or_create_app_config_profile(appconfig: Any, app_id: str, config_name: str) -> str:
-    list_func = lambda next_token: appconfig.list_configuration_profiles(ApplicationId = app_id, NextToken = next_token) if next_token else appconfig.list_configuration_profiles(ApplicationId = app_id)
-    create_func = lambda: appconfig.create_configuration_profile(ApplicationId = app_id, Name = config_name, LocationUri = 'hosted')
+    list_func = lambda next_token: appconfig.list_configuration_profiles(ApplicationId=app_id, NextToken=next_token) if next_token else appconfig.list_configuration_profiles(ApplicationId=app_id)
+    create_func = lambda: appconfig.create_configuration_profile(ApplicationId=app_id, Name=config_name, LocationUri='hosted')
 
     return _get_or_create(config_name, list_func, create_func)
 
 
 def _get_or_create(name: str, list_func: Callable[[str], Dict], create_func: Callable[[], Dict]) -> str:
     return _get_id_by_name(name, list_func) or create_func().get('Id')
+
 
 def _get_id_by_name(name: str, list_func: Callable[[str], Dict]) -> str:
     next_token: str = None
@@ -121,10 +129,11 @@ def _get_id_by_name(name: str, list_func: Callable[[str], Dict]) -> str:
         matches = items_dict.get('Items') and list(filter(lambda x: x.get('Name') == name, items_dict.get('Items')))
         if matches and len(matches) > 0:
             return matches[0].get('Id')
-        
-        nextToken = items_dict.get('NextToken')
+
+        next_token = items_dict.get('NextToken')
 
     return None
+
 
 def _wait_until_deployment_completes(appconfig: Any, deployment: Deployment) -> Deployment:
     deployment_state = DeploymentState(deployment.get('State'))
@@ -136,9 +145,9 @@ def _wait_until_deployment_completes(appconfig: Any, deployment: Deployment) -> 
         
         time.sleep(1)
         deployment = appconfig.get_deployment(
-            ApplicationId = deployment.get('ApplicationId'),
-            DeploymentNumber = deployment.get('DeploymentNumber'),
-            EnvironmentId = deployment.get('EnvironmentId')
+            ApplicationId=deployment.get('ApplicationId'),
+            DeploymentNumber=deployment.get('DeploymentNumber'),
+            EnvironmentId=deployment.get('EnvironmentId')
         )
     
     return deployment
@@ -151,11 +160,13 @@ def _create_arg_parser():
     parser.add_argument('--region', type = str, required = True, help = 'Region e.g., us-east-1')
     return parser
 
+
 def main():
     parser = _create_arg_parser()
     args = parser.parse_args()
 
     deploy_service_configuration(args.service_name, args.stage, args.region)
+
 
 if __name__ == "__main__":
     main()
