@@ -85,25 +85,20 @@ def deploy_service_configuration(service_name: str, stage: str, region: str) -> 
 
 
 def _get_or_create_app_config_application(appconfig: Any, app_name: str) -> str:
-   # list_func = lambda next_token: appconfig.list_applications(NextToken=next_token) if next_token else appconfig.list_applications()
-   # create_func = lambda: appconfig.create_application(Name=app_name)
-
-    return _get_or_create(app_name,
+   return _get_or_create(app_name,
                           lambda next_token: appconfig.list_applications(NextToken=next_token) if next_token else appconfig.list_applications(),
-                          lambda: appconfig.create_application(Name=app_name)
-                        )
+                          lambda: appconfig.create_application(Name=app_name))
 
 
 def _get_or_create_app_config_environment(appconfig: Any, app_id: str, env_name: str) -> str:
-    list_func = lambda next_token: appconfig.list_environments(ApplicationId=app_id, NextToken=next_token) if next_token else appconfig.list_environments(ApplicationId=app_id)
-    create_func = lambda: appconfig.create_environment(ApplicationId=app_id, Name=env_name)
-
-    return _get_or_create(env_name, list_func, create_func)
+    return _get_or_create(env_name,
+                          lambda next_token: appconfig.list_environments(ApplicationId=app_id, NextToken=next_token) if next_token else appconfig.list_environments(ApplicationId=app_id),
+                          lambda: appconfig.create_environment(ApplicationId=app_id, Name=env_name))
 
 
 def _get_deployment_strategy_id(appconfig: Any, strategy_name: str) -> str:
-    list_func = lambda next_token: appconfig.list_deployment_strategies(NextToken=next_token) if next_token else appconfig.list_deployment_strategies()
-    id = _get_id_by_name(strategy_name, list_func)
+    id = _get_id_by_name(strategy_name,
+                         lambda next_token: appconfig.list_deployment_strategies(NextToken=next_token) if next_token else appconfig.list_deployment_strategies())
     
     if id:
         return id
@@ -112,10 +107,9 @@ def _get_deployment_strategy_id(appconfig: Any, strategy_name: str) -> str:
 
 
 def _get_or_create_app_config_profile(appconfig: Any, app_id: str, config_name: str) -> str:
-    list_func = lambda next_token: appconfig.list_configuration_profiles(ApplicationId=app_id, NextToken=next_token) if next_token else appconfig.list_configuration_profiles(ApplicationId=app_id)
-    create_func = lambda: appconfig.create_configuration_profile(ApplicationId=app_id, Name=config_name, LocationUri='hosted')
-
-    return _get_or_create(config_name, list_func, create_func)
+    return _get_or_create(config_name,
+                          lambda next_token: appconfig.list_configuration_profiles(ApplicationId=app_id, NextToken=next_token) if next_token else appconfig.list_configuration_profiles(ApplicationId=app_id),
+                           lambda: appconfig.create_configuration_profile(ApplicationId=app_id, Name=config_name, LocationUri='hosted'))
 
 
 def _get_or_create(name: str, list_func: Callable[[str], Dict], create_func: Callable[[], Dict]) -> str:
