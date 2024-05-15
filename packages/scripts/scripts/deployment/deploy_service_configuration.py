@@ -105,10 +105,10 @@ def _get_deployment_strategy_id(appconfig: Any, strategy_name: str) -> str:
         strategy_name,
         lambda next_token: appconfig.list_deployment_strategies(NextToken=next_token) if next_token else appconfig.list_deployment_strategies()
     )
-    
+
     if id:
         return id
-    
+
     raise KeyError(f'Deployment strategy with name ${strategy_name} does not exist')
 
 
@@ -147,22 +147,22 @@ def _wait_until_deployment_completes(appconfig: Any, deployment: Deployment) -> 
         if deployment_state == DeploymentState.ROLLED_BACK or deployment_state == DeploymentState.ROLLING_BACK:
             event_log = deployment.get('EventLog') and map(lambda entry: entry.get('Description').join('\n'), deployment.get('EventLog'))
             raise DeploymentError(f'Configuration deployment failed. Details:\n ${event_log}')
-        
+
         time.sleep(1)
         deployment = appconfig.get_deployment(
             ApplicationId=deployment.get('ApplicationId'),
             DeploymentNumber=deployment.get('DeploymentNumber'),
             EnvironmentId=deployment.get('EnvironmentId')
         )
-    
+
     return deployment
 
 
 def _create_arg_parser():
     parser = argparse.ArgumentParser(prog='deploy_service_configuration.py', description='Deploy service configuration to AWS AppConfig')
-    parser.add_argument('--service-name', type = str, required = True, help = 'The name of the service package, for example: greeting')
-    parser.add_argument('--stage', type = str, required = True, help = 'Stage in [prod|dev|staging]')
-    parser.add_argument('--region', type = str, required = True, help = 'Region e.g., us-east-1')
+    parser.add_argument('--service-name', type=str, required=True, help='The name of the service package, for example: greeting')
+    parser.add_argument('--stage', type=str, required=True, help='Stage in [prod|dev|staging]')
+    parser.add_argument('--region', type=str, required=True, help='Region e.g., us-east-1')
     return parser
 
 
