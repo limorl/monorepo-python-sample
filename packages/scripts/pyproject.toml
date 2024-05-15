@@ -14,6 +14,7 @@ install-all = "scripts.poetry.install_all:install_all"
 build-all = "scripts.poetry.build_all:build_all"
 pytest-all = "scripts.testing.pytest_all:pytest_all"
 pytest-impacted-only = "scripts.testing.pytest_impacted_only:pytest_impacted_only"
+deploy-service-configuration = "scripts.deployment.deploy_service_configuration:main" # args --service-name <service-name> --stage <stage> --region <region>
 
 [tool.poetry.dependencies]
 python = "^3.10"
