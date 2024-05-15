@@ -54,7 +54,7 @@ def deploy_service_configuration(service_name: str, stage: str, region: str) -> 
             logger.debug(f'Loading configuration file: {config_file}')
             config_json_str = json.dumps(json.load(file))
             config_bytes = config_json_str.encode('utf-8')
-            
+
             config_profile_id = _get_or_create_app_config_profile(appconfig, app_id, config_name)
             hosted_configuration_version = appconfig.create_hosted_configuration_version(
                 ApplicationId=app_id,
@@ -77,7 +77,7 @@ def deploy_service_configuration(service_name: str, stage: str, region: str) -> 
             deployment = _wait_until_deployment_completes(appconfig, deployment)
 
     except json.JSONDecodeError:
-        logger.error(f'Failed to decode JSON from configuration file: {config_file}')    
+        logger.error(f'Failed to decode JSON from configuration file: {config_file}')
     except ClientError as err:
         logger.error(f'Failed to deploy configuration for service: {service_name}. Error Code: {err["Error"]["Code"]} error: {err}')
     except DeploymentError as err:
@@ -85,8 +85,8 @@ def deploy_service_configuration(service_name: str, stage: str, region: str) -> 
 
 
 def _get_or_create_app_config_application(appconfig: Any, app_name: str) -> str:
-    list_func = lambda next_token: appconfig.list_applications(NextToken=next_token) if next_token else appconfig.list_applications()
-    create_func = lambda: appconfig.create_application(Name=app_name)
+    def list_func(next_token): appconfig.list_applications(NextToken=next_token) if next_token else appconfig.list_applications()
+    def create_func(): appconfig.create_application(Name=app_name)
 
     return _get_or_create(app_name, list_func, create_func)
 
