@@ -7,11 +7,13 @@ logger = logging.getLogger()
 
 
 class IConfigurationProvider(ABC):
+    """ Synchronous Configuration Provider, initialized before creating apps (services) """
+    
     __initiated = False
     __initiating = False
     __configuration: Dict[str, ConfigurationDict] = {}
 
-    async def init_configuration(self) -> None:
+    def init_configuration(self) -> None:
         if self.__initiated or self.__initiating:
             return
 

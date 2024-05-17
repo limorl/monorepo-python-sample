@@ -11,10 +11,10 @@ from typing import Any, Callable, Dict, NewType
 
 logger = logging.getLogger()
 
-DEFAULT_ENVIRONMENT_NAME = 'default'
-SERVICE_DEPLOYMENT_STARTEGY_NAME = 'service-deployment'  # This assumes this service deployment strategy was created using Terraform. For now it was created manually.
+#DEFAULT_ENVIRONMENT_NAME = 'default'
+#SERVICE_DEPLOYMENT_STARTEGY_NAME = 'service-deployment'  # This assumes this service deployment strategy was created using Terraform. For now it was created manually.
 
-Deployment = NewType('Deployment', Dict)
+#Deployment = NewType('Deployment', Dict)
 
 
 class DeploymentError(Exception):
@@ -29,11 +29,13 @@ class DeploymentState(Enum):
     ROLLING_BACK = 'ROLLING_BACK'
     ROLLED_BACK = 'ROLLED_BACK'
 
+# TODO (limorl): Add --version argument to be used as VersionLable when calling create_hosted_configuration_version.
+# The label should indicate the package version
 
-def deploy_service_configuration(service_name: str, stage: str, region: str) -> None:
+def deploy_service_configuration(service_name: str, platform: str, stage: str, region: str) -> None:
     """Deploy service configuration to AWS AppConfig"""
     config_folder = 'config'
-    config_name = f'aws.{stage}.{region}'
+    config_name = f'{platform.lower()}.{stage}.{region}'
     config_file = os.path.join(os.getcwd(), 'services', service_name, config_folder, f'{config_name}.json')
 
     if not os.path.exists(config_file):
@@ -161,6 +163,7 @@ def _wait_until_deployment_completes(appconfig: Any, deployment: Deployment) -> 
 def _create_arg_parser():
     parser = argparse.ArgumentParser(prog='deploy_service_configuration.py', description='Deploy service configuration to AWS AppConfig')
     parser.add_argument('--service-name', type=str, required=True, help='The name of the service package, for example: greeting')
+    parser.add_argument('--platform', type=str, required=False, default='AWS', help='The platform to deploy to, currently only AWS is supported')
     parser.add_argument('--stage', type=str, required=True, help='Stage in [prod|dev|staging]')
     parser.add_argument('--region', type=str, required=True, help='Region e.g., us-east-1')
     return parser
@@ -170,7 +173,7 @@ def main():
     parser = _create_arg_parser()
     args = parser.parse_args()
 
-    deploy_service_configuration(args.service_name, args.stage, args.region)
+    deploy_service_configuration(args.service_name, args.platform, args.stage, args.region)
 
 
 if __name__ == "__main__":

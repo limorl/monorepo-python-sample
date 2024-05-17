@@ -1,33 +1,77 @@
 import boto3
 import logging
-from typing import Dict, Type
+from typing import Dict, Type, List
 from configuration.configuration import ConfigurationDict, ConfigT
 from configuration.configuration_provider import IConfigurationProvider
+from .app_config_utils import *
+from .ssm_utils import *
 from environment.environment_variables import EnvironmentVariables
 
 logger = logging.getLogger()
 
-
 class AppConfigConfigurationProvider(IConfigurationProvider):
-    """TODO: Implement
-    Configuration Provider based on AWS App Config.
-    When deploying services, the configuration files under the service's /config folders are deployed"""
+    """ Configuration Provider based on AWS App Config.
+        When deploying services, the configuration files under the service's /config folders are deployed to AppConfig.
+        This implementation assumed a single configuration per { service_name, stage, region } as well as:
+        DEFAULT_ENVIRONMENT_NAME = 'default'
+        SERVICE_DEPLOYMENT_STARTEGY_NAME = 'service-deployment' which is already created
+
+        If multiple environments are needed, the lambda template should be updated with additional parameters, such as:
+        Parameters:
+            AppConfigEnvironment:
+                Description: AppConfig Environment id
+                Type: String
+            AppConfigConfigProfile:
+                Description: AppConfig Configuration Profile id
+                Type: String
+
+        It is recommended to use lambda extensions for appcongi and ssm as explained here: https://medium.com/@guidonebiolo/boost-your-serverless-apps-with-aws-lambda-extensions-and-appconfig-5d41808c74ce.
+        For now, we use a simple implementation in which in each lambda invokation, the configuration and secrets are retreived from appcofig and ssm.
+    """
 
     def __init__(self, env_vars: EnvironmentVariables):
         super().__init__()
 
-        options = {}
+        options: Dict = {'region_name': env_vars.region}
         if env_vars.cloud_endpoint_override:
             options['endpoint_url'] = env_vars.cloud_endpoint_override
-
+        
         self._appconfig = boto3.client('appconfig', **options)
+        self._appconfigdata = boto3.client('appconfigdata', **options)
         self._ssm = boto3.client('ssm', **options)
 
-        self._app_name = f'{env_vars.service_name}-{env_vars.stage}-{env_vars.region}'
-        self._env_vars = env_vars
+        self._app_name = compose_app_name(env_vars.service_name, env_vars.stage.value, env_vars.region)
+        self._config_name = compose_config_name(env_vars.platform.value, env_vars.stage.value, env_vars.region)
 
     def get_configuration(self, config_type: Type[ConfigT]) -> ConfigT:
         return super().get_configuration(config_type)
 
     def _read_configuration(self) -> Dict[str, ConfigurationDict]:
-        pass
+        configurations: Dict[str,ConfigurationDict] = {}
+        app_id = app_config_get_application_id(self._appconfig, self._app_name, False)
+        profile_id = app_config_get_profile_id(self._appconfig, app_id, self._config_name, False)
+        env_id = app_config_get_environment_id(self._appconfig, app_id, DEFAULT_ENVIRONMENT_NAME, False)
+
+        configuration_dict: Dict[str, Any] = app_config_data_get_latest_configuration(self._appconfigdata, app_id, env_id, profile_id)
+
+        configuration_with_secrets: Dict[str, ConfigurationDict] = {}
+
+        for key, val in configuration_dict.items():
+            configuration_with_secrets[key] = self._populate_secrets(val)
+
+        return configuration_with_secrets
+     
+    
+    def _populate_secrets(self, config: Dict[str, Any]) -> Dict[str, Any]:
+        config_with_secrets = {}
+
+        for key, val in config.items():
+            if is_secret(val):
+                secret_value = ssm_get_secret_value(self._ssm, val)
+                config_with_secrets[key] = secret_value
+            elif isinstance(val, dict) and not isinstance(val, List):
+                config_with_secrets[key] = self._populate_secrets(val)
+            else:
+                config_with_secrets[key] = val
+        
+        return config_with_secrets

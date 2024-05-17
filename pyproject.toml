@@ -11,6 +11,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.dependencies]
 python = "^3.10"
 pydevd-pycharm = "^241.15989.155"
+scripts = {path = "packages/scripts"}
 
 [tool.poetry.dev-dependencies]
 python-semantic-release = "9.3.1"
