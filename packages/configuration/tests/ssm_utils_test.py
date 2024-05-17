@@ -1,7 +1,8 @@
 import pytest
 from unittest.mock import patch, Mock
-from configuration.ssm_utils import *
+from configuration.ssm_utils import is_secret, ssm_get_secret_value
 from botocore.exceptions import ClientError
+
 
 @pytest.fixture
 def mock_ssm_client():
@@ -10,11 +11,18 @@ def mock_ssm_client():
         mock.return_value = mock_client
         yield mock_client
 
+@pytest.fixture(params=[['ssm:fake/secret/name', True], ['not-a-secret', False], ['', False], [5, False]])
+def secret_pair(request):
+    return request.param
+
+def test_is_secret(secret_pair):
+    assert is_secret(secret_pair[0]) == secret_pair[1]
+
 
 def test_get_secret_success_string(mock_ssm_client):
     secret_name = 'test/app/fake-secret'
     expected_secret_val = 'fake-secret-sdbhe-dmlf-127nd'
-    
+
     mock_ssm_client.get_secret_value.return_value = {'SecretString': expected_secret_val}
 
     response = ssm_get_secret_value(mock_ssm_client, f'ssm:{secret_name}')
@@ -26,7 +34,7 @@ def test_get_secret_success_string(mock_ssm_client):
 def test_get_secret_success_binary(mock_ssm_client):
     secret_name = 'test/app/fake-secret'
     expected_secret_val = 'fake-secret-sdbhe-dmlf-127nd'
-    
+
     mock_ssm_client.get_secret_value.return_value = {'SecretBinary': expected_secret_val.encode('utf-8')}
 
     response = ssm_get_secret_value(mock_ssm_client, f'ssm:{secret_name}')

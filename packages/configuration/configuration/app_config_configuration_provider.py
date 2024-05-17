@@ -1,11 +1,12 @@
 import boto3
 import logging
 from typing import Dict, Type, List, Any
-from configuration.configuration import ConfigurationDict, ConfigT
-from configuration.configuration_provider import IConfigurationProvider
+from environment.environment_variables import EnvironmentVariables
+from .configuration import ConfigurationDict, ConfigT
+from .configuration_provider import IConfigurationProvider
 from .app_config_utils import DEFAULT_ENVIRONMENT_NAME, compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_profile_id, app_config_get_environment_id, app_config_data_get_latest_configuration
 from .ssm_utils import is_secret, ssm_get_secret_value
-from environment.environment_variables import EnvironmentVariables
+
 
 logger = logging.getLogger()
 
@@ -61,7 +62,6 @@ class AppConfigConfigurationProvider(IConfigurationProvider):
 
         return configuration_with_secrets
 
-
     def _populate_secrets(self, config: Dict[str, Any]) -> Dict[str, Any]:
         config_with_secrets = {}
 
@@ -73,5 +73,5 @@ class AppConfigConfigurationProvider(IConfigurationProvider):
                 config_with_secrets[key] = self._populate_secrets(val)
             else:
                 config_with_secrets[key] = val
-        
+
         return config_with_secrets

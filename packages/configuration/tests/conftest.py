@@ -1,10 +1,11 @@
+import json
 import pytest
 from unittest.mock import patch
-from configuration.app_config_utils import *
 from botocore.response import StreamingBody
 from io import StringIO
 
 """ Shared Fixtures """
+
 
 @pytest.fixture
 def mock_boto_client():
@@ -16,12 +17,12 @@ def mock_boto_client():
 def mock_configuration_dict():
     config_dict = {
         "FooConfiguration": {
-            "int1": 1, 
-            "str2": "2", 
+            "int1": 1,
+            "str2": "2",
             "section10": {
-                "int10": 10, 
+                "int10": 10,
                 "str10": "10"
-            }, 
+            },
             "secrets10": {
                 "secret11": "ssm:fake-secret/name/11",
                 "secret12": "ssm:fake-secret/name/12"
@@ -35,14 +36,14 @@ def mock_configuration_dict():
 def mock_configuration_with_secrets_dict():
     config_dict = {
         "FooConfiguration": {
-            "int1": 1, 
-            "str2": "2", 
+            "int1": 1,
+            "str2": "2",
             "section10": {
-                "int10": 10, 
+                "int10": 10,
                 "str10": "10"
-            }, 
+            },
             "secrets10": {
-                "secret11": "populated-fake-secret-11", 
+                "secret11": "populated-fake-secret-11",
                 "secret12": "populated-fake-secret-12"
             }
         }
@@ -52,7 +53,7 @@ def mock_configuration_with_secrets_dict():
 
 @pytest.fixture
 def mock_list_applications_response():
-    return  {
+    return {
         'Items': [
             {'Id': 'app-123', 'Name': 'test-service-prod-us-west-2'},
             {'Id': 'app-456', 'Name': 'test-service-dev-us-east-1'}
@@ -71,7 +72,7 @@ def mock_create_application_reponse():
 
 @pytest.fixture
 def mock_list_environments_response():
-    return  {
+    return {
         'Items': [
             {'ApplicationId': 'app-123', 'Id': 'env-123', 'Name': 'name-123', 'State': 'READY_FOR_DEPLOYMENT'},
             {'ApplicationId': 'app-456', 'Id': 'env-456', 'Name': 'name-456', 'State': 'READY_FOR_DEPLOYMENT'},
@@ -111,8 +112,8 @@ def mock_list_deployment_strategies_response():
 def mock_list_configuration_profiles_response():
     return {
         'Items': [
-            { 'ApplicationId': 'app-123', 'Id': 'profile123', 'Name': 'name-123'},
-            { 'ApplicationId': 'app-456', 'Id': 'profile456', 'Name': 'name-456'}
+            {'ApplicationId': 'app-123', 'Id': 'profile123', 'Name': 'name-123'},
+            {'ApplicationId': 'app-456', 'Id': 'profile456', 'Name': 'name-456'}
         ]
     }
 
@@ -124,7 +125,7 @@ def mock_create_configuration_profile_response():
         'Id': 'id-789',
         'Name': 'profile-789',
     }
-    
+
 
 @pytest.fixture
 def mock_start_configuration_session_response():

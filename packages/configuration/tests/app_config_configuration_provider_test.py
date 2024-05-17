@@ -1,12 +1,12 @@
 import os
 import pytest
+from botocore.exceptions import ClientError
 from unittest.mock import Mock, patch
 from configuration.app_config_configuration_provider import AppConfigConfigurationProvider
 from configuration.configuration_provider import ConfigurationDict
 from configuration.configuration import Configuration
 from environment.environment_variables import EnvironmentVariables, reset_environment_variables
-from configuration.app_config_utils import *
-from configuration.ssm_utils import *
+from configuration.app_config_utils import compose_app_name, compose_config_name
 
 
 class FooConfiguration(Configuration):
@@ -23,7 +23,7 @@ def env_variables():
     os.environ['PLATFORM'] = 'AWS'
     os.environ['STAGE'] = 'prod'
     os.environ['REGION'] = 'us-west-2'
-    os.environ['SERVICE_NAME']= 'hello'
+    os.environ['SERVICE_NAME'] = 'hello'
 
     return EnvironmentVariables()
 
@@ -40,10 +40,10 @@ def config_name(env_variables):
 
 @pytest.fixture
 def mock_get_secret_value_responses():
-   return [
-       {'ARN': 'test-arn', 'SecretString': 'populated-fake-secret-11'},
-       {'ARN': 'test-arn', 'SecretString': 'populated-fake-secret-12'}
-   ]
+    return [
+        {'ARN': 'test-arn', 'SecretString': 'populated-fake-secret-11'},
+        {'ARN': 'test-arn', 'SecretString': 'populated-fake-secret-12'}
+    ]
 
 
 @pytest.fixture
@@ -114,10 +114,10 @@ def test_get_configuration_not_initialized_error(app_configuration_provider):
 
 
 def test_init_configuration_app_config_data_error(
-        app_configuration_provider, 
+        app_configuration_provider,
         mock_configuration_dict,
-        mock_list_applications_response, 
-        mock_list_environments_response, 
+        mock_list_applications_response,
+        mock_list_environments_response,
         mock_list_configuration_profiles_response
     ):
     

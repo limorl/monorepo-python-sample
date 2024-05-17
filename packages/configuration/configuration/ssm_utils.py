@@ -5,8 +5,10 @@ SECRET_PREFIX = 'ssm:'
 
 logger = logging.getLogger()
 
+
 def is_secret(val: str) -> bool:
     return isinstance(val, str) and val.startswith(SECRET_PREFIX)
+
 
 def ssm_get_secret_value(ssm, secret_config_val: str) -> str:
     secret_name = secret_config_val and secret_config_val.replace(SECRET_PREFIX, '')

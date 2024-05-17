@@ -1,6 +1,6 @@
 import pytest
-from unittest.mock import Mock, patch
-from configuration.app_config_utils import *
+from unittest.mock import Mock 
+from configuration.app_config_utils import compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_environment_id, app_config_get_deployment_strategy_id, app_config_data_get_latest_configuration, app_config_get_profile_id
 
 
 def test_compose_app_name():
@@ -38,7 +38,7 @@ def test_app_config_get_application_id_app_does_not_exist_create(mock_boto_clien
     mock_appconfig.list_applications.assert_called_once()
     mock_appconfig.create_application.assert_called_once()
     assert app_id == mock_create_application_reponse['Id']
-    
+
 
 def test_app_config_get_environment_id_env_exists(mock_boto_client, mock_list_environments_response):
     mock_appconfig = Mock()
@@ -57,7 +57,7 @@ def test_app_config_get_environment_id_env_exists(mock_boto_client, mock_list_en
 def test_app_config_get_environment_id_env_exists_env_does_not_exist_create(mock_boto_client, mock_list_environments_response, mock_create_environment_reponse):
     mock_appconfig = Mock()
     mock_boto_client.return_value = mock_appconfig
-    
+
     mock_list_environments_response['Items'] = []
     mock_appconfig.list_environments.return_value = mock_list_environments_response
     mock_appconfig.create_environment.return_value = mock_create_environment_reponse
@@ -92,7 +92,7 @@ def test_app_config_get_deployment_strategy_id_does_not_exist_expected_error(moc
     mock_appconfig.list_deployment_strategies.return_value = mock_list_deployment_strategies_response
 
     with pytest.raises(KeyError) as err:
-        strategy_id = app_config_get_deployment_strategy_id(mock_appconfig, strategy_name)
+        pp_config_get_deployment_strategy_id(mock_appconfig, strategy_name)
         assert 'strategy with name' in err.message
 
 
@@ -128,11 +128,11 @@ def test_app_config_get_profile_id_profile_does_not_exist_create(mock_boto_clien
 
 
 def test_app_config_data_get_latest_configuration_success(
-        mock_boto_client,
-        mock_configuration_dict,
-        mock_start_configuration_session_response,
-        mock_get_latest_configuration_response
-    ):
+    mock_boto_client,
+    mock_configuration_dict,
+    mock_start_configuration_session_response,
+    mock_get_latest_configuration_response
+):
     mock_appconfigdata = Mock()
     mock_boto_client.return_value = mock_appconfigdata
 

@@ -13,7 +13,7 @@ Deployment = NewType('Deployment', Dict)
 
 def compose_config_name(platform: str, stage: str, region: str) -> str:
     return f'{platform.lower()}.{stage}.{region}'
-    
+
 
 def compose_app_name(service_name: str, stage: str, region: str) -> str:
     return f'{service_name}-{stage}-{region}'
@@ -54,7 +54,8 @@ def app_config_get_profile_id(appconfig: Any, app_id: str, config_name: str, cre
         create_if_not_exists and (lambda: appconfig.create_configuration_profile(ApplicationId=app_id, Name=config_name, LocationUri='hosted'))
     )
 
-def app_config_data_get_latest_configuration(appconfigdata: Any, app_id: str, env_id: str, config_profile_id:str) -> Dict[str, Any]:
+
+def app_config_data_get_latest_configuration(appconfigdata: Any, app_id: str, env_id: str, config_profile_id: str) -> Dict[str, Any]:
         
     initial_configuration_token = appconfigdata.start_configuration_session(
         ApplicationIdentifier=app_id,
