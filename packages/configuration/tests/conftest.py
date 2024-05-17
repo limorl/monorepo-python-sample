@@ -1,6 +1,6 @@
 import json
 import pytest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from botocore.response import StreamingBody
 from io import StringIO
 
@@ -11,6 +11,18 @@ from io import StringIO
 def mock_boto_client():
     with patch('boto3.client') as mock:
         yield mock
+
+@pytest.fixture
+def mock_appconfig(mock_boto_client):
+    mock_appconfig = Mock()
+    mock_boto_client.return_value = mock_appconfig
+    return mock_appconfig
+
+@pytest.fixture
+def mock_appconfigdata(mock_boto_client):
+    mock_appconfigdata = Mock()
+    mock_boto_client.return_value = mock_appconfigdata
+    return mock_appconfigdata
 
 
 @pytest.fixture

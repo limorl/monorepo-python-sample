@@ -13,9 +13,7 @@ def test_compose_config_name():
 
 # TODO (limorl): Add tests with NextToken and to handle when create_if_not_exists = False
 
-def test_app_config_get_application_id_app_exists(mock_boto_client, mock_list_applications_response):
-    mock_appconfig = Mock()
-    mock_boto_client.return_value = mock_appconfig
+def test_app_config_get_application_id_app_exists(mock_appconfig, mock_list_applications_response):
     mock_appconfig.list_applications.return_value = mock_list_applications_response
 
     app_id = app_config_get_application_id(mock_appconfig, mock_list_applications_response['Items'][0]['Name'])
@@ -25,10 +23,7 @@ def test_app_config_get_application_id_app_exists(mock_boto_client, mock_list_ap
     assert app_id == mock_list_applications_response['Items'][0]['Id']
 
 
-def test_app_config_get_application_id_app_does_not_exist_create(mock_boto_client, mock_list_applications_response, mock_create_application_reponse):
-    mock_appconfig = Mock()
-    mock_boto_client.return_value = mock_appconfig
-    
+def test_app_config_get_application_id_app_does_not_exist_create(mock_appconfig, mock_list_applications_response, mock_create_application_reponse):
     mock_list_applications_response['Items'] = []
     mock_appconfig.list_applications.return_value = mock_list_applications_response
     mock_appconfig.create_application.return_value = mock_create_application_reponse
@@ -40,9 +35,7 @@ def test_app_config_get_application_id_app_does_not_exist_create(mock_boto_clien
     assert app_id == mock_create_application_reponse['Id']
 
 
-def test_app_config_get_environment_id_env_exists(mock_boto_client, mock_list_environments_response):
-    mock_appconfig = Mock()
-    mock_boto_client.return_value = mock_appconfig
+def test_app_config_get_environment_id_env_exists(mock_appconfig, mock_list_environments_response):
     mock_appconfig.list_environments.return_value = mock_list_environments_response
 
     app_id = mock_list_environments_response['Items'][1]['ApplicationId']
@@ -54,10 +47,7 @@ def test_app_config_get_environment_id_env_exists(mock_boto_client, mock_list_en
     assert env_id == mock_list_environments_response['Items'][1]['Id']
 
 
-def test_app_config_get_environment_id_env_exists_env_does_not_exist_create(mock_boto_client, mock_list_environments_response, mock_create_environment_reponse):
-    mock_appconfig = Mock()
-    mock_boto_client.return_value = mock_appconfig
-
+def test_app_config_get_environment_id_env_exists_env_does_not_exist_create(mock_appconfig, mock_list_environments_response, mock_create_environment_reponse):
     mock_list_environments_response['Items'] = []
     mock_appconfig.list_environments.return_value = mock_list_environments_response
     mock_appconfig.create_environment.return_value = mock_create_environment_reponse
@@ -71,9 +61,7 @@ def test_app_config_get_environment_id_env_exists_env_does_not_exist_create(mock
     assert env_id == mock_create_environment_reponse['Id']
 
 
-def test_pp_config_get_deployment_strategy_id_stratey_exists(mock_boto_client, mock_list_deployment_strategies_response):
-    mock_appconfig = Mock()
-    mock_boto_client.return_value = mock_appconfig
+def test_pp_config_get_deployment_strategy_id_stratey_exists(mock_appconfig, mock_list_deployment_strategies_response):
     mock_appconfig.list_deployment_strategies.return_value = mock_list_deployment_strategies_response
 
     strategy_name = mock_list_deployment_strategies_response['Items'][0]['Name']
@@ -83,10 +71,7 @@ def test_pp_config_get_deployment_strategy_id_stratey_exists(mock_boto_client, m
     assert strategy_id == mock_list_deployment_strategies_response['Items'][0]['Id']
 
 
-def test_app_config_get_deployment_strategy_id_does_not_exist_expected_error(mock_boto_client, mock_list_deployment_strategies_response):
-    mock_appconfig = Mock()
-    mock_boto_client.return_value = mock_appconfig
-
+def test_app_config_get_deployment_strategy_id_does_not_exist_expected_error(mock_appconfig, mock_list_deployment_strategies_response):
     strategy_name = mock_list_deployment_strategies_response['Items'][0]['Name']
     mock_list_deployment_strategies_response['Items'] = []
     mock_appconfig.list_deployment_strategies.return_value = mock_list_deployment_strategies_response
@@ -96,9 +81,7 @@ def test_app_config_get_deployment_strategy_id_does_not_exist_expected_error(moc
         assert 'strategy with name' in err.message
 
 
-def test_app_config_get_profile_id_profile_exists(mock_boto_client, mock_list_configuration_profiles_response):
-    mock_appconfig = Mock()
-    mock_boto_client.return_value = mock_appconfig
+def test_app_config_get_profile_id_profile_exists(mock_appconfig, mock_list_configuration_profiles_response):
     mock_appconfig.list_configuration_profiles.return_value = mock_list_configuration_profiles_response
 
     app_id = mock_list_configuration_profiles_response['Items'][0]['ApplicationId']
@@ -110,10 +93,7 @@ def test_app_config_get_profile_id_profile_exists(mock_boto_client, mock_list_co
     assert profile_id == mock_list_configuration_profiles_response['Items'][0]['Id']
 
 
-def test_app_config_get_profile_id_profile_does_not_exist_create(mock_boto_client, mock_list_configuration_profiles_response, mock_create_configuration_profile_response):
-    mock_appconfig = Mock()
-    mock_boto_client.return_value = mock_appconfig
-    
+def test_app_config_get_profile_id_profile_does_not_exist_create(mock_appconfig, mock_list_configuration_profiles_response, mock_create_configuration_profile_response):
     mock_list_configuration_profiles_response['Items'] = []
     mock_appconfig.list_configuration_profiles.return_value = mock_list_configuration_profiles_response
     mock_appconfig.create_configuration_profile.return_value = mock_create_configuration_profile_response
@@ -126,10 +106,7 @@ def test_app_config_get_profile_id_profile_does_not_exist_create(mock_boto_clien
     mock_appconfig.create_configuration_profile.assert_called_once()
     assert profile_id == mock_create_configuration_profile_response['Id']
 
-def test_app_config_create_hosted_configuration_version_success(mock_boto_client, mock_configuration_dict, mock_create_hosted_configuration_version_response):
-    mock_appconfig = Mock()
-    mock_boto_client.return_value = mock_appconfig
-
+def test_app_config_create_hosted_configuration_version_success(mock_appconfig, mock_configuration_dict, mock_create_hosted_configuration_version_response):
     mock_appconfig.create_hosted_configuration_version.return_value = mock_create_hosted_configuration_version_response
 
     app_id = mock_create_hosted_configuration_version_response['ApplicationId']
@@ -139,14 +116,11 @@ def test_app_config_create_hosted_configuration_version_success(mock_boto_client
     assert version_number == mock_create_hosted_configuration_version_response['VersionNumber'] 
     
 def test_app_config_data_get_latest_configuration_success(
-    mock_boto_client,
+    mock_appconfigdata,
     mock_configuration_dict,
     mock_start_configuration_session_response,
     mock_get_latest_configuration_response
 ):
-    mock_appconfigdata = Mock()
-    mock_boto_client.return_value = mock_appconfigdata
-
     mock_appconfigdata.start_configuration_session.return_value = mock_start_configuration_session_response
     mock_appconfigdata.get_latest_configuration.return_value = mock_get_latest_configuration_response
 
