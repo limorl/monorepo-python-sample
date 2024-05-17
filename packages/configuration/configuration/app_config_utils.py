@@ -65,7 +65,6 @@ def app_config_create_hosted_configuration_version(appconfig: Any, app_id: str, 
 
 
 def app_config_data_get_latest_configuration(appconfigdata: Any, app_id: str, env_id: str, config_profile_id: str) -> Dict[str, Any]:
-        
     initial_configuration_token = appconfigdata.start_configuration_session(
         ApplicationIdentifier=app_id,
         EnvironmentIdentifier=env_id,

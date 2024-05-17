@@ -11,9 +11,11 @@ def mock_ssm_client():
         mock.return_value = mock_client
         yield mock_client
 
+
 @pytest.fixture(params=[['ssm:fake/secret/name', True], ['not-a-secret', False], ['', False], [5, False]])
 def secret_pair(request):
     return request.param
+
 
 def test_is_secret(secret_pair):
     assert is_secret(secret_pair[0]) == secret_pair[1]
@@ -57,6 +59,5 @@ def test_get_secret_failure_secret_value_is_none(mock_ssm_client):
 
     mock_ssm_client.get_secret_value.return_value = {}  # Both SecretString and SecretBinary are None
 
-    
     with pytest.raises(ValueError):
         ssm_get_secret_value(mock_ssm_client, secret_name)

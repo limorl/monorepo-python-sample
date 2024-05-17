@@ -12,11 +12,13 @@ def mock_boto_client():
     with patch('boto3.client') as mock:
         yield mock
 
+
 @pytest.fixture
 def mock_appconfig(mock_boto_client):
     mock_appconfig = Mock()
     mock_boto_client.return_value = mock_appconfig
     return mock_appconfig
+
 
 @pytest.fixture
 def mock_appconfigdata(mock_boto_client):
@@ -106,7 +108,7 @@ def mock_create_environment_reponse():
 
 @pytest.fixture
 def mock_list_deployment_strategies_response():
-    return  {
+    return {
         'Items': [
             {
                 'Id': 'id-123',

@@ -119,8 +119,7 @@ def test_init_configuration_app_config_data_error(
         mock_list_applications_response,
         mock_list_environments_response,
         mock_list_configuration_profiles_response
-    ):
-
+):
     config_provider, mock_appconfig, mock_appconfigdata, _ = app_configuration_provider
 
     mock_appconfig.list_applications.return_value = mock_list_applications_response

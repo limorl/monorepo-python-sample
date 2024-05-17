@@ -113,7 +113,7 @@ def test_app_config_create_hosted_configuration_version_success(mock_appconfig, 
     profile_id = mock_create_hosted_configuration_version_response['ConfigurationProfileId']
     version_number = app_config_create_hosted_configuration_version(mock_appconfig, app_id, profile_id, mock_configuration_dict)
 
-    assert version_number == mock_create_hosted_configuration_version_response['VersionNumber'] 
+    assert version_number == mock_create_hosted_configuration_version_response['VersionNumber']
 
 
 def test_app_config_data_get_latest_configuration_success(
