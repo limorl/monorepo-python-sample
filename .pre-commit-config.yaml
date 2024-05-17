@@ -17,6 +17,21 @@ repos:
       hooks:
         - id: yaspeller
           stages: [push]
+    
+    - repo: https://github.com/streetsidesoftware/cspell-cli/
+      rev: v8.8.1
+      hooks:
+        - id: cspell
+          description: CSpell spellchecker
+          entry: cspell-cli
+          language: node
+          types: [text]
+          args:
+            - --no-must-find-files
+            - --no-progress
+            - --no-summary
+            - --gitignore
+          stages: [push]
 
     # This will be updated to run recursively after Poetry is added and to run only on impacted tests. The ci.yml workflow should run all unit tests
     - repo: local
