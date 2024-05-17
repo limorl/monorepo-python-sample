@@ -42,7 +42,7 @@ def mock_configuration_with_secrets_dict():
                 "str10": "10"
             }, 
             "secrets10": {
-                "secret11": "populated-fake-secret-11",
+                "secret11": "populated-fake-secret-11", 
                 "secret12": "populated-fake-secret-12"
             }
         }

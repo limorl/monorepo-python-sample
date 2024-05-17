@@ -1,7 +1,7 @@
 from botocore.exceptions import ClientError
 import logging
 
-SECRET_PREFIX = 'ssm:'
+SECRET_PREFIX = 'ssm:' 
 
 logger = logging.getLogger()
 
