@@ -1,7 +1,7 @@
 
 import json
 import logging
-from typing import Any, Callable, Dict, NewType
+from typing import Any, Callable, Dict
 from .configuration import ConfigurationSection
 
 logger = logging.getLogger()
@@ -50,6 +50,7 @@ def app_config_get_profile_id(appconfig: Any, app_id: str, config_name: str, cre
         create_if_not_exists and (lambda: appconfig.create_configuration_profile(ApplicationId=app_id, Name=config_name, LocationUri='hosted'))
     )
 
+
 def app_config_create_hosted_configuration_version(appconfig: Any, app_id: str, config_profile_id: str, configuration: Dict[str, ConfigurationSection]) -> int:
     config_bytes = json.dumps(configuration).encode('utf-8')
 
@@ -61,6 +62,7 @@ def app_config_create_hosted_configuration_version(appconfig: Any, app_id: str, 
     )
 
     return version.get('VersionNumber')
+
 
 def app_config_data_get_latest_configuration(appconfigdata: Any, app_id: str, env_id: str, config_profile_id: str) -> Dict[str, Any]:
         

@@ -7,14 +7,15 @@ import json
 import logging
 import os
 import time
-from typing import Any, Callable, Dict, NewType
+from typing import Any, Dict
 from configuration.configuration import ConfigurationSection
-from configuration.app_config_utils import compose_app_name, compose_config_name, app_config_data_get_latest_configuration, app_config_get_application_id, app_config_get_deployment_strategy_id, app_config_get_environment_id, app_config_get_profile_id, app_config_create_hosted_configuration_version
+from configuration.app_config_utils import compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_deployment_strategy_id, app_config_get_environment_id, app_config_get_profile_id, app_config_create_hosted_configuration_version
 
 logger = logging.getLogger()
 
 # This assumes this service deployment strategy was created using Terraform. For now it was created manually.
-DEFAULT_SERVICE_DEPLOYMENT_STARTEGY = 'linear-step20'  
+DEFAULT_SERVICE_DEPLOYMENT_STARTEGY = 'linear-step20'
+
 
 class DeploymentError(Exception):
     pass
@@ -30,6 +31,7 @@ class DeploymentState(Enum):
 
 # TODO (limorl): Add --version argument to be used as VersionLable when calling create_hosted_configuration_version.
 # The label should indicate the package version
+
 
 def deploy_service_configuration(service_name: str, platform: str, stage: str, region: str) -> None:
     """Deploy service configuration to AWS AppConfig"""

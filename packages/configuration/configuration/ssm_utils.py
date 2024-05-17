@@ -1,7 +1,7 @@
 from botocore.exceptions import ClientError
 import logging
 
-SECRET_PREFIX = 'ssm:' 
+SECRET_PREFIX = 'ssm:'
 
 logger = logging.getLogger()
 
@@ -19,12 +19,12 @@ def ssm_get_secret_value(ssm, secret_config_val: str) -> str:
 
         if not secret_value:
             # secret was created in cli
-            secret_value = response.get('SecretBinary') and response.get('SecretBinary').decode('utf-8')   
+            secret_value = response.get('SecretBinary') and response.get('SecretBinary').decode('utf-8')
         if not secret_value:
             raise ValueError((f"SSM failed to retrieve secret {secret_name}. Both SecretString and SecretBinary are None."))
 
     except ClientError as err:
         logger.error(f"SSM failed to retrieve secret {secret_name}. Error: {err}")
         raise err
-    
+
     return secret_value

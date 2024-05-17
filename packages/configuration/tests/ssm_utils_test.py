@@ -48,7 +48,7 @@ def test_get_secret_failure_non_existing_secret(mock_ssm_client):
 
     mock_ssm_client.get_secret_value.side_effect = ClientError({"Error": {"Code": "ResourceNotFoundException"}}, "get_secret_value")
 
-    with pytest.raises(ClientError) as err:
+    with pytest.raises(ClientError):
         ssm_get_secret_value(mock_ssm_client, secret_name)
 
 

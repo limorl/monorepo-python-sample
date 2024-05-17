@@ -58,17 +58,17 @@ def app_configuration_provider(env_variables):
 
 
 def test_init_and_get_configuration_success(
-        app_configuration_provider, 
+        app_configuration_provider,
         mock_configuration_dict,
         mock_configuration_with_secrets_dict,
-        mock_list_applications_response, 
-        mock_list_environments_response, 
+        mock_list_applications_response,
+        mock_list_environments_response,
         mock_list_configuration_profiles_response,
         mock_start_configuration_session_response,
         mock_get_latest_configuration_response,
         mock_get_secret_value_responses
-    ):
-    
+):
+
     config_provider, mock_appconfig, mock_appconfigdata, mock_ssm = app_configuration_provider
 
     mock_appconfig.list_applications.return_value = mock_list_applications_response
@@ -89,13 +89,13 @@ def test_init_and_get_configuration_success(
 
     mock_appconfigdata.start_configuration_session.assert_called_once()
     mock_appconfigdata.get_latest_configuration.assert_called_once()
-    
+
     assert config_provider._app_name == 'hello-prod-us-west-2'
     assert config_provider._config_name == 'aws.prod.us-west-2'
-        
+
     foo_configuration: FooConfiguration = config_provider.get_configuration(FooConfiguration)
     expected_foo_configuration_dict = mock_configuration_with_secrets_dict['FooConfiguration']
-    
+
     # assert configuration is correct and secrets were populated
     assert foo_configuration
     assert foo_configuration.int1 == expected_foo_configuration_dict['int1']
@@ -104,7 +104,7 @@ def test_init_and_get_configuration_success(
     assert foo_configuration.section10['str10'] == expected_foo_configuration_dict['section10']['str10']
     assert foo_configuration.secrets10['secret11'] == expected_foo_configuration_dict['secrets10']['secret11']
     assert foo_configuration.secrets10['secret12'] == expected_foo_configuration_dict['secrets10']['secret12']
- 
+
 
 def test_get_configuration_not_initialized_error(app_configuration_provider):
     config_provider, _, _, _ = app_configuration_provider
@@ -120,7 +120,7 @@ def test_init_configuration_app_config_data_error(
         mock_list_environments_response,
         mock_list_configuration_profiles_response
     ):
-    
+
     config_provider, mock_appconfig, mock_appconfigdata, _ = app_configuration_provider
 
     mock_appconfig.list_applications.return_value = mock_list_applications_response
@@ -132,4 +132,3 @@ def test_init_configuration_app_config_data_error(
 
     with pytest.raises(ClientError):
         config_provider.init_configuration()
-
