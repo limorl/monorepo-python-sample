@@ -23,4 +23,3 @@ configuration = {path = "../configuration"}
 
 [tool.poetry.dev-dependencies]
 pathspec = "0.12.1"
-
