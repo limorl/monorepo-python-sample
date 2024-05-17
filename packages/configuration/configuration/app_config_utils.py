@@ -6,9 +6,6 @@ from .configuration import ConfigurationSection
 
 logger = logging.getLogger()
 
-DEFAULT_ENVIRONMENT_NAME = 'prod'
-DEFAULT_SERVICE_DEPLOYMENT_STARTEGY = 'linear-step20'  # This assumes this service deployment strategy was created using Terraform. For now it was created manually.
-
 
 def compose_config_name(platform: str, stage: str, region: str) -> str:
     return f'{platform.lower()}.{stage}.{region}'
@@ -34,7 +31,7 @@ def app_config_get_environment_id(appconfig: Any, app_id: str, env_name: str, cr
     )
 
 
-def app_config_get_deployment_strategy_id(appconfig: Any, strategy_name: str = DEFAULT_SERVICE_DEPLOYMENT_STARTEGY) -> str:
+def app_config_get_deployment_strategy_id(appconfig: Any, strategy_name: str) -> str:
     id = _get_id_by_name(
         strategy_name,
         lambda next_token: appconfig.list_deployment_strategies(NextToken=next_token) if next_token else appconfig.list_deployment_strategies()

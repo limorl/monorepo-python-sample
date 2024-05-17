@@ -18,6 +18,8 @@ deploy-service-configuration = "scripts.deployment.deploy_service_configuration:
 
 [tool.poetry.dependencies]
 python = "^3.10"
+boto3 = "1.34.105"
+configuration = {path = "../configuration"}
 
 [tool.poetry.dev-dependencies]
 pathspec = "0.12.1"

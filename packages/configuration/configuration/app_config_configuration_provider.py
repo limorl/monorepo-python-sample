@@ -4,7 +4,7 @@ from typing import Dict, Type, List, Any
 from environment.environment_variables import EnvironmentVariables
 from .configuration import ConfigurationSection, ConfigT
 from .configuration_provider import IConfigurationProvider
-from .app_config_utils import DEFAULT_ENVIRONMENT_NAME, compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_profile_id, app_config_get_environment_id, app_config_data_get_latest_configuration
+from .app_config_utils import compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_profile_id, app_config_get_environment_id, app_config_data_get_latest_configuration
 from .ssm_utils import is_secret, ssm_get_secret_value
 
 
@@ -14,9 +14,8 @@ logger = logging.getLogger()
 class AppConfigConfigurationProvider(IConfigurationProvider):
     """ Configuration Provider based on AWS App Config.
         When deploying services, the configuration files under the service's /config folders are deployed to AppConfig.
-        This implementation assumed a single configuration per { service_name, stage, region } as well as:
-        DEFAULT_ENVIRONMENT_NAME = 'default'
-        SERVICE_DEPLOYMENT_STARTEGY_NAME = 'service-deployment' which is already created
+        This implementation assumed a single configuration per { service_name, stage, region } where stage maps to AppConfig Environment
+        DEFAULT_DEPLOYMENT_STRATEGY = holds the name of the strategy already created on AppConfig
 
         If multiple environments are needed, the lambda template should be updated with additional parameters, such as:
         Parameters:
@@ -44,6 +43,7 @@ class AppConfigConfigurationProvider(IConfigurationProvider):
 
         self._app_name = compose_app_name(env_vars.service_name, env_vars.stage.value, env_vars.region)
         self._config_name = compose_config_name(env_vars.platform.value, env_vars.stage.value, env_vars.region)
+        self._env_vars = env_vars
 
     def get_configuration(self, config_type: Type[ConfigT]) -> ConfigT:
         return super().get_configuration(config_type)
@@ -51,7 +51,7 @@ class AppConfigConfigurationProvider(IConfigurationProvider):
     def _read_configuration(self) -> Dict[str, ConfigurationSection]:
         app_id = app_config_get_application_id(self._appconfig, self._app_name)
         profile_id = app_config_get_profile_id(self._appconfig, app_id, self._config_name)
-        env_id = app_config_get_environment_id(self._appconfig, app_id, DEFAULT_ENVIRONMENT_NAME)
+        env_id = app_config_get_environment_id(self._appconfig, app_id, self._env_vars.stage)
 
         configuration_dict: Dict[str, Any] = app_config_data_get_latest_configuration(self._appconfigdata, app_id, env_id, profile_id)
 
