@@ -7,9 +7,7 @@ from .configuration import ConfigurationSection
 logger = logging.getLogger()
 
 DEFAULT_ENVIRONMENT_NAME = 'prod'
-DEFAULT_SERVICE_DEPLOYMENT_STARTEGY = 'linear-service-deployment'  # This assumes this service deployment strategy was created using Terraform. For now it was created manually.
-
-Deployment = NewType('Deployment', Dict)
+DEFAULT_SERVICE_DEPLOYMENT_STARTEGY = 'linear-step20'  # This assumes this service deployment strategy was created using Terraform. For now it was created manually.
 
 
 def compose_config_name(platform: str, stage: str, region: str) -> str:
