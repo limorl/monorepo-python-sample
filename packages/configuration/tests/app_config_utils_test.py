@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import Mock 
-from configuration.app_config_utils import compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_environment_id, app_config_get_deployment_strategy_id, app_config_data_get_latest_configuration, app_config_get_profile_id
+from configuration.app_config_utils import compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_environment_id, app_config_get_deployment_strategy_id, app_config_data_get_latest_configuration, app_config_get_profile_id, app_config_create_hosted_configuration_version
 
 
 def test_compose_app_name():
@@ -33,7 +33,7 @@ def test_app_config_get_application_id_app_does_not_exist_create(mock_boto_clien
     mock_appconfig.list_applications.return_value = mock_list_applications_response
     mock_appconfig.create_application.return_value = mock_create_application_reponse
 
-    app_id = app_config_get_application_id(mock_appconfig, mock_create_application_reponse['Id'])
+    app_id = app_config_get_application_id(mock_appconfig, mock_create_application_reponse['Id'], True)
 
     mock_appconfig.list_applications.assert_called_once()
     mock_appconfig.create_application.assert_called_once()
@@ -47,7 +47,7 @@ def test_app_config_get_environment_id_env_exists(mock_boto_client, mock_list_en
 
     app_id = mock_list_environments_response['Items'][1]['ApplicationId']
     env_name = mock_list_environments_response['Items'][1]['Name']
-    env_id = app_config_get_environment_id(mock_appconfig, app_id, env_name)
+    env_id = app_config_get_environment_id(mock_appconfig, app_id, env_name, True)
 
     mock_appconfig.list_environments.assert_called_once()
     assert not mock_appconfig.create_environments.called
@@ -64,7 +64,7 @@ def test_app_config_get_environment_id_env_exists_env_does_not_exist_create(mock
 
     app_id = mock_create_environment_reponse['Id']
     env_name = mock_create_environment_reponse['Name']
-    env_id = app_config_get_environment_id(mock_appconfig, app_id, env_name)
+    env_id = app_config_get_environment_id(mock_appconfig, app_id, env_name, True)
 
     mock_appconfig.list_environments.assert_called_once()
     mock_appconfig.create_environment.assert_called_once()
@@ -92,7 +92,7 @@ def test_app_config_get_deployment_strategy_id_does_not_exist_expected_error(moc
     mock_appconfig.list_deployment_strategies.return_value = mock_list_deployment_strategies_response
 
     with pytest.raises(KeyError) as err:
-        pp_config_get_deployment_strategy_id(mock_appconfig, strategy_name)
+        app_config_get_deployment_strategy_id(mock_appconfig, strategy_name)
         assert 'strategy with name' in err.message
 
 
@@ -103,7 +103,7 @@ def test_app_config_get_profile_id_profile_exists(mock_boto_client, mock_list_co
 
     app_id = mock_list_configuration_profiles_response['Items'][0]['ApplicationId']
     profile_name = mock_list_configuration_profiles_response['Items'][0]['Name']
-    profile_id = app_config_get_profile_id(mock_appconfig, app_id, profile_name)
+    profile_id = app_config_get_profile_id(mock_appconfig, app_id, profile_name, True)
 
     mock_appconfig.list_configuration_profiles.assert_called_once()
     assert not mock_appconfig.create_configuration_profile.called
@@ -120,13 +120,24 @@ def test_app_config_get_profile_id_profile_does_not_exist_create(mock_boto_clien
 
     app_id = mock_create_configuration_profile_response['ApplicationId']
     config_name = mock_create_configuration_profile_response['Name']
-    profile_id = app_config_get_profile_id(mock_appconfig, app_id, config_name, mock_create_configuration_profile_response['Id'])
+    profile_id = app_config_get_profile_id(mock_appconfig, app_id, config_name, True)
 
     mock_appconfig.list_configuration_profiles.assert_called_once()
     mock_appconfig.create_configuration_profile.assert_called_once()
     assert profile_id == mock_create_configuration_profile_response['Id']
 
+def test_app_config_create_hosted_configuration_version_success(mock_boto_client, mock_configuration_dict, mock_create_hosted_configuration_version_response):
+    mock_appconfig = Mock()
+    mock_boto_client.return_value = mock_appconfig
 
+    mock_appconfig.create_hosted_configuration_version.return_value = mock_create_hosted_configuration_version_response
+
+    app_id = mock_create_hosted_configuration_version_response['ApplicationId']
+    profile_id = mock_create_hosted_configuration_version_response['ConfigurationProfileId']
+    version_number = app_config_create_hosted_configuration_version(mock_appconfig, app_id, profile_id, mock_configuration_dict)
+    
+    assert version_number == mock_create_hosted_configuration_version_response['VersionNumber'] 
+    
 def test_app_config_data_get_latest_configuration_success(
     mock_boto_client,
     mock_configuration_dict,

@@ -128,6 +128,15 @@ def mock_create_configuration_profile_response():
 
 
 @pytest.fixture
+def mock_create_hosted_configuration_version_response():
+    return {
+        'ApplicationId': 'app-789',
+        'ConfigurationProfileId': 'id-789',
+        'VersionNumber': 3,
+    }
+
+
+@pytest.fixture
 def mock_start_configuration_session_response():
     return {
         'InitialConfigurationToken': 'initial-token'

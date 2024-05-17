@@ -18,8 +18,8 @@ def ssm_get_secret_value(ssm, secret_config_val: str) -> str:
         secret_value = response.get('SecretString')  # if secret were created by ssm console
 
         if not secret_value:
-            secret_value = response.get('SecretBinary') and response.get('SecretBinary').decode('utf-8') # if secret was created in cli
-        
+            # secret was created in cli
+            secret_value = response.get('SecretBinary') and response.get('SecretBinary').decode('utf-8')   
         if not secret_value:
             raise ValueError((f"SSM failed to retrieve secret {secret_name}. Both SecretString and SecretBinary are None."))
 

@@ -2,11 +2,12 @@
 import json
 import logging
 from typing import Any, Callable, Dict, NewType
+from .configuration import ConfigurationSection
 
 logger = logging.getLogger()
 
 DEFAULT_ENVIRONMENT_NAME = 'prod'
-DEFAULT_DEPLOYMENT_STARTEGY_NAME = 'service-deployment-strategy'  # This assumes this service deployment strategy was created using Terraform. For now it was created manually.
+DEFAULT_SERVICE_DEPLOYMENT_STARTEGY = 'linear-service-deployment'  # This assumes this service deployment strategy was created using Terraform. For now it was created manually.
 
 Deployment = NewType('Deployment', Dict)
 
@@ -19,7 +20,7 @@ def compose_app_name(service_name: str, stage: str, region: str) -> str:
     return f'{service_name}-{stage}-{region}'
 
 
-def app_config_get_application_id(appconfig: Any, app_name: str, create_if_not_exists: bool = True) -> str:
+def app_config_get_application_id(appconfig: Any, app_name: str, create_if_not_exists: bool = False) -> str:
     return _get_or_create_id(
         app_name,
         lambda next_token: appconfig.list_applications(NextToken=next_token) if next_token else appconfig.list_applications(),
@@ -27,7 +28,7 @@ def app_config_get_application_id(appconfig: Any, app_name: str, create_if_not_e
     )
 
 
-def app_config_get_environment_id(appconfig: Any, app_id: str, env_name: str, create_if_not_exists: bool = True) -> str:
+def app_config_get_environment_id(appconfig: Any, app_id: str, env_name: str, create_if_not_exists: bool = False) -> str:
     return _get_or_create_id(
         env_name,
         lambda next_token: appconfig.list_environments(ApplicationId=app_id, NextToken=next_token) if next_token else appconfig.list_environments(ApplicationId=app_id),
@@ -35,7 +36,7 @@ def app_config_get_environment_id(appconfig: Any, app_id: str, env_name: str, cr
     )
 
 
-def app_config_get_deployment_strategy_id(appconfig: Any, strategy_name: str = DEFAULT_DEPLOYMENT_STARTEGY_NAME) -> str:
+def app_config_get_deployment_strategy_id(appconfig: Any, strategy_name: str = DEFAULT_SERVICE_DEPLOYMENT_STARTEGY) -> str:
     id = _get_id_by_name(
         strategy_name,
         lambda next_token: appconfig.list_deployment_strategies(NextToken=next_token) if next_token else appconfig.list_deployment_strategies()
@@ -47,13 +48,24 @@ def app_config_get_deployment_strategy_id(appconfig: Any, strategy_name: str = D
     raise KeyError(f'Deployment strategy with name ${strategy_name} does not exist')
 
 
-def app_config_get_profile_id(appconfig: Any, app_id: str, config_name: str, create_if_not_exists: bool = True) -> str:
+def app_config_get_profile_id(appconfig: Any, app_id: str, config_name: str, create_if_not_exists: bool = False) -> str:
     return _get_or_create_id(
         config_name,
         lambda next_token: appconfig.list_configuration_profiles(ApplicationId=app_id, NextToken=next_token) if next_token else appconfig.list_configuration_profiles(ApplicationId=app_id),
         create_if_not_exists and (lambda: appconfig.create_configuration_profile(ApplicationId=app_id, Name=config_name, LocationUri='hosted'))
     )
 
+def app_config_create_hosted_configuration_version(appconfig: Any, app_id: str, config_profile_id: str, configuration: Dict[str, ConfigurationSection]) -> int:
+    config_bytes = json.dumps(configuration).encode('utf-8')
+
+    version = appconfig.create_hosted_configuration_version(
+        ApplicationId=app_id,
+        ConfigurationProfileId=config_profile_id,
+        Content=config_bytes,
+        ContentType='application/json'
+    )
+
+    return version.get('VersionNumber')
 
 def app_config_data_get_latest_configuration(appconfigdata: Any, app_id: str, env_id: str, config_profile_id: str) -> Dict[str, Any]:
         

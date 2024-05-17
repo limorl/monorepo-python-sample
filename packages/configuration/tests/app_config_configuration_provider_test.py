@@ -3,14 +3,14 @@ import pytest
 from botocore.exceptions import ClientError
 from unittest.mock import Mock, patch
 from configuration.app_config_configuration_provider import AppConfigConfigurationProvider
-from configuration.configuration_provider import ConfigurationDict
+from configuration.configuration_provider import ConfigurationSection
 from configuration.configuration import Configuration
 from environment.environment_variables import EnvironmentVariables, reset_environment_variables
 from configuration.app_config_utils import compose_app_name, compose_config_name
 
 
 class FooConfiguration(Configuration):
-    def __init__(self, config_dict: ConfigurationDict):
+    def __init__(self, config_dict: ConfigurationSection):
         self.int1 = config_dict['int1']
         self.str2 = config_dict['str2']
         self.section10 = config_dict.get('section10', {})
