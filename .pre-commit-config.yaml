@@ -12,26 +12,22 @@ repos:
         - id: flake8
           stages: [push]
 
-    - repo: https://github.com/hcodes/yaspeller
-      rev: v10.0.1
-      hooks:
-        - id: yaspeller
-          stages: [push]
+    # TODO (@limorl): yaspeller uses deprecated module punycode, we should move to cspell, but there are issues with its installation
+    # - repo: https://github.com/hcodes/yaspeller
+    #   rev: v10.0.1
+    #   hooks:
+    #     - id: yaspeller
+    #       stages: [push]
     
-    - repo: https://github.com/streetsidesoftware/cspell-cli/
-      rev: v8.8.1
-      hooks:
-        - id: cspell
-          description: CSpell spellchecker
-          entry: cspell-cli
-          language: node
-          types: [text]
-          args:
-            - --no-must-find-files
-            - --no-progress
-            - --no-summary
-            - --gitignore
-          stages: [push]
+    # - repo: https://github.com/streetsidesoftware/cspell-cli
+    #   rev: v8.8.1
+    #   hooks:
+    #     - id: cspell
+    #       description: CSpell spellchecker
+    #       entry: cspell-cli
+    #       language: node
+    #       types: [text]
+    #       stages: [commit]
 
     # This will be updated to run recursively after Poetry is added and to run only on impacted tests. The ci.yml workflow should run all unit tests
     - repo: local

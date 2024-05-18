@@ -46,12 +46,30 @@ files = []
 develop = true
 
 [package.dependencies]
+environment = {path = "../environment"}
 jsonify = "0.5"
 python-dotenv = "1.0.1"
 
 [package.source]
 type = "directory"
 url = "../../packages/configuration"
+
+[[package]]
+name = "environment"
+version = "0.1.0"
+description = "Environment Variables"
+optional = false
+python-versions = "^3.10"
+files = []
+develop = false
+
+[package.dependencies]
+jsonify = "0.5"
+python-dotenv = "1.0.1"
+
+[package.source]
+type = "directory"
+url = "../../packages/environment"
 
 [[package]]
 name = "exceptiongroup"

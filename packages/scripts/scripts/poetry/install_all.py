@@ -11,6 +11,7 @@ def export_requirements_to_directory(directory: Path):
 
 def install_dependencies_in_directory(directory: Path):
     print(f"Installing dependencies in: {directory}")
+    subprocess.run(["poetry", "lock", "--no-update"], cwd=directory)
     subprocess.run(["poetry", "install"], cwd=directory)
 
 

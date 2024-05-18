@@ -26,7 +26,6 @@
     "lang": "en",
     "ignoreTags": ["code", "script"],
     "ignoreUrls": true,
-    "ignoreUppercase": true,
     "ignoreDigits": true,
     "dictionary": [
         "api",
