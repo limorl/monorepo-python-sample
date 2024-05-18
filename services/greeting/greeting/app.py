@@ -47,5 +47,6 @@ def create_and_init_configuration_provider() -> IConfigurationProvider:
     config_provider.init_configuration()
     return config_provider
 
+
 configuration_provider = create_and_init_configuration_provider()
 app = create_app(configuration_provider, Greeting(configuration_provider))
