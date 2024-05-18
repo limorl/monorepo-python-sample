@@ -5,7 +5,7 @@ from scripts.utils.packages import get_package_paths, is_service_path
 
 
 def export_requirements_to_directory(directory: Path):
-    print(f"Exporting dependencies to: {directory}/requirments.txt")
+    print(f"Exporting dependencies to: {directory}/requirements.txt")
     subprocess.run(["poetry", "export", "-f", "requirements.txt", "--output", "./requirements.txt", "--without-hashes"], cwd=directory)
 
 

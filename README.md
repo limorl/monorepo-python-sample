@@ -48,7 +48,7 @@ This requires *all of our developers* to use docker and Visual Studio Code, to g
 ### Initial Setup
 1. Clone the [DevContainer](https://github.com/vox-studio/dev-container) repo.
 2. Open the repo in visual studio code
-3. Create and edit .devcontainer/.env based on the .env.sample file. Set TARGETARCH and VARIANT based on your computer architecture, as explaind in the comments on .env.sample.
+3. Create and edit .devcontainer/.env based on the .env.sample file. Set TARGETARCH and VARIANT based on your computer architecture, as explained in the comments on .env.sample.
 3. Press `CMD SHIFT P` and then type `reopen in container`
 4. Once the container is ready you should have a working dev-environment.
 5. If you are running into `Remote-Containers CLI: RPC pipe not configured` error, please [follow this fix](https://rexbytes.com/2022/08/23/visual-studio-docker-container-target-stop-importing-local-git-config/)
@@ -56,7 +56,7 @@ This requires *all of our developers* to use docker and Visual Studio Code, to g
 ### Dependency Management, Packaging and Versioning 
 [Poetry](https://python-poetry.org/) is used for dependency management in the monorepo instead of `pip`.
 Potery settings and list of dependencies is managed in `pyproject.toml` file for each package, in addition to the root.
-To install a package, add  `<package-name> = "<verion>"` to the `pyproject.toml` file and install using `poetry install`.
+To install a package, add  `<package-name> = "<version>"` to the `pyproject.toml` file and install using `poetry install`.
 Make sure you distinguish dev and prod dependencies.
 
 In the long run, we aim to release packages into a private Github package registry and install them from the registry.
@@ -87,7 +87,7 @@ Given a version number MAJOR.MINOR.PATCH, increment the:
 * MINOR version when you add functionality in a backward compatible manner
 * PATCH version when you make backward compatible bug fixes
 
-#### Commit Messages Format (to be inforced through Code Review):
+#### Commit Messages Format (to be enforced through Code Review):
 To allow automatic versioning, we'll need to follow commit message format.
 
 1. **Commit Message Format:** `<type>(<scope>): <short summary>`.
@@ -294,3 +294,5 @@ curl https://8fwcdbjd95.execute-api.us-east-1.amazonaws.com/prod/hello/Danny
 ```
 
 **NOTE:** When deployed remotely, the greeting message returns with 5 exclamation points, according to the remote config, but when running locally or on local stack, it is returned with a single exclamation point. 
+
+spellddoper

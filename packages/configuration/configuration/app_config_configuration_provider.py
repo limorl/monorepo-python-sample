@@ -27,7 +27,7 @@ class AppConfigConfigurationProvider(IConfigurationProvider):
                 Type: String
 
         It is recommended to use lambda extensions for appcongi and ssm as explained here: https://medium.com/@guidonebiolo/boost-your-serverless-apps-with-aws-lambda-extensions-and-appconfig-5d41808c74ce.
-        For now, we use a simple implementation in which in each lambda invokation, the configuration and secrets are retreived from appcofig and ssm.
+        For now, we use a simple implementation in which in each lambda invocation, the configuration and secrets are retrieved from appcofig and ssm.
     """
 
     def __init__(self, env_vars: EnvironmentVariables):

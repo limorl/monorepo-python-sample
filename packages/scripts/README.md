@@ -11,7 +11,7 @@ pytest-all = "scripts.testing.pytest_all:main"
 pytest-impacted-pnly = "scripts.testing.pytest_impacted_only:main"
 ```
 
-To run thos scripts from the root folder or from a sub directory, we had to wrap those scripts and locate it under the root repo: `monorepo-python-sample/run_script.py`.
+To run those scripts from the root folder or from a sub directory, we had to wrap those scripts and locate it under the root repo: `monorepo-python-sample/run_script.py`.
 
 ## Adding/Updating scripts
 If you are adding or updatimg scripts, you need to add them to `[tool.poetry.scripts]` configuration and re-install the scripts package before you can run them via `run_script.py`

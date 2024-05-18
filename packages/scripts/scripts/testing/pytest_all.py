@@ -33,7 +33,7 @@ def run_pytest_for_package(package_dir):
 def pytest_all():
     package_paths = get_package_paths()
     for path in package_paths:
-        print("Runnin Pytest for package: ", path)
+        print("Running Pytest for package: ", path)
         run_pytest_for_package(path)
 
 

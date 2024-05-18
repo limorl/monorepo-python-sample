@@ -1,6 +1,6 @@
 # Configuration Provider
 
-Configuration provider is initialized with a config file which containes configuration sections named after the type of configuration.
+Configuration provider is initialized with a config file which contains configuration sections named after the type of configuration.
 For example, a configuration file as follows:
 ```json
 {
@@ -30,4 +30,4 @@ For example, a configuration file as follows:
 }
 ```
 
-`app_configuration_provider.get_configuration(AppConfiguration)` it will return an oject of type `AppConfiguration`.
+`app_configuration_provider.get_configuration(AppConfiguration)` it will return an object of type `AppConfiguration`.
