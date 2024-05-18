@@ -13,11 +13,12 @@ This is a sample monorepo that can be used as a starting point for a python proj
 
 ### Next Steps
 The monorepo will be extendedt to support:
-1. Implement AppConfigConfigurationProvider based on AWS AppConfig and SSM
+1. Implement AppConfigConfigurationProvider based on AWS AppConfig and SSM - Start Lambda with AppConfigConfigurationProvider when runs on AWS + Define IAM role to access AppConfig and SSM
 2. Logging using [aws-powertools] (https://github.com/aws-powertools/powertools-lambda-python)
-2. Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/
-4. Terraform to deploy infra on localstack and on AWS
-5. Add a deployment.yml workflow to deploy to AWS and to Localstack
+3. Use Lambda Extensions to better handle calls to AppConfig and SSM
+4. Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/
+5. Terraform to deploy infra on localstack and on AWS
+6. Add a deployment.yml workflow to deploy to AWS and to Localstack
 7. Add e2e.yml workflow with a simple e2e test which runs nightly (every night)
 
 ## Issues
@@ -241,13 +242,13 @@ Use the `FunctionName` in the returned list when invoking the lambda.
 For example, for greeting service, invoke the lambda function:
 ```shell
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingFlaskLambda-3497da7d \
+--function-name greeting-service-GreetingLambda-3497da7d \
 --payload '{"headers": {}, "path": "/hello", "httpMethod": "GET"}' \
 --cli-binary-format raw-in-base64-out \
 output.txt
 
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingFlaskLambda-3497da7d \
+--function-name greeting-service-GreetingLambda-3497da7d \
 --payload '{"headers": {}, "path": "/hello/Danny", "httpMethod": "GET"}' \
 --cli-binary-format raw-in-base64-out \
 output.txt
