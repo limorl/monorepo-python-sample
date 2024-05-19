@@ -3,7 +3,7 @@ import logging
 from botocore.exceptions import ClientError
 from typing import Dict, Any
 
-SECRET_PREFIX = 'ssm:'
+SECRET_PREFIX = 'secret:'
 
 logger = logging.getLogger()
 
@@ -12,12 +12,12 @@ def is_secret(val: str) -> bool:
     return isinstance(val, str) and val.startswith(SECRET_PREFIX)
 
 
-def ssm_get_secret_value(ssm, secret_config_val: str) -> str:
+def secrets_manager_get_secret_value(secretesmanager: Any, secret_config_val: str) -> str:
     secret_name = secret_config_val and secret_config_val.replace(SECRET_PREFIX, '')
 
     try:
-        response = ssm.get_secret_value(SecretId=secret_name)
-        secret_value = _parse_secret(response.get('SecretString'))  # if secret were created by ssm console
+        response = secretesmanager.get_secret_value(SecretId=secret_name)
+        secret_value = _parse_secret(response.get('SecretString'))  # if secret were created by secrets manager console
 
         if not secret_value:
             # secret was created in cli

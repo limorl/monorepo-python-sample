@@ -38,8 +38,8 @@ def mock_configuration_dict():
                 "str10": "10"
             },
             "secrets10": {
-                "secret11": "ssm:test/app/fake-secret-1",
-                "secret12": "ssm:test/app/fake-secret-2"
+                "secret11": "secret:test/app/fake-secret-1",
+                "secret12": "secret:test/app/fake-secret-2"
             }
         }
     }

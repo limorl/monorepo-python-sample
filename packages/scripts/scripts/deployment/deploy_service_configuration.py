@@ -9,7 +9,7 @@ import os
 import time
 from typing import Any, Dict
 from configuration.configuration import ConfigurationSection
-from configuration.app_config_utils import compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_deployment_strategy_id, app_config_get_environment_id, app_config_get_profile_id, app_config_create_hosted_configuration_version
+from configuration.app_config_utils import APP_CONFIG_REGION, compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_deployment_strategy_id, app_config_get_environment_id, app_config_get_profile_id, app_config_create_hosted_configuration_version
 
 logger = logging.getLogger()
 
@@ -37,17 +37,18 @@ def deploy_service_configuration(service_name: str, platform: str, stage: str, r
     """Deploy service configuration to AWS AppConfig"""
     config_folder = 'config'
     config_name = compose_config_name(platform, stage, region)
-    config_file = os.path.join(os.getcwd(), 'services', service_name, config_folder, f'{config_name}.json')
 
+    config_file = os.path.join(os.getcwd(), 'services', service_name, config_folder, f'{config_name}.json')
+    
     if not os.path.exists(config_file):
-        logger.warn(f'No configuration file found under {config_folder} folder for service {service_name}')
+        logger.warning(f'No configuration file found under {config_folder} folder for service {service_name}')
         return
 
     options = {}
-    options['region_name'] = region
+    options['region_name'] = APP_CONFIG_REGION
     appconfig = boto3.client('appconfig', **options)
 
-    app_name = compose_app_name(service_name, stage, region)
+    app_name = compose_app_name(service_name)
     app_id = app_config_get_application_id(appconfig, app_name, True)
     env_id = app_config_get_environment_id(appconfig, app_id, stage, True)
     service_deployment_strategy_id = app_config_get_deployment_strategy_id(appconfig, DEFAULT_SERVICE_DEPLOYMENT_STARTEGY)

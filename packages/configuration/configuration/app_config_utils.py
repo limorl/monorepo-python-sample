@@ -7,12 +7,12 @@ from .configuration import ConfigurationSection
 logger = logging.getLogger()
 
 
+def compose_app_name(service_name: str) -> str:
+    return f'{service_name}-app'
+
+
 def compose_config_name(platform: str, stage: str, region: str) -> str:
     return f'{platform.lower()}.{stage}.{region}'
-
-
-def compose_app_name(service_name: str, stage: str, region: str) -> str:
-    return f'{service_name}-{stage}-{region}'
 
 
 def app_config_get_application_id(appconfig: Any, app_name: str, create_if_not_exists: bool = False) -> str:

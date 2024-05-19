@@ -6,7 +6,6 @@ from configuration.app_config_configuration_provider import AppConfigConfigurati
 from configuration.configuration_provider import ConfigurationSection
 from configuration.configuration import Configuration
 from environment.environment_variables import EnvironmentVariables, reset_environment_variables
-from configuration.app_config_utils import compose_app_name, compose_config_name
 
 
 class FooConfiguration(Configuration):
@@ -28,14 +27,19 @@ def env_variables():
     return EnvironmentVariables()
 
 
-@pytest.fixture
-def app_name(env_variables):
-    return compose_app_name(env_variables.service_name, env_variables.stage.value, env_variables.region)
+# @pytest.fixture
+# def app_name(env_variables):
+#     return env_variables.service_name
 
 
-@pytest.fixture
-def config_name(env_variables):
-    return compose_config_name(env_variables.platform.value, env_variables.stage.value, env_variables.region)
+# @pytest.fixture
+# def config_profile_name(env_variables):
+#     return compose_config_profile_name(env_variables.service_name, env_variables.stage.value)
+
+
+# @pytest.fixture
+# def config_name(env_variables):
+#     return compose_config_name(env_variables.platform.value, env_variables.stage.value, env_variables.region)
 
 
 @pytest.fixture
@@ -51,10 +55,10 @@ def app_configuration_provider(env_variables):
     with patch('boto3.client') as mock_boto_client:
         mock_appconfig = Mock()
         mock_appconfigdata = Mock()
-        mock_ssm = Mock()
-        mock_boto_client.side_effect = lambda service, **kwargs: mock_appconfig if service == 'appconfig' else (mock_appconfigdata if service == 'appconfigdata' else mock_ssm)
+        mock_secretsmanager = Mock()
+        mock_boto_client.side_effect = lambda service, **kwargs: mock_appconfig if service == 'appconfig' else (mock_appconfigdata if service == 'appconfigdata' else mock_secretsmanager)
         configuration_provider = AppConfigConfigurationProvider(env_vars=env_variables)
-        return configuration_provider, mock_appconfig, mock_appconfigdata, mock_ssm
+        return configuration_provider, mock_appconfig, mock_appconfigdata, mock_secretsmanager
 
 
 def test_init_and_get_configuration_success(
@@ -69,7 +73,7 @@ def test_init_and_get_configuration_success(
         mock_get_secret_value_responses
 ):
 
-    config_provider, mock_appconfig, mock_appconfigdata, mock_ssm = app_configuration_provider
+    config_provider, mock_appconfig, mock_appconfigdata, mock_secretsmanager = app_configuration_provider
 
     mock_appconfig.list_applications.return_value = mock_list_applications_response
     mock_appconfig.list_environments.return_value = mock_list_environments_response
@@ -79,7 +83,7 @@ def test_init_and_get_configuration_success(
     mock_appconfigdata.start_configuration_session.return_value = mock_start_configuration_session_response
     mock_appconfigdata.get_latest_configuration.return_value = mock_get_latest_configuration_response
 
-    mock_ssm.get_secret_value.side_effect = mock_get_secret_value_responses
+    mock_secretsmanager.get_secret_value.side_effect = mock_get_secret_value_responses
 
     config_provider.init_configuration()
 
@@ -90,7 +94,7 @@ def test_init_and_get_configuration_success(
     mock_appconfigdata.start_configuration_session.assert_called_once()
     mock_appconfigdata.get_latest_configuration.assert_called_once()
 
-    assert config_provider._app_name == 'hello-prod-us-west-2'
+    assert config_provider._app_name == 'hello-app'
     assert config_provider._config_name == 'aws.prod.us-west-2'
 
     foo_configuration: FooConfiguration = config_provider.get_configuration(FooConfiguration)

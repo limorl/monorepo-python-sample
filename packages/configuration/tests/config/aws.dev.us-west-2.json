@@ -1,0 +1,10 @@
+{
+    "TestConfiguration": {
+        "int1": 1,
+        "str2": "2",
+        "secrets": {
+            "secret_plain": "secret:test/app/fake-secret-plain",
+            "secret_pair": "secret:test/app/fake-secret-pair"
+        }
+    }
+}

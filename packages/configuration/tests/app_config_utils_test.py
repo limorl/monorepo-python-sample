@@ -3,7 +3,7 @@ from configuration.app_config_utils import compose_app_name, compose_config_name
 
 
 def test_compose_app_name():
-    assert compose_app_name('my-service', 'dev', 'us-west-2') == 'my-service-dev-us-west-2'
+    assert compose_app_name('test') == 'test-app'
 
 
 def test_compose_config_name():
