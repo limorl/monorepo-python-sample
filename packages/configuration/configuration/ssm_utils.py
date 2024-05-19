@@ -31,6 +31,7 @@ def ssm_get_secret_value(ssm, secret_config_val: str) -> str:
 
     return secret_value
 
+
 def _parse_secret(text: str) -> str | Dict[str, Any]:
     try:
         if text and text.startswith('{') and text.endswith('}'):
