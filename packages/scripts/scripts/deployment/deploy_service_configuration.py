@@ -39,7 +39,7 @@ def deploy_service_configuration(service_name: str, platform: str, stage: str, r
     config_name = compose_config_name(platform, stage, region)
 
     config_file = os.path.join(os.getcwd(), 'services', service_name, config_folder, f'{config_name}.json')
-    
+
     if not os.path.exists(config_file):
         logger.warning(f'No configuration file found under {config_folder} folder for service {service_name}')
         return

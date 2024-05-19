@@ -13,6 +13,7 @@ logger = logging.getLogger()
 # We are using app config on a single region, while services can be on multiple regions
 APP_CONFIG_REGION = 'us-east-1'
 
+
 class AppConfigConfigurationProvider(IConfigurationProvider):
     """ Configuration Provider based on AWS App Config.
         When deploying services, the configuration files under the service's /config folders are deployed to AppConfig.
