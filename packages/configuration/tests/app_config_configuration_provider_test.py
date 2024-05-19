@@ -41,8 +41,8 @@ def config_name(env_variables):
 @pytest.fixture
 def mock_get_secret_value_responses():
     return [
-        {'ARN': 'test-arn', 'SecretString': 'populated-fake-secret-11'},
-        {'ARN': 'test-arn', 'SecretString': 'populated-fake-secret-12'}
+        {'ARN': 'test-arn', 'SecretString': 'populated-fake-secret-1'},
+        {'ARN': 'test-arn', 'SecretString': 'populated-fake-secret-2'}
     ]
 
 
