@@ -36,4 +36,3 @@ class IConfigurationProvider(ABC):
 
     @abstractmethod
     def _read_configuration(self) -> Dict[str, ConfigurationSection]:
-        pass

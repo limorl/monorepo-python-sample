@@ -1,6 +1,7 @@
 # Configuration Provider
 
 Configuration provider is initialized with a config file which contains configuration sections named after the type of configuration.
+
 For example, a configuration file as follows:
 ```json
 {

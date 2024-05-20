@@ -37,6 +37,7 @@ class AppConfigConfigurationProvider(IConfigurationProvider):
         super().__init__()
 
         options: Dict = {'region_name': APP_CONFIG_REGION}
+
         if env_vars.cloud_endpoint_override:
             options['endpoint_url'] = env_vars.cloud_endpoint_override
 

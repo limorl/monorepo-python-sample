@@ -295,5 +295,3 @@ curl https://8fwcdbjd95.execute-api.us-east-1.amazonaws.com/prod/hello/Danny
 ```
 
 **NOTE:** When deployed remotely, the greeting message returns with 5 exclamation points, according to the remote config, but when running locally or on local stack, it is returned with a single exclamation point. 
-
-spellddoper

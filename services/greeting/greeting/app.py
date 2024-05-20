@@ -1,3 +1,4 @@
+import asyncio
 import os
 from .lambda_logging import get_logger
 from .greeting import IGreeting, Greeting
