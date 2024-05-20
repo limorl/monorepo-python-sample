@@ -1,17 +1,19 @@
 import logging
 from abc import ABC, abstractmethod
 from typing import Dict, Type
-from configuration.configuration import ConfigurationDict, ConfigT
+from configuration.configuration import ConfigurationSection, ConfigT
 
 logger = logging.getLogger()
 
 
 class IConfigurationProvider(ABC):
+    """ Synchronous Configuration Provider, initialized before creating apps (services) """
+
     __initiated = False
     __initiating = False
-    __configuration: Dict[str, ConfigurationDict] = {}
+    __configuration: Dict[str, ConfigurationSection] = {}
 
-    async def init_configuration(self) -> None:
+    def init_configuration(self) -> None:
         if self.__initiated or self.__initiating:
             return
 
@@ -33,5 +35,5 @@ class IConfigurationProvider(ABC):
         return config_type(config_data)
 
     @abstractmethod
-    def _read_configuration(self) -> Dict[str, ConfigurationDict]:
+    def _read_configuration(self) -> Dict[str, ConfigurationSection]:
         pass

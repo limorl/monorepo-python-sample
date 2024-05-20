@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from typing import Dict, Type
-from configuration.configuration import ConfigurationDict, ConfigT
+from configuration.configuration import ConfigurationSection, ConfigT
 from configuration.configuration_provider import IConfigurationProvider
 from environment.environment_variables import EnvironmentVariables, is_cloud_platform
 
@@ -26,7 +26,7 @@ class LocalConfigurationProvider(IConfigurationProvider):
     def get_configuration(self, config_type: Type[ConfigT]) -> ConfigT:
         return super().get_configuration(config_type)
 
-    def _read_configuration(self) -> Dict[str, ConfigurationDict]:
+    def _read_configuration(self) -> Dict[str, ConfigurationSection]:
         try:
             with open(self._config_file_path, 'r') as file:
                 logger.debug(f"LocalConfigurationProvider loading configuration file: {self._config_file_path}")
@@ -50,5 +50,3 @@ class LocalConfigurationProvider(IConfigurationProvider):
             return os.path.join(local_config_folder, f'{platform}.{stage}.{region}.json')
         else:
             return os.path.join(local_config_folder, f'{platform}.{stage}.json')
-
-        return None

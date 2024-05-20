@@ -13,11 +13,12 @@ This is a sample monorepo that can be used as a starting point for a python proj
 
 ### Next Steps
 The monorepo will be extendedt to support:
-1. Implement AppConfigConfigurationProvider based on AWS AppConfig and SSM
+1. Implement AppConfigConfigurationProvider based on AWS AppConfig and SSM - Start Lambda with AppConfigConfigurationProvider when runs on AWS + Define IAM role to access AppConfig and SSM
 2. Logging using [aws-powertools] (https://github.com/aws-powertools/powertools-lambda-python)
-2. Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/
-4. Terraform to deploy infra on localstack and on AWS
-5. Add a deployment.yml workflow to deploy to AWS and to Localstack
+3. Use Lambda Extensions to better handle calls to AppConfig and SSM
+4. Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/
+5. Terraform to deploy infra on localstack and on AWS
+6. Add a deployment.yml workflow to deploy to AWS and to Localstack
 7. Add e2e.yml workflow with a simple e2e test which runs nightly (every night)
 
 ## Issues
@@ -48,7 +49,7 @@ This requires *all of our developers* to use docker and Visual Studio Code, to g
 ### Initial Setup
 1. Clone the [DevContainer](https://github.com/vox-studio/dev-container) repo.
 2. Open the repo in visual studio code
-3. Create and edit .devcontainer/.env based on the .env.sample file. Set TARGETARCH and VARIANT based on your computer architecture, as explaind in the comments on .env.sample.
+3. Create and edit .devcontainer/.env based on the .env.sample file. Set TARGETARCH and VARIANT based on your computer architecture, as explained in the comments on .env.sample.
 3. Press `CMD SHIFT P` and then type `reopen in container`
 4. Once the container is ready you should have a working dev-environment.
 5. If you are running into `Remote-Containers CLI: RPC pipe not configured` error, please [follow this fix](https://rexbytes.com/2022/08/23/visual-studio-docker-container-target-stop-importing-local-git-config/)
@@ -56,7 +57,7 @@ This requires *all of our developers* to use docker and Visual Studio Code, to g
 ### Dependency Management, Packaging and Versioning 
 [Poetry](https://python-poetry.org/) is used for dependency management in the monorepo instead of `pip`.
 Potery settings and list of dependencies is managed in `pyproject.toml` file for each package, in addition to the root.
-To install a package, add  `<package-name> = "<verion>"` to the `pyproject.toml` file and install using `poetry install`.
+To install a package, add  `<package-name> = "<version>"` to the `pyproject.toml` file and install using `poetry install`.
 Make sure you distinguish dev and prod dependencies.
 
 In the long run, we aim to release packages into a private Github package registry and install them from the registry.
@@ -87,7 +88,7 @@ Given a version number MAJOR.MINOR.PATCH, increment the:
 * MINOR version when you add functionality in a backward compatible manner
 * PATCH version when you make backward compatible bug fixes
 
-#### Commit Messages Format (to be inforced through Code Review):
+#### Commit Messages Format (to be enforced through Code Review):
 To allow automatic versioning, we'll need to follow commit message format.
 
 1. **Commit Message Format:** `<type>(<scope>): <short summary>`.
@@ -241,13 +242,13 @@ Use the `FunctionName` in the returned list when invoking the lambda.
 For example, for greeting service, invoke the lambda function:
 ```shell
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingFlaskLambda-3497da7d \
+--function-name greeting-service-GreetingLambda-3497da7d \
 --payload '{"headers": {}, "path": "/hello", "httpMethod": "GET"}' \
 --cli-binary-format raw-in-base64-out \
 output.txt
 
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingFlaskLambda-3497da7d \
+--function-name greeting-service-GreetingLambda-3497da7d \
 --payload '{"headers": {}, "path": "/hello/Danny", "httpMethod": "GET"}' \
 --cli-binary-format raw-in-base64-out \
 output.txt

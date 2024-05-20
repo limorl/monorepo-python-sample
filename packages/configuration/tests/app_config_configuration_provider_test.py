@@ -1,64 +1,137 @@
-""" import json
 import os
-from unittest.mock import patch, MagicMock
 import pytest
-from configuration.configuration_provider import Configuration
+from botocore.exceptions import ClientError
+from unittest.mock import Mock, patch
 from configuration.app_config_configuration_provider import AppConfigConfigurationProvider
+from configuration.configuration_provider import ConfigurationSection
+from configuration.configuration import Configuration
 from environment.environment_variables import EnvironmentVariables, reset_environment_variables
-from typing import Dict, Any
+
+
+class FooConfiguration(Configuration):
+    def __init__(self, config_dict: ConfigurationSection):
+        self.int1 = config_dict['int1']
+        self.str2 = config_dict['str2']
+        self.section10 = config_dict.get('section10', {})
+        self.secrets10 = config_dict.get('secrets10', {})
+
 
 @pytest.fixture
-def aws_prod_env():
-    # reset_environment_variables()
+def env_variables():
+    reset_environment_variables()
     os.environ['PLATFORM'] = 'AWS'
     os.environ['STAGE'] = 'prod'
-    os.environ['REGION'] = 'region'
-    os.environ['SERVICE_NAME'] = 'service'
+    os.environ['REGION'] = 'us-west-2'
+    os.environ['SERVICE_NAME'] = 'hello'
 
-    yield EnvironmentVariables()
+    return EnvironmentVariables()
+
+
+# @pytest.fixture
+# def app_name(env_variables):
+#     return env_variables.service_name
+
+
+# @pytest.fixture
+# def config_profile_name(env_variables):
+#     return compose_config_profile_name(env_variables.service_name, env_variables.stage.value)
+
+
+# @pytest.fixture
+# def config_name(env_variables):
+#     return compose_config_name(env_variables.platform.value, env_variables.stage.value, env_variables.region)
+
 
 @pytest.fixture
-def app_config_configuration_provider(aws_prod_env):
-    with patch('configuration.app_config_configuration_provider.boto3') as mock_boto3:
-        mock_app_config = mock_boto3.client.return_value
-        mock_ssm = mock_boto3.client.return_value
-
-        mock_app_config.list_applications.side_effect = [
-            {'Items': [{'Name': 'App1'}, {'Name': 'App2'}], 'NextToken': 'token'},
-            {'Items': [{'Name': 'App3'}, {'Name': 'service-prod-region', 'Id': 'app-id'}]},
-        ]
-        mock_app_config.list_configuration_profiles.side_effect = [
-            {'Items': [{'Name': 'FooConfig'}], 'NextToken': 'token'},
-            {'Items': [{'Name': 'BarConfig'}]},
-        ]
-        mock_app_config.get_configuration.side_effect = [
-            {'Content': json.dumps({'size': 10, 'message': 'hi'}).encode()},
-            {'Content': json.dumps({'url': 'url.com', 'arr': ['value1', 'value2'], 'queue': {'should_persist': False, 'token': 'SECRET'}}).encode()},
-        ]
-        mock_ssm.get_parameter.return_value = {'Parameter': {'Value': 'SECRET'}}
-        yield AppConfigConfigurationProvider(aws_prod_env)
-
-class FooConfig(Configuration):
-    size: int
-    message: str
+def mock_get_secret_value_responses():
+    return [
+        {'ARN': 'test-arn', 'SecretString': 'populated-fake-secret-1'},
+        {'ARN': 'test-arn', 'SecretString': 'populated-fake-secret-2'}
+    ]
 
 
-class BarConfig(Configuration):
-    url: str
-    queue: Dict[str, Any]
+@pytest.fixture
+def app_configuration_provider(env_variables):
+    with patch('boto3.client') as mock_boto_client:
+        mock_appconfig = Mock()
+        mock_appconfigdata = Mock()
+        mock_secretsmanager = Mock()
+        mock_boto_client.side_effect = lambda service, **kwargs: mock_appconfig if service == 'appconfig' else (mock_appconfigdata if service == 'appconfigdata' else mock_secretsmanager)
+        configuration_provider = AppConfigConfigurationProvider(env_vars=env_variables)
+        return configuration_provider, mock_appconfig, mock_appconfigdata, mock_secretsmanager
 
 
-@pytest.mark.asyncio
-async def test_configuration_provider_init_configurations(app_config_configuration_provider):
-    await app_config_configuration_provider.init_configuration()
-    foo_config = app_config_configuration_provider.get_configuration(FooConfig)
+def test_init_and_get_configuration_success(
+        app_configuration_provider,
+        mock_configuration_dict,
+        mock_configuration_with_secrets_dict,
+        mock_list_applications_response,
+        mock_list_environments_response,
+        mock_list_configuration_profiles_response,
+        mock_start_configuration_session_response,
+        mock_get_latest_configuration_response,
+        mock_get_secret_value_responses
+):
 
-    assert foo_config.size == 10
-    assert foo_config.message == 'hi'
+    config_provider, mock_appconfig, mock_appconfigdata, mock_secretsmanager = app_configuration_provider
 
-    bar_config = app_config_configuration_provider.get_configuration(BarConfig)
-    assert bar_config.url == 'url.com'
-    assert bar_config.arr == ['value1', 'value2']
-    assert bar_config.queue.shouldPersist is False
-    assert bar_config.queue.token == 'SECRET'
- """
+    mock_appconfig.list_applications.return_value = mock_list_applications_response
+    mock_appconfig.list_environments.return_value = mock_list_environments_response
+    mock_appconfig.list_configuration_profiles.return_value = mock_list_configuration_profiles_response
+    mock_appconfig.get_configuration.return_value = mock_configuration_dict
+
+    mock_appconfigdata.start_configuration_session.return_value = mock_start_configuration_session_response
+    mock_appconfigdata.get_latest_configuration.return_value = mock_get_latest_configuration_response
+
+    mock_secretsmanager.get_secret_value.side_effect = mock_get_secret_value_responses
+
+    config_provider.init_configuration()
+
+    mock_appconfig.list_applications.assert_called_once()
+    mock_appconfig.list_environments.assert_called_once()
+    mock_appconfig.list_configuration_profiles.assert_called_once()
+
+    mock_appconfigdata.start_configuration_session.assert_called_once()
+    mock_appconfigdata.get_latest_configuration.assert_called_once()
+
+    assert config_provider._app_name == 'hello-app'
+    assert config_provider._config_name == 'aws.prod.us-west-2'
+
+    foo_configuration: FooConfiguration = config_provider.get_configuration(FooConfiguration)
+    expected_foo_configuration_dict = mock_configuration_with_secrets_dict['FooConfiguration']
+
+    # assert configuration is correct and secrets were populated
+    assert foo_configuration
+    assert foo_configuration.int1 == expected_foo_configuration_dict['int1']
+    assert foo_configuration.str2 == expected_foo_configuration_dict['str2']
+    assert foo_configuration.section10['int10'] == expected_foo_configuration_dict['section10']['int10']
+    assert foo_configuration.section10['str10'] == expected_foo_configuration_dict['section10']['str10']
+    assert foo_configuration.secrets10['secret11'] == expected_foo_configuration_dict['secrets10']['secret11']
+    assert foo_configuration.secrets10['secret12'] == expected_foo_configuration_dict['secrets10']['secret12']
+
+
+def test_get_configuration_not_initialized_error(app_configuration_provider):
+    config_provider, _, _, _ = app_configuration_provider
+
+    with pytest.raises(RuntimeError):
+        config_provider.get_configuration(FooConfiguration)
+
+
+def test_init_configuration_app_config_data_error(
+        app_configuration_provider,
+        mock_configuration_dict,
+        mock_list_applications_response,
+        mock_list_environments_response,
+        mock_list_configuration_profiles_response
+):
+    config_provider, mock_appconfig, mock_appconfigdata, _ = app_configuration_provider
+
+    mock_appconfig.list_applications.return_value = mock_list_applications_response
+    mock_appconfig.list_environments.return_value = mock_list_environments_response
+    mock_appconfig.list_configuration_profiles.return_value = mock_list_configuration_profiles_response
+    mock_appconfig.get_configuration.return_value = mock_configuration_dict
+
+    mock_appconfigdata.start_configuration_session.side_effect = ClientError({"Error": {"Code": "InternalServerException"}}, "start_configuration_session")
+
+    with pytest.raises(ClientError):
+        config_provider.init_configuration()

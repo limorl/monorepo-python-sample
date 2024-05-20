@@ -1,4 +1,3 @@
-import asyncio
 import os
 from .lambda_logging import get_logger
 from .greeting import IGreeting, Greeting
@@ -32,7 +31,7 @@ def create_app(configProvider: IConfigurationProvider, greeting: IGreeting):
     return app
 
 
-async def create_and_init_configuration_provider_async() -> IConfigurationProvider:
+def create_and_init_configuration_provider() -> IConfigurationProvider:
     env_variables = EnvironmentVariables()
     logger.debug(f"greeting-service app created with env_variables: {env_variables}")
 
@@ -45,12 +44,8 @@ async def create_and_init_configuration_provider_async() -> IConfigurationProvid
         # config_provider = AppConfigConfigurationProvider()
         config_provider = LocalConfigurationProvider(env_variables)
 
-    await config_provider.init_configuration()
+    config_provider.init_configuration()
     return config_provider
-
-
-def create_and_init_configuration_provider() -> IConfigurationProvider:
-    return asyncio.run(create_and_init_configuration_provider_async())
 
 
 configuration_provider = create_and_init_configuration_provider()
