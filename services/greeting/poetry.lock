@@ -46,7 +46,7 @@ files = []
 develop = true
 
 [package.dependencies]
-environment = {path = "../environment"}
+environment = {path = "../environment", develop = true}
 jsonify = "0.5"
 python-dotenv = "1.0.1"
 
@@ -61,7 +61,7 @@ description = "Environment Variables"
 optional = false
 python-versions = "^3.12"
 files = []
-develop = false
+develop = true
 
 [package.dependencies]
 jsonify = "0.5"

@@ -26,7 +26,7 @@ pyright = "1.1.296"
 pre-commit = "3.6.2"
 debugpy = "1.8.1"
 localstack = "3.3.0"
-scripts = { path = "packages/scripts" }
+scripts = { path = "packages/scripts", develop = true }
 
 [tool.semantic_release]
 version_variable = "pyproject.toml:tool.poetry.version"

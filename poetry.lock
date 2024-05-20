@@ -368,7 +368,7 @@ files = []
 develop = false
 
 [package.dependencies]
-environment = {path = "../environment"}
+environment = {path = "../environment", develop = true}
 jsonify = "0.5"
 python-dotenv = "1.0.1"
 
@@ -618,7 +618,7 @@ description = "Environment Variables"
 optional = false
 python-versions = "^3.12"
 files = []
-develop = false
+develop = true
 
 [package.dependencies]
 jsonify = "0.5"
@@ -2025,4 +2025,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "424088ed1f97911bfbeb12e95b1ecf9f85fd001e48f8e291933e9e7cb08b14ff"
+content-hash = "e049d745f8b7ec2b899a86176716a0bb6acecf8f1fe66c571b5c61261d00db28"

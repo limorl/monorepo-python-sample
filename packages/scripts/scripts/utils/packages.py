@@ -10,9 +10,9 @@ def is_excluded(path: Path) -> bool:
     is_excluded = any(excluded_folder in path.parts for excluded_folder in excluded_directories)
 
     # for now we are not treating the root as a package
-    is_root = is_root_pyproject(path)
+    # is_root = is_root_pyproject(path)
 
-    return is_excluded or is_root
+    return is_excluded  # or is_root
 
 
 def is_service_path(path: Path) -> bool:

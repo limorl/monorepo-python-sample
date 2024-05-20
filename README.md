@@ -62,10 +62,11 @@ Make sure you distinguish dev and prod dependencies.
 
 In the long run, we aim to release packages into a private Github package registry and install them from the registry.
 In the short term, we'll keep it simple and won't publish the packages, but rather install them locally.
+When `develop = true`, the package is installed in editable mode, so chages in the local package will be reflected directly.
 For example:
 ```python
 [tool.poetry.dependencies]
-my_local_package = { path = "../packages/my_local_package", develop = false }
+my_local_package = { path = "../packages/my_local_package", develop = true } 
 ```
 
 #### Package versioning
@@ -208,7 +209,7 @@ To deploy using SAM CLI to LocalStack, set the --endpoint-url parameter to point
 
 First, create an S3 bucket in local stack for the lambdas packaged using sam cli:
 ```shell
-aws-localstack s3api create-bucket --bucket sam-build-lambdas
+aws-localstack s3api create-bucket --bucket sam-build-lambda-code-greeting
 ```
 
 Here's an example on how to build and deploy the greeting service:
@@ -218,13 +219,13 @@ cd services/greeting
 sam build
 ```
 
-Then, deploy using sam deploy:
+Then, deploy to localstack using sam deploy (open a new bash window):
 ```shell
 sam-localstack deploy \
 --stack-name greeting-service \
 --capabilities CAPABILITY_IAM \
 --region us-east-1 \
---s3-bucket sam-build-lambdas \
+--s3-bucket sam-build-lambda-code-greeting \
 --parameter-overrides 'Stage=dev Platform=local'
 ```
 
@@ -241,13 +242,13 @@ Use the `FunctionName` in the returned list when invoking the lambda.
 For example, for greeting service, invoke the lambda function:
 ```shell
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingLambda-3497da7d \
+--function-name greeting-service-GreetingLambda-a09aff94 \
 --payload '{"headers": {}, "path": "/hello", "httpMethod": "GET"}' \
 --cli-binary-format raw-in-base64-out \
 output.txt
 
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingLambda-3497da7d \
+--function-name greeting-service-GreetingLambda-a09aff94 \
 --payload '{"headers": {}, "path": "/hello/Danny", "httpMethod": "GET"}' \
 --cli-binary-format raw-in-base64-out \
 output.txt

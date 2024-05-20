@@ -9,7 +9,7 @@ readme = "README.md"
 python = "^3.12"
 python-dotenv="1.0.1"
 jsonify = "0.5"
-environment = { path = "../environment" }
+environment = { path = "../environment", develop = true }
 
 [tool.poetry.dev-dependencies]
 pytest = "8.2.0"
