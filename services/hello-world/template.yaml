@@ -16,7 +16,7 @@ Resources:
       FunctionName: "hello-world"
       CodeUri: .
       Handler: hello_world.app.lambda_handler
-      Runtime: python3.10
+      Runtime: python3.12
       Architectures:
         - arm64
 

@@ -65,7 +65,6 @@ In the short term, we'll keep it simple and won't publish the packages, but rath
 For example:
 ```python
 [tool.poetry.dependencies]
-python = "^3.10"
 my_local_package = { path = "../packages/my_local_package", develop = false }
 ```
 

@@ -1,7 +1,7 @@
 
-# Default image for DevContainer: Python 3.10 for Apple Silicone
+# Default image for DevContainer: Python 3.12 for Apple Silicone
 ARG IMAGE="mcr.microsoft.com/vscode/devcontainers/python"
-ARG VERSION="3.10"
+ARG VERSION="3.12"
 ARG VARIANT="-bullseye"
 
 FROM ${IMAGE}:${VERSION}${VARIANT}

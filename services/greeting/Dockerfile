@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.12
 
 # Install necessary dependencies
 RUN pip install flask serverless-wsgi
