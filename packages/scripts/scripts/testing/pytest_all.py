@@ -24,6 +24,7 @@ def find_packages_not_ignored(root_dir, spec):
         # Remove ignored directories
         dirnames[:] = [d for d in dirnames if not spec.match_file(os.path.join(dirpath, d))]
 
+
 def has_tests_folder(package_dir):
     return os.path.exists(os.path.join(package_dir, 'tests'))
 
