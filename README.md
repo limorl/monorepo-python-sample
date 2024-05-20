@@ -62,7 +62,8 @@ Make sure you distinguish dev and prod dependencies.
 
 In the long run, we aim to release packages into a private Github package registry and install them from the registry.
 In the short term, we'll keep it simple and won't publish the packages, but rather install them locally.
-When `develop = true`, the package is installed in editable mode, so chages in the local package will be reflected directly.
+When `develop = true`, the package is installed in editable mode, so changes in the local package will be reflected directly.
+
 For example:
 ```python
 [tool.poetry.dependencies]
