@@ -2,7 +2,7 @@ import boto3
 import logging
 from typing import Dict, Type, List, Any
 from environment.environment_variables import EnvironmentVariables
-from .configuration import ConfigurationSection
+from .configuration import Configuration, ConfigurationSection
 from .configuration_provider import IConfigurationProvider
 from .app_config_utils import compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_profile_id, app_config_get_environment_id, app_config_data_get_latest_configuration
 from .secrets_manager_utils import is_secret, secrets_manager_get_secret_value
