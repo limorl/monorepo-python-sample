@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-package-a = { path = "../package-a", develop = true }
+package-a = { path = "../package-a", develop = false }
 
 [tool.poetry.dev-dependencies]
 pytest = "8.2.0"

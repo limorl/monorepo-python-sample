@@ -56,7 +56,7 @@ description = "Environment Variables"
 optional = false
 python-versions = "^3.12"
 files = []
-develop = true
+develop = false
 
 [package.dependencies]
 jsonify = "0.5"
@@ -238,4 +238,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "4b7356635f1459d83c445f69caa13d67bbad6a3084059a8b9b9cad819842417a"
+content-hash = "e22868afc3ddcefe58970886912457572b6027a596120da3af9c32a6163c618d"

@@ -43,10 +43,10 @@ description = "Configuration Provider based on configuration file"
 optional = false
 python-versions = "^3.12"
 files = []
-develop = true
+develop = false
 
 [package.dependencies]
-environment = {path = "../environment", develop = true}
+environment = {path = "../environment"}
 jsonify = "0.5"
 python-dotenv = "1.0.1"
 
@@ -61,7 +61,7 @@ description = "Environment Variables"
 optional = false
 python-versions = "^3.12"
 files = []
-develop = true
+develop = false
 
 [package.dependencies]
 jsonify = "0.5"
@@ -305,4 +305,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "746bbdf29a1e641c0a9dad80176e9dbb5a664e25fc945c57c63064feb8625ffa"
+content-hash = "6a891e6fe3ae73624d22abe1350d62e12ccc429a54f7d61aff41a17e3e7b031c"

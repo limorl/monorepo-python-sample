@@ -1,7 +1,7 @@
 import logging
 
 
-def get_logger() -> logging.Logger:
+def get_lambda_logger() -> logging.Logger:
     logger = logging.getLogger()
     if len(logger.handlers) > 0:
         # The Lambda environment pre-configures a handler logging to stderr. If a handler is already configured,

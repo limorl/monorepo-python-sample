@@ -29,7 +29,7 @@ description = ""
 optional = false
 python-versions = "^3.12"
 files = []
-develop = true
+develop = false
 
 [package.source]
 type = "directory"
@@ -102,4 +102,4 @@ testing = ["coverage (>=6.2)", "hypothesis (>=5.7.1)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "bb9085a811bbb09a36d51f96ce0f7a5bc0b811faa8d47b5e46f72d579a2971a2"
+content-hash = "c03ac27fc992b7c6b76e5fd99ee1709c0837667072f257cd532764bed6fa3df9"

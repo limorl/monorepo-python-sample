@@ -16,6 +16,7 @@ def install_dependencies_in_directory(directory: Path):
 
 
 def find_and_install_packages(start_directory: Path):
+    
     package_paths = get_package_paths()
     for path in package_paths:
         install_dependencies_in_directory(path)

@@ -67,7 +67,7 @@ When `develop = true`, the package is installed in editable mode, so changes in 
 For example:
 ```python
 [tool.poetry.dependencies]
-my_local_package = { path = "../packages/my_local_package", develop = true } 
+my_local_package = { path = "../packages/my_local_package", develop = false } 
 ```
 
 #### Package versioning
@@ -243,13 +243,13 @@ Use the `FunctionName` in the returned list when invoking the lambda.
 For example, for greeting service, invoke the lambda function:
 ```shell
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingLambda-a09aff94 \
+--function-name greeting-service-GreetingLambda-8fc0648c \
 --payload '{"headers": {}, "path": "/hello", "httpMethod": "GET"}' \
 --cli-binary-format raw-in-base64-out \
 output.txt
 
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingLambda-a09aff94 \
+--function-name greeting-service-GreetingLambda-8fc0648c \
 --payload '{"headers": {}, "path": "/hello/Danny", "httpMethod": "GET"}' \
 --cli-binary-format raw-in-base64-out \
 output.txt
