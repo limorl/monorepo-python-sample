@@ -6,8 +6,4 @@ class Configuration:
         pass
 
 
-# Generic type for any object extending Configuration
-ConfigT = TypeVar('ConfigT', bound=Configuration)
-
-
 ConfigurationSection = Dict[str, Any]

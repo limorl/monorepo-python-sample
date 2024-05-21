@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 from typing import Dict, Type
-from configuration.configuration import ConfigurationSection, ConfigT
+from configuration.configuration import Configuration, ConfigurationSection
 
 logger = logging.getLogger()
 
@@ -24,7 +24,7 @@ class IConfigurationProvider(ABC):
 
         logger.debug(f"init_configuration: __config_dict: {self.__configuration}")
 
-    def get_configuration(self, config_type: Type[ConfigT]) -> ConfigT:
+    def get_configuration[T: Configuration](self, config_type: Type[T]) -> T:  # pylint: disable=invalid-syntax
         if not self.__initiated:
             raise RuntimeError('Configuration provider is not initiated.')
 
