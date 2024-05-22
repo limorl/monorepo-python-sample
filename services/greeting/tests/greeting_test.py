@@ -4,19 +4,19 @@ from greeting.greeting import Greeting
 from greeting.greeting_configuration import GreetingConfiguration
 
 
-@pytest.fixture(params=[2, 5, 0])
+@pytest.fixture(scope="module", params=[2, 5, 0])
 def greeting_configuration(request):
     return GreetingConfiguration({'num_of_exclamations': request.param})
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def mock_config_provider(greeting_configuration):
     mock_config_provider = Mock()
     mock_config_provider.get_configuration.return_value = greeting_configuration
     return mock_config_provider
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 def greeting(mock_config_provider):
     return Greeting(mock_config_provider)
 

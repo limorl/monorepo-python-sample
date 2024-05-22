@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from typing import Dict, Type
-from configuration.configuration import ConfigurationSection, ConfigT
+from configuration.configuration import Configuration, ConfigurationSection
 from configuration.configuration_provider import IConfigurationProvider
 from environment.environment_variables import EnvironmentVariables, is_cloud_platform
 
@@ -23,7 +23,7 @@ class LocalConfigurationProvider(IConfigurationProvider):
 
         logger.debug(f"LocalConfigurationProvider _local_config_path set to: {self._config_file_path}")
 
-    def get_configuration(self, config_type: Type[ConfigT]) -> ConfigT:
+    def get_configuration[T: Configuration](self, config_type: Type[T]) -> T:  # pylint: disable=invalid-syntax
         return super().get_configuration(config_type)
 
     def _read_configuration(self) -> Dict[str, ConfigurationSection]:

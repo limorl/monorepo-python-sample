@@ -21,7 +21,7 @@ repos:
         entry: codespell
         language: python
         types: [text]
-        stage: [push]
+        stages: [push]
 
     # This will be updated to run recursively after Poetry is added and to run only on impacted tests. The ci.yml workflow should run all unit tests
     - repo: local

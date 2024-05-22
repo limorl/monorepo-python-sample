@@ -15,7 +15,7 @@ def mock_config_provider(request):
     return mock_config_provider
 
 
-@pytest.fixture
+@pytest.fixture()
 def app(mock_config_provider):
     reset_environment_variables()
     os.environ['PLATFORM'] = 'local'
