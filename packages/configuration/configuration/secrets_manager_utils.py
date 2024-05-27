@@ -8,7 +8,7 @@ logger = logging.getLogger()
 
 
 def secrets_manager_get_secret_value(secretesmanager: Any, secret_config_val: str) -> str:
-    secret_name =  try_get_secret_name(secret_config_val)
+    secret_name = try_get_secret_name(secret_config_val)
 
     try:
         response = secretesmanager.get_secret_value(SecretId=secret_name)
