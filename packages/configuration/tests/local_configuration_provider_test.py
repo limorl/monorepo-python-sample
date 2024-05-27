@@ -33,8 +33,8 @@ def test_get_configuration_local_dev_with_env_secrets(reset_env):
     os.environ['PLATFORM'] = 'local'
     os.environ['STAGE'] = 'dev'
     os.environ['SERVICE_NAME'] = 'hello'
-    os.environ['FAKE_SECRET_PLAIN']='fake-secret'
-    os.environ['FAKE_SECRET_PAIR']='{"username": "fake-user", "password": "fake-password"}'
+    os.environ['FAKE_SECRET_PLAIN'] = 'fake-secret'
+    os.environ['FAKE_SECRET_PAIR'] = '{"username": "fake-user", "password": "fake-password"}'
 
     env_variables = EnvironmentVariables()
     config_provider = LocalConfigurationProvider(env_variables)
@@ -60,13 +60,13 @@ def test_get_configuration_local_dev_dotenv_secrets(reset_env):
     os.environ['STAGE'] = 'dev'
     os.environ['SERVICE_NAME'] = 'hello'
 
-    dotenv_path = config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), '.env.test')
+    dotenv_path = os.path.join(pathlib.Path(__file__).parent.resolve(), '.env.test')
     env_variables = EnvironmentVariables(dotenv_path)
     config_provider = LocalConfigurationProvider(env_variables)
     config_provider.init_configuration()
 
     config: BarConfiguration = config_provider.get_configuration(BarConfiguration)
-    
+
     # assert configuration is correct and secrets were populated
     assert config
     assert config.int1 == 1

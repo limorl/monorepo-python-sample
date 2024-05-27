@@ -31,7 +31,7 @@ class LocalConfigurationProvider(IConfigurationProvider):
         try:
             with open(self._config_file_path, 'r') as file:
                 logger.debug(f"LocalConfigurationProvider loading configuration file: {self._config_file_path}")
-                configuration_dict: Dict[str, Any]  = json.load(file)
+                configuration_dict: Dict[str, Any] = json.load(file)
                 configuration_with_secrets: Dict[str, ConfigurationSection] = {}
 
                 for key, val in configuration_dict.items():

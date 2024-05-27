@@ -8,15 +8,6 @@ SECRET_PREFIX = 'secret:'
 logger = logging.getLogger()
 
 
-def is_secret(val: str) -> bool:
-    return isinstance(val, str) and val.startswith(SECRET_PREFIX)
-
-def try_get_secret_name(val: str) -> str:
-    if val and is_secret(val):
-        return val.replace(SECRET_PREFIX, '')
-    return None
-
-
 def secrets_manager_get_secret_value(secretesmanager: Any, secret_config_val: str) -> str:
     secret_name = secret_config_val and secret_config_val.replace(SECRET_PREFIX, '')
 
