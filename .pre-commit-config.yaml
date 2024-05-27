@@ -3,7 +3,7 @@ repos:
       rev: v1.4.0
       hooks:
         - id: detect-secrets
-          args: ["--exclude-lines", "SECRET_PREFIX = 'secret:'", "--exclude-secrets", ".*fake-secret.*|.*fake-password.*|.*FAKE_SECRE.*"]
+          args: ["--exclude-lines", "SECRET_PREFIX = 'secret:'", "--exclude-secrets", ".{5}fake-secret.{5}|.{5}fake-password.{5}|.{5}FAKE_SECRE.{5}"]
           stages: [commit]
 
     - repo: https://github.com/pycqa/flake8
