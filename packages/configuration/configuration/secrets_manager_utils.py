@@ -1,15 +1,14 @@
 import logging
 from botocore.exceptions import ClientError
 from typing import Any
-from configuration.secret import is_secret, parse_secret_value
+from configuration.secret import parse_secret_value, try_get_secret_name
 
-SECRET_PREFIX = 'secret:'
 
 logger = logging.getLogger()
 
 
 def secrets_manager_get_secret_value(secretesmanager: Any, secret_config_val: str) -> str:
-    secret_name = secret_config_val and secret_config_val.replace(SECRET_PREFIX, '')
+    secret_name =  try_get_secret_name(secret_config_val)
 
     try:
         response = secretesmanager.get_secret_value(SecretId=secret_name)
