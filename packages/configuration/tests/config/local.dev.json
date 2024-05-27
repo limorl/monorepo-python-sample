@@ -9,6 +9,10 @@
         "section10": {
             "int10": 10,
             "str10": "10"
+        },
+        "secrets": {
+            "secret_plain": "secret:FAKE_SECRET_PLAIN",
+            "secret_pair": "secret:FAKE_SECRET_PAIR"
         }
     }
 }

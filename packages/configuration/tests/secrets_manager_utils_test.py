@@ -1,7 +1,8 @@
 import json
 import pytest
 from unittest.mock import patch, Mock
-from configuration.secrets_manager_utils import is_secret, secrets_manager_get_secret_value, _parse_secret
+from configuration.secret import parse_secret_value
+from configuration.secrets_manager_utils import secrets_manager_get_secret_value
 from botocore.exceptions import ClientError
 
 
@@ -13,23 +14,14 @@ def mock_secretsmanager():
         yield mock_client
 
 
-@pytest.fixture(params=[['secret:fake/secret/name', True], ['not-a-secret', False], ['', False], [5, False]])
-def is_secret_pair(request):
-    return request.param
-
-
 @pytest.fixture(params=[['test/app/fake-secret-plain', 'fake-secret-val'], ['test/app/fake-secret-pair', '{"Username": "fake-user", "Password": "fake-password"}']])
 def secret_and_populated_secret(request):
     return request.param
 
 
-def test_is_secret(is_secret_pair):
-    assert is_secret(is_secret_pair[0]) == is_secret_pair[1]
-
-
 def test_get_secret_success_string(mock_secretsmanager, secret_and_populated_secret):
     secret_name = secret_and_populated_secret[0]
-    expected_secret_val = _parse_secret(secret_and_populated_secret[1])
+    expected_secret_val = parse_secret_value(secret_and_populated_secret[1])
 
     mock_secretsmanager.get_secret_value.return_value = {'SecretString': secret_and_populated_secret[1]}
 
@@ -41,7 +33,7 @@ def test_get_secret_success_string(mock_secretsmanager, secret_and_populated_sec
 
 def test_get_secret_success_binary(mock_secretsmanager, secret_and_populated_secret):
     secret_name = secret_and_populated_secret[0]
-    expected_secret_val = _parse_secret(secret_and_populated_secret[1])
+    expected_secret_val = parse_secret_value(secret_and_populated_secret[1])
 
     mock_secretsmanager.get_secret_value.return_value = {'SecretBinary': secret_and_populated_secret[1].encode('utf-8')}
 
