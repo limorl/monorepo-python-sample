@@ -49,16 +49,16 @@ def get_impacted_test_files(changed_files: List[str], package_paths: List[str]) 
     return impacted_test_files
 
 
-def run_pytest_on_files(dir: str, files) -> List[str]:
+def run_unit_tests_in_files(dir: str, files) -> List[str]:
     if files:
-        subprocess.run(['pytest', '-vs', ' '.join(files)], cwd=dir)
+        subprocess.run(['pytest', '-m', 'not integration and not e2e', '-vs', ' '.join(files)], cwd=dir)
 
 
 def _get_relative_path(full_path: str, relative_path: str) -> str:
     return os.path.relpath(full_path, relative_path)
 
 
-def pytest_impacted_only():
+def pytest_impacted_unit_tests():
     root_dir = os.getcwd()
     spec = load_gitignore(root_dir)
     package_paths = list(map(lambda x: _get_relative_path(str(x), root_dir), get_package_paths()))
@@ -69,8 +69,8 @@ def pytest_impacted_only():
 
     if impacted_test_files:
         print(f'Running {len(impacted_test_files)} impacted tests under {root_dir}')
-        run_pytest_on_files(root_dir, impacted_test_files)
+        run_unit_tests_in_files(root_dir, impacted_test_files)
 
 
 if __name__ == "__main__":
-    pytest_impacted_only()
+    pytest_impacted_unit_tests()

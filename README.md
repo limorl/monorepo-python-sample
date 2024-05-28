@@ -13,10 +13,11 @@ This is a sample monorepo that can be used as a starting point for a python proj
 
 ### Next Steps
 The monorepo will be extendedt to support:
-1. Implement AppConfigConfigurationProvider based on AWS AppConfig and SSM - Start Lambda with AppConfigConfigurationProvider when runs on AWS + Define IAM role to access AppConfig and SSM
+1. Update AppConfigConfigurationProvider to use SSM ParameterStore instead of SecretsManager (cheapper, no need to auto-rotate keys at this point)
+2. When running in AWS mode,  Start Lambda with AppConfigConfigurationProvider when runs on AWS + Define IAM role to access AppConfig and SecretsManager
 2. Logging using [aws-powertools] (https://github.com/aws-powertools/powertools-lambda-python)
 3. Use Lambda Extensions to better handle calls to AppConfig and SSM
-4. Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/
+4. Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/)
 5. Terraform to deploy infra on localstack and on AWS
 6. Add a deployment.yml workflow to deploy to AWS and to Localstack
 7. Add e2e.yml workflow with a simple e2e test which runs nightly (every night)
@@ -296,3 +297,37 @@ curl https://8fwcdbjd95.execute-api.us-east-1.amazonaws.com/prod/hello/Danny
 ```
 
 **NOTE:** When deployed remotely, the greeting message returns with 5 exclamation points, according to the remote config, but when running locally or on local stack, it is returned with a single exclamation point. 
+
+## Testing
+
+Three main types of tests in this repo:
+**Unit Tests**
+* Tests individual software units (functions and classes) in isolation.
+* Best Practices: Write unit tests alongside code development, ensure comprehensive coverage of the unit's logic, and strive for isolated and repeatable tests.
+Unit tests are required in each PR, and Code Review process should ensure it. (Later on coverage tools will be added)
+* Naming: `<file-name>_test.py`
+* Mark: Given most of our tests are unit tests, there's no need to mark them
+* Executed: 
+  - Pre-push runs all impacted unit tests
+  - CI: All unit tests are executed automatically and must pass, otherwise merge to main fails
+  - Nightly: All tests are executed nightly (workflow will be added soon)
+
+**Integration Tests**
+* Verifies how different software units interact with each other.
+* Best Practices: Focus on interfaces and data exchange between units, test with stubs or mocks for external dependencies (except for the modules which their integration is being verified), and design tests to uncover integration issues.
+* Naming: `<file-name>_integration_test.py`
+* Mark: `@pytest.mark.integration`
+* Executed:
+  - Nightly on each environment: All tests are executed nightly (workflow will be added soon)
+
+**End-to-end Tests**
+* Simulates real user journeys, testing how different system components work together from start to finish. It encompasses functional, non-functional, and integration testing aspects.
+* Best Practices:
+  - Design tests that mimic real user workflows and critical business processes.
+  - Prioritize high-impact user scenarios that deliver the most value.
+  - Use realistic and well-structured test data sets that reflect real-world conditions.
+  - Ensure data isolation to prevent tests from interfering with each other.
+* Naming: /e2e/<test-scenario>_e2e_test.py
+* Mark: `@pytest.mark.e2e`
+* Execeuted:
+  - Nightly on each environment: All tests are executed nightly (workflow will be added soon)

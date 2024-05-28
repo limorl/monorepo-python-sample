@@ -33,4 +33,4 @@ jobs:
     - name: Run Tests
       uses: devcontainers/ci@v0.3
       with:
-        runCmd: python run_script.py pytest_all
+        runCmd: pytest -m  "not integration and not e2e"  # run unit tests only

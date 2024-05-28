@@ -1,4 +1,6 @@
+import argparse
 import os
+from pathlib import Path
 import pathspec
 import subprocess
 
@@ -29,17 +31,31 @@ def has_tests_folder(package_dir):
     return os.path.exists(os.path.join(package_dir, 'tests'))
 
 
-def run_pytest_for_package(package_dir):
+def run_pytest_for_package(package_dir: Path, type: str):
     if package_dir and has_tests_folder(package_dir):
-        subprocess.run(["pytest"], cwd=package_dir)
+        if type == "all":
+            subprocess.run(["pytest"], cwd=package_dir)
+        elif type == 'unit':
+            subprocess.run(["pytest", "-m", "not integration and not e2e"], cwd=package_dir)
+        else:
+            subprocess.run(["pytest", "-m", type], cwd=package_dir)
 
 
-def pytest_all():
+def pytest_all(type: str):
     package_paths = get_package_paths()
     for path in package_paths:
         print("Running Pytest for package: ", path)
-        run_pytest_for_package(path)
+        run_pytest_for_package(path, type)
+
+
+def _create_arg_parser():
+    parser = argparse.ArgumentParser(prog='pytest_all.py', description='Run all tests if given type using Pytest')
+    parser.add_argument('--type', type=str, required=False, default='all', help='The pytest mark to run [all|unit|integration|e2e]')
+    return parser
 
 
 if __name__ == "__main__":
-    pytest_all()
+    parser = _create_arg_parser()
+    args = parser.parse_args()
+
+    pytest_all(args.type)
