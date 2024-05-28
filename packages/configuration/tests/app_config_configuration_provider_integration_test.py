@@ -7,7 +7,7 @@ from configuration.configuration import Configuration
 from environment.environment_variables import EnvironmentVariables, reset_environment_variables
 
 
-class TestConfiguration(Configuration):
+class GooConfiguration(Configuration):
     def __init__(self, config_dict: ConfigurationSection):
         self.int1 = config_dict['int1']
         self.str2 = config_dict['str2']
@@ -16,7 +16,7 @@ class TestConfiguration(Configuration):
 
 @pytest.fixture
 def configuration():
-    return TestConfiguration({
+    return GooConfiguration({
         'int1': 1,
         'str2': '2',
         'secrets': {
@@ -28,7 +28,7 @@ def configuration():
 
 @pytest.fixture
 def configuration_with_populated_secrets():
-    return TestConfiguration({
+    return GooConfiguration({
         'int1': 1,
         'str2': '2',
         'secrets': {
@@ -77,7 +77,7 @@ def app_configuration_provider(env_variables):
     TODO (@limorl): Test can be imprived to deploy a newly created configuration and then deleted after test test
 """
 
-
+@pytest.mark.integration
 def test_init_and_get_configuration__success(
         app_configuration_provider,
         configuration,
@@ -86,7 +86,7 @@ def test_init_and_get_configuration__success(
 
     app_configuration_provider.init_configuration()
 
-    configuration: TestConfiguration = app_configuration_provider.get_configuration(TestConfiguration)
+    configuration: GooConfiguration = app_configuration_provider.get_configuration(GooConfiguration)
 
     # assert configuration is correct and secrets were populated
     assert configuration
