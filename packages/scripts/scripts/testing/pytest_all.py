@@ -41,11 +41,11 @@ def run_pytest_for_package(package_dir: Path, type: str):
             subprocess.run(["pytest", "-m", type], cwd=package_dir)
 
 
-def pytest_all(mark: str):
+def pytest_all(type: str):
     package_paths = get_package_paths()
     for path in package_paths:
         print("Running Pytest for package: ", path)
-        run_pytest_for_package(path, mark)
+        run_pytest_for_package(path, type)
 
 
 def _create_arg_parser():
@@ -59,4 +59,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     pytest_all(args.type)
-

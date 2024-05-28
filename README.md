@@ -329,5 +329,5 @@ Unit tests are required in each PR, and Code Review process should ensure it. (L
   - Ensure data isolation to prevent tests from interfering with each other.
 * Naming: /e2e/<test-scenario>_e2e_test.py
 * Mark: `@pytest.mark.e2e`
-* Exceuted:
+* Execeuted:
   - Nightly on each environment: All tests are executed nightly (workflow will be added soon)

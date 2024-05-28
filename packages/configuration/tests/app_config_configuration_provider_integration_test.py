@@ -77,6 +77,7 @@ def app_configuration_provider(env_variables):
     TODO (@limorl): Test can be imprived to deploy a newly created configuration and then deleted after test test
 """
 
+
 @pytest.mark.integration
 def test_init_and_get_configuration__success(
         app_configuration_provider,
