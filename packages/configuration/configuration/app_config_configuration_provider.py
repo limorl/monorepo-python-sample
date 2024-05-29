@@ -4,15 +4,12 @@ from typing import Dict, Type, List, Any
 from environment.environment_variables import EnvironmentVariables
 from .configuration import Configuration, ConfigurationSection
 from .configuration_provider import IConfigurationProvider
-from .app_config_utils import compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_profile_id, app_config_get_environment_id, app_config_data_get_latest_configuration
+from .app_config_utils import get_app_config_region, compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_profile_id, app_config_get_environment_id, app_config_data_get_latest_configuration
 from .secret import is_secret
 from .secrets_manager_utils import secrets_manager_get_secret_value
 
 
 logger = logging.getLogger()
-
-# We are using app config on a single region, while services can be on multiple regions
-APP_CONFIG_REGION = 'us-east-1'
 
 
 class AppConfigConfigurationProvider(IConfigurationProvider):
@@ -37,7 +34,7 @@ class AppConfigConfigurationProvider(IConfigurationProvider):
     def __init__(self, env_vars: EnvironmentVariables):
         super().__init__()
 
-        options: Dict = {'region_name': APP_CONFIG_REGION}
+        options: Dict = {'region_name': get_app_config_region(env_vars.stage)}
 
         if env_vars.cloud_endpoint_override:
             options['endpoint_url'] = env_vars.cloud_endpoint_override
@@ -47,7 +44,7 @@ class AppConfigConfigurationProvider(IConfigurationProvider):
         self._secretsmanager = boto3.client('secretsmanager', **options)
 
         self._app_name = compose_app_name(env_vars.service_name)
-        self._config_name = compose_config_name(env_vars.platform.value, env_vars.stage.value, env_vars.region)
+        self._config_name = compose_config_name(env_vars.platform, env_vars.stage, env_vars.region)
         self._env_vars = env_vars
 
     def get_configuration[T: Configuration](self, config_type: Type[T]) -> T:  # pylint: disable=invalid-syntax

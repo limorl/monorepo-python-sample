@@ -9,7 +9,8 @@ import os
 import time
 from typing import Any, Dict
 from configuration.configuration import ConfigurationSection
-from configuration.app_config_utils import APP_CONFIG_REGION, compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_deployment_strategy_id, app_config_get_environment_id, app_config_get_profile_id, app_config_create_hosted_configuration_version
+from configuration.app_config_utils import get_app_config_region, compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_deployment_strategy_id, app_config_get_environment_id, app_config_get_profile_id, app_config_create_hosted_configuration_version
+from environment.environment_variables import Platform, Stage
 
 logger = logging.getLogger()
 
@@ -33,7 +34,7 @@ class DeploymentState(Enum):
 # The label should indicate the package version
 
 
-def deploy_service_configuration(service_name: str, platform: str, stage: str, region: str) -> None:
+def deploy_service_configuration(service_name: str, platform: Platform, stage: Stage, region: str) -> None:
     """Deploy service configuration to AWS AppConfig"""
     config_folder = 'config'
     config_name = compose_config_name(platform, stage, region)
@@ -45,7 +46,7 @@ def deploy_service_configuration(service_name: str, platform: str, stage: str, r
         return
 
     options = {}
-    options['region_name'] = APP_CONFIG_REGION
+    options['region_name'] = get_app_config_region(stage)
     appconfig = boto3.client('appconfig', **options)
 
     app_name = compose_app_name(service_name)
@@ -112,7 +113,7 @@ def main():
     parser = _create_arg_parser()
     args = parser.parse_args()
 
-    deploy_service_configuration(args.service_name, args.platform, args.stage, args.region)
+    deploy_service_configuration(args.service_name,Platform(args.platform), Stage(args.stage), args.region)
 
 
 if __name__ == "__main__":

@@ -2,17 +2,26 @@
 import json
 import logging
 from typing import Any, Callable, Dict
+
+from environment.environment_variables import Stage, Platform
 from .configuration import ConfigurationSection
 
 logger = logging.getLogger()
 
 
+def get_app_config_region(stage: Stage) -> str:
+    """ If you manage app config and secret managers in each account and not centralized, 
+    set app_config_region according to self.stage. For example: 
+    return 'us-east-1' if stage == Stage.PROD else 'us-west-2'
+    """
+    return 'us-east-1'
+
 def compose_app_name(service_name: str) -> str:
     return f'{service_name}-app'
 
 
-def compose_config_name(platform: str, stage: str, region: str) -> str:
-    return f'{platform.lower()}.{stage}.{region}'
+def compose_config_name(platform: Platform, stage: Stage, region: str) -> str:
+    return f'{platform.value.lower()}.{stage.value}.{region}'
 
 
 def app_config_get_application_id(appconfig: Any, app_name: str, create_if_not_exists: bool = False) -> str:
