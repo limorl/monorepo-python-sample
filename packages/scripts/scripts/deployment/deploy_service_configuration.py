@@ -113,7 +113,7 @@ def main():
     parser = _create_arg_parser()
     args = parser.parse_args()
 
-    deploy_service_configuration(args.service_name,Platform(args.platform), Stage(args.stage), args.region)
+    deploy_service_configuration(args.service_name, Platform(args.platform), Stage(args.stage), args.region)
 
 
 if __name__ == "__main__":
