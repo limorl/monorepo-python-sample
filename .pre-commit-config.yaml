@@ -3,7 +3,7 @@ repos:
       rev: v1.4.0
       hooks:
         - id: detect-secrets
-          args: ['--no-verify']
+          args: ["--exclude-lines", "SECRET_PREFIX = 'secret:'", "--exclude-secrets", ".*fake-secret.*|.*fake-password.*|.*FAKE_SECRE.*"]
           stages: [commit]
 
     - repo: https://github.com/pycqa/flake8
@@ -11,19 +11,24 @@ repos:
       hooks:
         - id: flake8
           stages: [push]
-
-    - repo: https://github.com/hcodes/yaspeller
-      rev: v10.0.1
+    
+    - repo: https://github.com/codespell-project/codespell
+      rev: v2.2.4
       hooks:
-        - id: yaspeller
-          stages: [push]
+      - id: codespell
+        name: codespell
+        description: Checks for common misspellings in text files.
+        entry: codespell
+        language: python
+        types: [text]
+        stages: [push]
 
     # This will be updated to run recursively after Poetry is added and to run only on impacted tests. The ci.yml workflow should run all unit tests
     - repo: local
       hooks:
         - id: unit-tests
           name: unit-tests
-          entry: python ./packages/utils/src/test/run_pytest_on_impacted_folders.py
+          entry: python run_script.py pytest-impacted-only
           language: system
           stages: [push]
           pass_filenames: false

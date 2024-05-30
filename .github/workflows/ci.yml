@@ -17,9 +17,9 @@ jobs:
     - name: Set-up Python Environment
       uses: actions/setup-python@v4
       with:
-        python-version: "3.10"
+        python-version: "3.12"
 
-    - name: Lint (flask8)
+    - name: Lint (flake8)
       uses: py-actions/flake8@v2
 
     - name: Set-up PWD Environment Variable
@@ -33,4 +33,4 @@ jobs:
     - name: Run Tests
       uses: devcontainers/ci@v0.3
       with:
-        runCmd: pytest
+        runCmd: pytest -m  "not integration and not e2e"  # run unit tests only

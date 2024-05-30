@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.202.5/containers/typescript-node
 {
-    "name": "Urecsys - Dev container",
+    "name": "Python Monorepo Sample - Dev container",
     "dockerComposeFile": "docker-compose.yml",
     "service": "devcontainer",
     "workspaceFolder": "${localWorkspaceFolder}",
@@ -21,9 +21,6 @@
         "python.linting.pylintPath": "/usr/local/py-utils/bin/pylint",
         "python.testing.unittestEnabled": false,
         "python.testing.pytestEnabled": true,
-        "python.testing.pytestArgs": [
-            "api_app"
-        ],
     },
     "extensions": [
         "rangav.vscode-thunder-client",
@@ -41,6 +38,7 @@
         "vscode-icons-team.vscode-icons",
         "wayou.vscode-todo-highlight",
         "timonwong.shellcheck",
+        "cweijan.vscode-office"
     ],
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],

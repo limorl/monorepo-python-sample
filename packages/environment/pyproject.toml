@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "environment"
+version = "0.1.0"
+description = "Environment Variables"
+authors = ["Limor Lahiani"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+python-dotenv="1.0.1"
+jsonify = "0.5"
+
+[tool.poetry.dev-dependencies]
+pytest = "8.2.0"
+pytest-asyncio = "0.23.6"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

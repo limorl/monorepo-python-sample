@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "scripts"
+version = "0.1.0"
+description = "Scripts used by Poetry"
+authors = ["Limor Lahiani"]
+readme = "README.md"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+install-all = "scripts.poetry.install_all:install_all"
+build-all = "scripts.poetry.build_all:build_all"
+pytest-all = "scripts.testing.pytest_all:pytest_all"
+pytest-impacted-only = "scripts.testing.pytest_impacted_only:pytest_impacted_only"
+deploy-service-configuration = "scripts.deployment.deploy_service_configuration:main" # args --service-name <service-name> --stage <stage> --region <region>
+
+[tool.poetry.dependencies]
+python = "^3.12"
+boto3 = "1.34.108"
+botocore = "1.34.108"
+configuration = { path = "../configuration", develop = false }
+
+[tool.poetry.dev-dependencies]
+pathspec = "0.12.1"

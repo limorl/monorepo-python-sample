@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "package-b"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+package-a = { path = "../package-a", develop = false }
+
+[tool.poetry.dev-dependencies]
+pytest = "8.2.0"
+pytest-asyncio = "0.23.6"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

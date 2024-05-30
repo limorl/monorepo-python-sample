@@ -4,28 +4,45 @@ version = "0.1.0"
 description = "A sample of python monorepo"
 authors = ["limorl"]
 
-[tool.poetry.scripts]
-# Installs packages for all sub projects: run poetry run install_sub
-install_all = "poetry_run:run_script install_all"
-
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.12"
+pydevd-pycharm = "^241.15989.155"
 
 [tool.poetry.dev-dependencies]
 python-semantic-release = "9.3.1"
 nox-poetry = "1.0.3"
-pytest = "7.2.1"
+pytest = "8.2.0"
+pytest-asyncio = "0.23.6"
 pytest-cov = "3.0.0"
 flake8 = "7.0.0"
+pydevd-pycharm = "241.15989.155"
 pylint = "2.17.7"
 pyright = "1.1.296"
 pre-commit = "3.6.2"
 debugpy = "1.8.1"
 localstack = "3.3.0"
+scripts = { path = "packages/scripts", develop = false }
+
+# We're adding test paths here for pytest discoverability in vs code testing extension (and also running pytest from monorepo root)
+# Note that due to how pytest handles test discovery, the order of paths matter. Changing the order can cause issues.
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib"
+pythonpath = [  
+  "packages/configuration",
+  "packages/environment",
+  "services/hello-world",
+  "services/greeting"
+]
+testpaths = [
+  "packages/configuration",
+  "packages/environment",
+  "services/hello-world",
+  "services/greeting"
+]
 
 [tool.semantic_release]
 version_variable = "pyproject.toml:tool.poetry.version"
@@ -43,7 +60,3 @@ fix = "patch"
 docs = "patch"
 style = "patch"
 chore = "patch"
-
-
-
-

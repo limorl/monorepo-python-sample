@@ -1,0 +1,17 @@
+# Scripts
+
+## Installing Scripts
+This section in `pyproject.toml` file configures scripts that can be run using `poetry sun <script>` after the package is installed using `poetry install`:
+
+```shell
+[tool.poetry.scripts]
+install-all = "scripts.poetry.install_all:install_all"
+build-all = "scripts.poetry.build_all:build_all"
+pytest-all = "scripts.testing.pytest_all:main"
+pytest-impacted-pnly = "scripts.testing.pytest_impacted_only:main"
+```
+
+To run those scripts from the root folder or from a sub directory, we had to wrap those scripts and locate it under the root repo: `monorepo-python-sample/run_script.py`.
+
+## Adding/Updating scripts
+If you are adding or updatimg scripts, you need to add them to `[tool.poetry.scripts]` configuration and re-install the scripts package before you can run them via `run_script.py`

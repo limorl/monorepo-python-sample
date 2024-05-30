@@ -1,7 +1,7 @@
 
-# Default image for DevContainer: Python 3.10 for Apple Silicone
+# Default image for DevContainer: Python 3.12 for Apple Silicone
 ARG IMAGE="mcr.microsoft.com/vscode/devcontainers/python"
-ARG VERSION="3.10"
+ARG VERSION="3.12"
 ARG VARIANT="-bullseye"
 
 FROM ${IMAGE}:${VERSION}${VARIANT}
@@ -63,6 +63,6 @@ RUN pip install poetry
 # No need to create virtual env since we are running inside a dev container
 # RUN poetry config virtualenvs.create false --local
 
-# making git case sensetive, so rename from File.js to file.js will be makred as a change
+# making git case sensitive, so rename from File.js to file.js will be makred as a change
 RUN git config --global core.ignorecase false
 

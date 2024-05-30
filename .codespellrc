@@ -1,0 +1,6 @@
+[codespell]
+skip = *.tf, *.tfvars,*.tf,**/terraform,*.lock
+quiet-level = 3
+
+# To ignore specific words, add them one word at each line to .codespell-ignore-words.txt and uncomment the following line:
+# ignore-words = .codespell-ignore-words.txt
