@@ -10,7 +10,7 @@ logger = logging.getLogger()
 
 
 def get_app_config_region(stage: Stage) -> str:
-    """ If you manage app config and secret managers in each account and not centralized, set app_config_region according to self.stage.
+    """ If you manage app config and secret managers in each account and not centralized, set app_config_region according to the stage.
     For example: return 'us-east-1' if stage == Stage.PROD else 'us-west-2'
     """
     return 'us-east-1'
