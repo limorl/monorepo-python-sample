@@ -3,6 +3,9 @@ from dotenv import load_dotenv
 import os
 
 
+AWS_PRIMARY_REGION_PROD = 'us-east-1'
+AWS_PRIMARY_REGION_DEV = 'us-east-1'
+
 class Platform(Enum):
     AWS = 'AWS'
     LOCAL = 'local'
@@ -17,8 +20,6 @@ class Stage(Enum):
 def is_cloud_platform(platform: Platform):
     return platform == Platform.AWS
 
-AWS_PRIMARY_REGION_PROD = 'us-east-1'
-AWS_PRIMARY_REGION_DEV = 'us-east-1'
 
 class ServiceEnvironment:
 

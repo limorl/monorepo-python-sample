@@ -1,23 +1,17 @@
-
-import json
-import logging
-import pathlib
-from typing import Any, Callable, Dict, Any
-
-from environment.service_environment import Stage, Platform
-from .configuration import ConfigurationSection
-
-logger = logging.getLogger()
-
-
 import boto3
 from botocore.exceptions import ClientError
 from enum import Enum
 import json
+import logging
 import os
+import pathlib
 import time
+from typing import Any, Callable, Dict
+from .configuration import ConfigurationSection
 from environment.service_environment import Platform, Stage, get_primary_region
 
+
+logger = logging.getLogger()
 
 # This assumes this service deployment strategy was created using Terraform. For now it was created manually.
 SERVICE_DEFAULT_DEPLOYMENT_STARTEGY = 'ServiceDefault.Linear'

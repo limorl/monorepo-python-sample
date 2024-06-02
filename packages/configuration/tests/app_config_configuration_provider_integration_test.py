@@ -10,6 +10,7 @@ from environment.service_environment import ServiceEnvironment, clear_service_en
 
 DEPLOYMENT_STRATEGY = 'Test.Linear.AllatOnce'
 
+
 class GooConfiguration(Configuration):
     def __init__(self, config_dict: ConfigurationSection):
         self.int1 = config_dict['int1']
@@ -51,7 +52,7 @@ def service_env():
     os.environ['STAGE'] = 'dev'
     os.environ['REGION'] = 'us-west-2'
     os.environ['SERVICE_NAME'] = 'test'
-    
+
     config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
     os.environ['LOCAL_CONFIGURATION_FOLDER'] = config_folder
 
@@ -68,7 +69,7 @@ def app_configuration_provider(service_env):
 
 """ This test assumes the following resources exists in Dev/Test env:
     Test.Linear.AllatOnce configuration deployment strategy (all at once with 0 interval and 0 bake time)
-    
+
     Two secrets are stored on Secretes Manager:
     - Plain text secret: 'test/app/fake-secret-plain' = fake-secret-val
     - Key/Value secret: 'secret:test/app/fake-secret-pair': {

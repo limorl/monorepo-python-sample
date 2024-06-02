@@ -10,7 +10,8 @@ logger = logging.getLogger()
 
 def deploy_service_configuration(service_name: str, platform: Platform, stage: Stage, region: str) -> None:
     app_config_deploy_service_configuration(service_name, Platform(platform), Stage(stage), region)
-    
+
+
 def _create_arg_parser():
     parser = argparse.ArgumentParser(prog='deploy_service_configuration.py', description='Deploy service configuration to AWS AppConfig')
     parser.add_argument('--service-name', type=str, required=True, help='The name of the service package, for example: greeting')
