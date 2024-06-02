@@ -6,6 +6,7 @@ import os
 AWS_PRIMARY_REGION_PROD = 'us-east-1'
 AWS_PRIMARY_REGION_DEV = 'us-east-1'
 
+
 class Platform(Enum):
     AWS = 'AWS'
     LOCAL = 'local'
@@ -50,10 +51,12 @@ class ServiceEnvironment:
     def __str__(self):
         return str(self.__class__.__name__) + ": " + str(self.__dict__)
 
+
 def get_primary_region(stage: Stage) -> str:
     if stage:
         return AWS_PRIMARY_REGION_PROD if stage == Stage.PROD else AWS_PRIMARY_REGION_DEV
     return None
+
 
 def clear_service_environment():
     if os.getenv('PLATFORM'):
@@ -68,6 +71,7 @@ def clear_service_environment():
         del os.environ['SERVICE_NAME']
     if os.getenv('LOCAL_CONFIGURATION_FOLDER'):
         del os.environ['LOCAL_CONFIGURATION_FOLDER']
+
 
 def restore_local_dev_service_environment():
     clear_service_environment()
