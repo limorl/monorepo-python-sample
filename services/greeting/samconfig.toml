@@ -1,0 +1,59 @@
+version = 0.1
+
+# Build (default configured for local dev)
+[default.build.parameters]
+use_container = true
+parameter_overrides = [
+    'Platform=local',
+    'Stage=dev',
+    'DockerTag=latest'
+]
+
+[dev.build.parameters]
+use_container = true
+parameter_overrides = [
+    'Platform=AWS',
+    'Stage=dev',
+    'DockerTag=latest'
+]
+
+[prod.build.parameters]
+use_container = true
+parameter_overrides = [
+    'Platform=AWS',
+    'Stage=prod'
+]
+
+# Local start-api (default configured for local dev)
+
+[default.local_start_api.parameters]
+warm_containers = 'EAGER'
+container_host = 'host.docker.internal'  # Use for Mac only, else remove
+parameter_overrides = [
+    'Platform=local',
+    'Stage=dev',
+    'DockerTag=latest'
+]
+
+# AWS deploy
+
+[dev.deploy.parameters]
+stack_name = 'greeting-service'
+region = 'us-east-1'    # Set to primary/default region and override when to deploying to other regions
+capabilities = 'CAPABILITY_IAM'
+image_repository = '__ACCOUNT_ID__.dkr.ecr.us-east-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
+parameter_overrides = [
+    'Platform=AWS',
+    'Stage=prod',
+    'DockerTag=latest'
+]
+
+[prod.deploy.parameters]
+stack_name = 'greeting-service'
+region = 'us-east-1'    # Set to primary/default region and override when to deploying to other regions
+capabilities = 'CAPABILITY_IAM'
+image_repository = '__ACCOUNT_ID__.dkr.ecr.us-east-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
+parameter_overrides = [
+    'Platform=AWS',
+    'Stage=prod'
+]

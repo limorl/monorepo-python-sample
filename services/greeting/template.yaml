@@ -25,6 +25,10 @@ Parameters:
       - local
     Description: Platform where the Lambda function is deployed
 
+  DockerTag:
+    Type: String
+    Description: Docker image tag - Use package version for cloud deployments and any value for local dev deployments
+
 Resources:
   GreetingApi:
     Type: AWS::Serverless::Api
@@ -34,16 +38,16 @@ Resources:
   GreetingLambda:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: greeting.lambda_handler.handler
-      Runtime: python3.12
+      FunctionName: "greeting"
+      PackageType: Image
+      ImageUri: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/greeting:${DockerTag}'
       Architectures:
-        - arm64
+        - arm64   # default is amd64      
       Environment:
         Variables:
           PLATFORM: !Ref Platform
           STAGE: !Ref Stage
           SERVICE_NAME: greeting
-      CodeUri: .
       Events:
         HelloNamePath:
           Type: Api
@@ -59,3 +63,7 @@ Resources:
             Method: GET
             RestApiId:
               Ref: GreetingApi
+    Metadata:
+      Dockerfile: ./services/greeting/Dockerfile
+      DockerContext: ../../       # Set docker context to monorepo root to include local packages
+      DockerTag: !Ref DockerTag   # Set DockerTage to package version when deploying to AWS 
