@@ -30,6 +30,7 @@ class DeploymentState(Enum):
     ROLLING_BACK = 'ROLLING_BACK'
     ROLLED_BACK = 'ROLLED_BACK'
 
+
 def get_app_name(service_name: str) -> str:
     return f'{service_name}-service'
 

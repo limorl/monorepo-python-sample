@@ -32,6 +32,5 @@ def create_and_init_configuration_provider() -> IConfigurationProvider:
         config_provider = AppConfigConfigurationProvider(service_env)
         logger.info(f'Service {service_env.service_name} initialized with AppConfigurationProvider')
 
-        
     config_provider.init_configuration()
     return config_provider
