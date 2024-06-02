@@ -34,6 +34,40 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Stage
+  
+  GreetingLambdaExecutionRole:  # TODO (@limorl): Remove after moving to Terraform
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "LambdaAppConfigAndSecretsManagerAccess"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "appconfig:ListApplications"
+                  - "appconfig:ListConfigurationProfiles"
+                  - "appconfig:ListEnvironments"
+                  - "appconfig:ListDeploymentStrategies"
+                  - "appconfig:CreateApplication"
+                  - "appconfig:CreateEnvironment"
+                  - "appconfig:CreateConfigurationProfile"                  
+                  - "appconfig:StartConfigurationSession"
+                  - "appconfig:GetLatestConfiguration"
+                Resource: "*"   # Ideally, specify the ARN of the specific secrets or path expression such as "arn:aws:appconfig:*:*:application/*"
+              - Effect: "Allow"
+                Action:
+                  - "secretsmanager:GetSecretValue"
+                Resource: "*"  # Ideally, specify the ARN of the specific secrets or path expression such as "arn:aws:secretsmanager:*:*:secret:*"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 
   GreetingLambda:
     Type: AWS::Serverless::Function
@@ -41,6 +75,7 @@ Resources:
       FunctionName: "greeting"
       PackageType: Image
       ImageUri: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/greeting:${DockerTag}'
+      Role: !GetAtt GreetingLambdaExecutionRole.Arn
       Architectures:
         - arm64   # default is amd64      
       Environment:
@@ -66,4 +101,5 @@ Resources:
     Metadata:
       Dockerfile: ./services/greeting/Dockerfile
       DockerContext: ../../       # Set docker context to monorepo root to include local packages
-      DockerTag: !Ref DockerTag   # Set DockerTage to package version when deploying to AWS 
+      DockerTag: !Ref DockerTag   # Set DockerTage to package version when deploying to AWS
+

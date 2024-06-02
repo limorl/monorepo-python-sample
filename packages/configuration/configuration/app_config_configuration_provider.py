@@ -4,7 +4,7 @@ from typing import Dict, Type, List, Any
 from environment.service_environment import ServiceEnvironment
 from .configuration import Configuration, ConfigurationSection
 from .configuration_provider import IConfigurationProvider
-from .app_config_utils import get_config_name, app_config_get_application_id, app_config_get_profile_id, app_config_get_environment_id, app_config_data_get_latest_configuration
+from .app_config_utils import get_app_name, get_config_name, app_config_get_application_id, app_config_get_profile_id, app_config_get_environment_id, app_config_data_get_latest_configuration
 from .secret import is_secret
 from .secrets_manager_utils import secrets_manager_get_secret_value
 
@@ -43,7 +43,7 @@ class AppConfigConfigurationProvider(IConfigurationProvider):
         self._appconfigdata = boto3.client('appconfigdata', **options)
         self._secretsmanager = boto3.client('secretsmanager', **options)
 
-        self._app_name = service_env.service_name
+        self._app_name = get_app_name(service_env.service_name)
         self._config_name = get_config_name(service_env.platform, service_env.stage, service_env.region)
         self._service_env = service_env
 

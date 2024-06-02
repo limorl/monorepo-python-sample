@@ -1,3 +1,4 @@
+from configuration.app_config_configuration_provider import AppConfigConfigurationProvider
 from configuration.configuration_provider import IConfigurationProvider
 from configuration.local_configuration_provider import LocalConfigurationProvider
 from environment.service_environment import ServiceEnvironment, Platform
@@ -25,10 +26,12 @@ def create_and_init_configuration_provider() -> IConfigurationProvider:
 
     if service_env.platform == Platform.LOCAL:
         config_provider = LocalConfigurationProvider(service_env)
-    else:
-        # TODO: Implement AppConfigConfigurationProvider using AWS AppConfig and then uncomment instead of LocalConfigurationProvider
-        # config_provider = AppConfigConfigurationProvider()
-        config_provider = LocalConfigurationProvider(service_env)
+        logger.info(f'Service {service_env.service_name} initialized with LocalConfigurationProvider')
 
+    else:
+        config_provider = AppConfigConfigurationProvider(service_env)
+        logger.info(f'Service {service_env.service_name} initialized with AppConfigurationProvider')
+
+        
     config_provider.init_configuration()
     return config_provider

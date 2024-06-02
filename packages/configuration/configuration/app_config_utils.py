@@ -15,6 +15,7 @@ logger = logging.getLogger()
 
 # This assumes this service deployment strategy was created using Terraform. For now it was created manually.
 SERVICE_DEFAULT_DEPLOYMENT_STARTEGY = 'ServiceDefault.Linear'
+SERVICE_DEV_DEPLOYMENT_STRATEGY = 'Test.Linear.AllatOnce'
 
 
 class DeploymentError(Exception):
@@ -28,6 +29,9 @@ class DeploymentState(Enum):
     COMPLETE = 'COMPLETE'
     ROLLING_BACK = 'ROLLING_BACK'
     ROLLED_BACK = 'ROLLED_BACK'
+
+def get_app_name(service_name: str) -> str:
+    return f'{service_name}-service'
 
 
 def get_config_name(platform: Platform, stage: Stage, region: str) -> str:
@@ -116,7 +120,7 @@ def app_config_deploy_service_configuration(service_name: str, platform: Platfor
     options['region_name'] = get_primary_region(stage)
     appconfig = boto3.client('appconfig', **options)
 
-    app_name = service_name
+    app_name = get_app_name(service_name)
     app_id = app_config_get_application_id(appconfig, app_name, True)
     env_id = app_config_get_environment_id(appconfig, app_id, stage.value, True)
     service_deployment_strategy_id = app_config_get_deployment_strategy_id(appconfig, deployment_strategy_name)

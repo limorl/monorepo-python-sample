@@ -80,7 +80,7 @@ def test_init_and_get_configuration_success(
     mock_appconfigdata.start_configuration_session.assert_called_once()
     mock_appconfigdata.get_latest_configuration.assert_called_once()
 
-    assert config_provider._app_name == 'hello'
+    assert config_provider._app_name == 'hello-service'
     assert config_provider._config_name == 'aws.prod.us-west-2'
 
     foo_configuration: FooConfiguration = config_provider.get_configuration(FooConfiguration)

@@ -19,14 +19,14 @@ The repo is great for ramping up on the following concepts:
 
 ### Next Steps
 The monorepo will be extendedt to support:
-1. Update AppConfigConfigurationProvider to use SSM ParameterStore instead of SecretsManager (cheapper, no need to auto-rotate keys at this point)
-2. When running in AWS mode,  Start Lambda with AppConfigConfigurationProvider when runs on AWS + Define IAM role to access AppConfig and SecretsManager
-2. Logging using [aws-powertools] (https://github.com/aws-powertools/powertools-lambda-python)
-3. Use Lambda Extensions to better handle calls to AppConfig and SSM
-4. Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/)
-5. Terraform to deploy infra on localstack and on AWS
-6. Add a deployment.yml workflow to deploy to AWS and to Localstack
-7. Add e2e.yml workflow with a simple e2e test which runs nightly (every night)
+* When running in AWS mode,  Start Lambda with AppConfigConfigurationProvider when runs on AWS + Define IAM role to access AppConfig and SecretsManager
+* Logging using [aws-powertools] (https://github.com/aws-powertools/powertools-lambda-python)
+* Use Lambda Extensions to better handle calls to AppConfig and SSM
+* Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/)
+* Terraform to deploy infra on localstack and on AWS
+* Remove IAM Role and Policy resources from SAM templates 
+* Add a deployment.yml workflow to deploy to AWS and to Localstack
+* Add e2e.yml workflow with a simple e2e test which runs nightly (every night)
 
 ### Issues
 * Semantic released is not used until sample key concepts are implemented.
