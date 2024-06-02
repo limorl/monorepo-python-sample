@@ -1,17 +1,20 @@
 import os
 import pytest
 import pathlib
+from configuration.app_config_utils import app_config_deploy_service_configuration
 from configuration.app_config_configuration_provider import AppConfigConfigurationProvider
 from configuration.configuration_provider import ConfigurationSection
 from configuration.configuration import Configuration
-from environment.environment_variables import EnvironmentVariables, reset_environment_variables
+from environment.service_environment import ServiceEnvironment, clear_service_environment, restore_local_dev_service_environment
 
+
+DEPLOYMENT_STRATEGY = 'Test.Linear.AllatOnce'
 
 class GooConfiguration(Configuration):
     def __init__(self, config_dict: ConfigurationSection):
         self.int1 = config_dict['int1']
         self.str2 = config_dict['str2']
-        self.secrets = config_dict.get('secrets', {})  # { "secret_plain": "secret:test/app/fake-secret-plain","secret_pair": "secret:test/app/fake-secret-pair" }
+        self.secrets = config_dict.get('secrets', {})
 
 
 @pytest.fixture
@@ -41,33 +44,32 @@ def configuration_with_populated_secrets():
     })
 
 
-@pytest.fixture()
-def reset_env():
-    reset_environment_variables()
-    config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
-    os.environ['LOCAL_CONFIGURATION_FOLDER'] = config_folder
-
-
 @pytest.fixture
-def env_variables(reset_env):
-    reset_environment_variables()
+def service_env():
+    clear_service_environment()
     os.environ['PLATFORM'] = 'AWS'
     os.environ['STAGE'] = 'dev'
     os.environ['REGION'] = 'us-west-2'
     os.environ['SERVICE_NAME'] = 'test'
+    
+    config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
+    os.environ['LOCAL_CONFIGURATION_FOLDER'] = config_folder
 
-    return EnvironmentVariables()
+    yield ServiceEnvironment()
+    restore_local_dev_service_environment()
 
 
 @pytest.fixture
-def app_configuration_provider(env_variables):
-    return AppConfigConfigurationProvider(env_variables)
+def app_configuration_provider(service_env):
+    app_configuration_provider = AppConfigConfigurationProvider(service_env)
+    app_configuration_provider.init_configuration()
+    return app_configuration_provider
 
 
-""" This test assumes the following resources exists:
-    AppConfig app names 'test-app' with 'aws.dev.us-west-2' configuration profile, deployed to 'dev' environment.
-    The configuration is described in tests/confug/aws.dev/us-west-2.json' file.
-    In addition two secrets are stored on Secretes Manager:
+""" This test assumes the following resources exists in Dev/Test env:
+    Test.Linear.AllatOnce configuration deployment strategy (all at once with 0 interval and 0 bake time)
+    
+    Two secrets are stored on Secretes Manager:
     - Plain text secret: 'test/app/fake-secret-plain' = fake-secret-val
     - Key/Value secret: 'secret:test/app/fake-secret-pair': {
                 'Username': 'fake-username',
@@ -80,16 +82,16 @@ def app_configuration_provider(env_variables):
 
 @pytest.mark.integration
 def test_init_and_get_configuration__success(
-        app_configuration_provider,
-        configuration,
-        configuration_with_populated_secrets,
+    service_env,
+    configuration_with_populated_secrets,
 ):
+    app_config_deploy_service_configuration(service_env.service_name, service_env.platform, service_env.stage, service_env.region, DEPLOYMENT_STRATEGY, service_env.local_configuration_folder)
 
+    app_configuration_provider = AppConfigConfigurationProvider(service_env)
     app_configuration_provider.init_configuration()
 
     configuration: GooConfiguration = app_configuration_provider.get_configuration(GooConfiguration)
 
-    # assert configuration is correct and secrets were populated
     assert configuration
     assert configuration.int1 == configuration_with_populated_secrets.int1
     assert configuration.str2 == configuration_with_populated_secrets.str2

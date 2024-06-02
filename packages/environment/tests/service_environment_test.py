@@ -1,12 +1,13 @@
 import os
 import pathlib
 import pytest
-from environment.environment_variables import EnvironmentVariables, Platform, Stage, reset_environment_variables
+from environment.service_environment import ServiceEnvironment, Platform, Stage, clear_service_environment, restore_local_dev_service_environment
 
 
 @pytest.fixture
 def reset_env():
-    reset_environment_variables()
+    yield clear_service_environment()
+    restore_local_dev_service_environment()
 
 
 @pytest.fixture
@@ -23,7 +24,7 @@ def test_init_environment_variables_dev_env(reset_env):
     os.environ['PLATFORM'] = 'local'
     os.environ['STAGE'] = 'dev'
     os.environ['CLOUD_ENDPOINT_OVERRIDE'] = 'http://localhost:4566'
-    env = EnvironmentVariables()
+    env = ServiceEnvironment()
 
     assert env.platform == Platform.LOCAL
     assert env.cloud_endpoint_override == 'http://localhost:4566'
@@ -35,17 +36,18 @@ def test_init_environment_variables_prod_env(reset_env, default_local_config_fol
     os.environ['REGION'] = 'us-east-1'
     os.environ['STAGE'] = 'prod'
     os.environ['SERVICE_NAME'] = 'hello'
-    env = EnvironmentVariables()
+    env = ServiceEnvironment()
 
     assert env.platform == Platform.AWS
     assert env.region == 'us-east-1'
+    assert env.primary_region == 'us-east-1'
     assert env.service_name == 'hello'
     assert env.stage == Stage.PROD
     assert env.local_configuration_folder == default_local_config_folder
 
 
 def test_init_environment_variables_empty_env_should_not_fail(reset_env, default_local_config_folder):
-    env = EnvironmentVariables()
+    env = ServiceEnvironment()
 
     assert env is not None
     assert env.platform is None
@@ -58,7 +60,7 @@ def test_init_environment_variables_empty_env_should_not_fail(reset_env, default
 
 def test_init_environment_variables_dev_dotenv_path(reset_env, test_data_dir, default_local_config_folder):
     dotnev_path = os.path.join(test_data_dir, '.dev.env')
-    env = EnvironmentVariables(dotnev_path)
+    env = ServiceEnvironment(dotnev_path)
 
     assert env.platform == Platform.LOCAL
     assert env.cloud_endpoint_override == 'http://localhost:4566'
@@ -69,10 +71,11 @@ def test_init_environment_variables_dev_dotenv_path(reset_env, test_data_dir, de
 
 def test_init_environment_variables_prod_dotenv_path(reset_env, test_data_dir, default_local_config_folder):
     dotnev_path = os.path.join(test_data_dir, '.prod.env')
-    env = EnvironmentVariables(dotnev_path)
+    env = ServiceEnvironment(dotnev_path)
 
     assert env.platform == Platform.AWS
     assert env.region == 'us-east-1'
+    assert env.primary_region == 'us-east-1'
     assert env.service_name == 'hello'
     assert env.stage == Stage.PROD
     assert env.local_configuration_folder == default_local_config_folder
@@ -80,7 +83,7 @@ def test_init_environment_variables_prod_dotenv_path(reset_env, test_data_dir, d
 
 def test_init_environment_variables_dotenv_empty(reset_env, test_data_dir, default_local_config_folder):
     dotnev_path = os.path.join(test_data_dir, '.empty.env')
-    env = EnvironmentVariables(dotnev_path)
+    env = ServiceEnvironment(dotnev_path)
 
     assert env.platform is None
     assert env.region is None
@@ -92,7 +95,7 @@ def test_init_environment_variables_dotenv_empty(reset_env, test_data_dir, defau
 
 def test_init_environment_variables_dotenv_with_config_folder(reset_env, test_data_dir, default_local_config_folder):
     dotnev_path = os.path.join(test_data_dir, '.local.config.folder.env')
-    env = EnvironmentVariables(dotnev_path)
+    env = ServiceEnvironment(dotnev_path)
 
     assert env.local_configuration_folder == 'configfolder'
 
@@ -100,7 +103,7 @@ def test_init_environment_variables_dotenv_with_config_folder(reset_env, test_da
 def test_init_environment_variables_dotenv_unknown_platform_should_throw(reset_env, test_data_dir):
     dotnev_path = os.path.join(test_data_dir, '.unknown.platform.env')
     with pytest.raises(ValueError) as exc_info:
-        EnvironmentVariables(dotnev_path)
+        ServiceEnvironment(dotnev_path)
 
     assert "'foo' is not a valid Platform" in str(exc_info.value)
 
@@ -109,7 +112,7 @@ def test_init_environment_variables_dotenv_unknown_stage_should_throw(reset_env,
     dotnev_path = os.path.join(test_data_dir, '.unknown.stage.env')
 
     with pytest.raises(ValueError) as exc_info:
-        EnvironmentVariables(dotnev_path)
+        ServiceEnvironment(dotnev_path)
 
     assert "'goo' is not a valid Stage" in str(exc_info.value)
 
@@ -120,6 +123,6 @@ def test_get_configuration_aws_prod_missing_service_name_should_throw_value_erro
     os.environ['REGION'] = 'us-east-1'
 
     with pytest.raises(ValueError) as exc_info:
-        EnvironmentVariables()
+        ServiceEnvironment()
 
     assert "Missing service name" in str(exc_info.value)

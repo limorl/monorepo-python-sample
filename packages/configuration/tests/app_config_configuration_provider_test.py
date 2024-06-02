@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 from configuration.app_config_configuration_provider import AppConfigConfigurationProvider
 from configuration.configuration_provider import ConfigurationSection
 from configuration.configuration import Configuration
-from environment.environment_variables import EnvironmentVariables, reset_environment_variables
+from environment.service_environment import ServiceEnvironment, clear_service_environment, restore_local_dev_service_environment
 
 
 class FooConfiguration(Configuration):
@@ -17,29 +17,15 @@ class FooConfiguration(Configuration):
 
 
 @pytest.fixture
-def env_variables():
-    reset_environment_variables()
+def set_env():
+    clear_service_environment()
     os.environ['PLATFORM'] = 'AWS'
     os.environ['STAGE'] = 'prod'
     os.environ['REGION'] = 'us-west-2'
     os.environ['SERVICE_NAME'] = 'hello'
 
-    return EnvironmentVariables()
-
-
-# @pytest.fixture
-# def app_name(env_variables):
-#     return env_variables.service_name
-
-
-# @pytest.fixture
-# def config_profile_name(env_variables):
-#     return compose_config_profile_name(env_variables.service_name, env_variables.stage.value)
-
-
-# @pytest.fixture
-# def config_name(env_variables):
-#     return compose_config_name(env_variables.platform.value, env_variables.stage.value, env_variables.region)
+    yield ServiceEnvironment()
+    restore_local_dev_service_environment()
 
 
 @pytest.fixture
@@ -51,13 +37,13 @@ def mock_get_secret_value_responses():
 
 
 @pytest.fixture
-def app_configuration_provider(env_variables):
+def app_configuration_provider(set_env):
     with patch('boto3.client') as mock_boto_client:
         mock_appconfig = Mock()
         mock_appconfigdata = Mock()
         mock_secretsmanager = Mock()
         mock_boto_client.side_effect = lambda service, **kwargs: mock_appconfig if service == 'appconfig' else (mock_appconfigdata if service == 'appconfigdata' else mock_secretsmanager)
-        configuration_provider = AppConfigConfigurationProvider(env_vars=env_variables)
+        configuration_provider = AppConfigConfigurationProvider(service_env=set_env)
         return configuration_provider, mock_appconfig, mock_appconfigdata, mock_secretsmanager
 
 
@@ -94,7 +80,7 @@ def test_init_and_get_configuration_success(
     mock_appconfigdata.start_configuration_session.assert_called_once()
     mock_appconfigdata.get_latest_configuration.assert_called_once()
 
-    assert config_provider._app_name == 'hello-app'
+    assert config_provider._app_name == 'hello'
     assert config_provider._config_name == 'aws.prod.us-west-2'
 
     foo_configuration: FooConfiguration = config_provider.get_configuration(FooConfiguration)

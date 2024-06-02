@@ -1,14 +1,10 @@
 import pytest
-from configuration.app_config_utils import compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_environment_id, app_config_get_deployment_strategy_id, app_config_data_get_latest_configuration, app_config_get_profile_id, app_config_create_hosted_configuration_version
-from environment.environment_variables import Platform, Stage
+from configuration.app_config_utils import get_config_name, app_config_get_application_id, app_config_get_environment_id, app_config_get_deployment_strategy_id, app_config_data_get_latest_configuration, app_config_get_profile_id, app_config_create_hosted_configuration_version
+from environment.service_environment import Platform, Stage
 
 
-def test_compose_app_name():
-    assert compose_app_name('test') == 'test-app'
-
-
-def test_compose_config_name():
-    assert compose_config_name(Platform.AWS, Stage.PROD, 'us-east-1') == 'aws.prod.us-east-1'
+def test_get_config_name():
+    assert get_config_name(Platform.AWS, Stage.PROD, 'us-east-1') == 'aws.prod.us-east-1'
 
 
 # TODO (limorl): Add tests with NextToken and to handle when create_if_not_exists = False

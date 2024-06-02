@@ -1,26 +1,42 @@
 
 import json
 import logging
-from typing import Any, Callable, Dict
+import pathlib
+from typing import Any, Callable, Dict, Any
 
-from environment.environment_variables import Stage, Platform
+from environment.service_environment import Stage, Platform
 from .configuration import ConfigurationSection
 
 logger = logging.getLogger()
 
 
-def get_app_config_region(stage: Stage) -> str:
-    """ If you manage app config and secret managers in each account and not centralized, set app_config_region according to the stage.
-    For example: return 'us-east-1' if stage == Stage.PROD else 'us-west-2'
-    """
-    return 'us-east-1'
+import boto3
+from botocore.exceptions import ClientError
+from enum import Enum
+import json
+import os
+import time
+from environment.service_environment import Platform, Stage, get_primary_region
 
 
-def compose_app_name(service_name: str) -> str:
-    return f'{service_name}-app'
+# This assumes this service deployment strategy was created using Terraform. For now it was created manually.
+SERVICE_DEFAULT_DEPLOYMENT_STARTEGY = 'ServiceDefault.Linear'
 
 
-def compose_config_name(platform: Platform, stage: Stage, region: str) -> str:
+class DeploymentError(Exception):
+    pass
+
+
+class DeploymentState(Enum):
+    BAKING = 'BAKING'
+    VALIDATING = 'VALIDATING'
+    DEPLOYING = 'DEPLOYING'
+    COMPLETE = 'COMPLETE'
+    ROLLING_BACK = 'ROLLING_BACK'
+    ROLLED_BACK = 'ROLLED_BACK'
+
+
+def get_config_name(platform: Platform, stage: Stage, region: str) -> str:
     return f'{platform.value.lower()}.{stage.value}.{region}'
 
 
@@ -89,6 +105,72 @@ def app_config_data_get_latest_configuration(appconfigdata: Any, app_id: str, en
     configuration: Dict[str, Any] = json.loads(configuration_json)
 
     return configuration
+
+
+def app_config_deploy_service_configuration(service_name: str, platform: Platform, stage: Stage, region: str, deployment_strategy_name: str = SERVICE_DEFAULT_DEPLOYMENT_STARTEGY, config_dir: str = None) -> None:
+    config_name = get_config_name(platform, stage, region)
+
+    monorepo_root = pathlib.Path(__file__).parent.parent.parent.parent.resolve()
+    config_dir = config_dir or os.path.join(monorepo_root, 'services', 'service_name', 'config')
+    config_file = os.path.join(config_dir, f'{config_name}.json')
+
+    if not os.path.exists(config_file):
+        logger.warning(f'Configuration file for service {service_name} does not exist: {config_file}')
+        return
+
+    options = {}
+    options['region_name'] = get_primary_region(stage)
+    appconfig = boto3.client('appconfig', **options)
+
+    app_name = service_name
+    app_id = app_config_get_application_id(appconfig, app_name, True)
+    env_id = app_config_get_environment_id(appconfig, app_id, stage.value, True)
+    service_deployment_strategy_id = app_config_get_deployment_strategy_id(appconfig, deployment_strategy_name)
+
+    try:
+        with open(config_file, 'r') as file:
+            logger.debug(f'Loading configuration file: {config_file}')
+            config_json: Dict[str, ConfigurationSection] = json.load(file)
+
+            config_profile_id = app_config_get_profile_id(appconfig, app_id, config_name, True)
+            version_number = app_config_create_hosted_configuration_version(appconfig, app_id, config_profile_id, config_json)
+
+            logger.info(f'Starting configuration deployment for app: {app_name}, config name: {config_name}, app id: {app_id}, profile: {config_profile_id}, version: {version_number}')
+
+            deployment = appconfig.start_deployment(
+                ApplicationId=app_id,
+                ConfigurationProfileId=config_profile_id,
+                ConfigurationVersion=str(version_number),
+                EnvironmentId=env_id,
+                DeploymentStrategyId=service_deployment_strategy_id
+            )
+
+            deployment = _wait_until_deployment_completes(appconfig, deployment)
+
+    except json.JSONDecodeError:
+        logger.error(f'Failed to decode JSON from configuration file: {config_file}')
+    except ClientError as err:
+        logger.error(f'Failed to deploy configuration for service: {service_name}. Error Code: {err["Error"]["Code"]} error: {err}')
+    except DeploymentError as err:
+        logger.error(f'Failed to deploy configuration for service: {service_name}. Error: {err}')
+
+
+def _wait_until_deployment_completes(appconfig: Any, deployment: Dict[str, Any]) -> Dict[str, Any]:
+    deployment_state = DeploymentState(deployment.get('State'))
+
+    while deployment_state != DeploymentState.COMPLETE:
+        if deployment_state == DeploymentState.ROLLED_BACK or deployment_state == DeploymentState.ROLLING_BACK:
+            event_log = deployment.get('EventLog') and map(lambda entry: entry.get('Description').join('\n'), deployment.get('EventLog'))
+            raise DeploymentError(f'Configuration deployment failed. Details:\n ${event_log}')
+
+        time.sleep(1)
+        deployment = appconfig.get_deployment(
+            ApplicationId=deployment.get('ApplicationId'),
+            DeploymentNumber=deployment.get('DeploymentNumber'),
+            EnvironmentId=deployment.get('EnvironmentId')
+        )
+
+    return deployment
 
 
 def _get_or_create_id(name: str, list_func: Callable[[str], Dict], create_func: Callable[[], Dict] = None) -> str:

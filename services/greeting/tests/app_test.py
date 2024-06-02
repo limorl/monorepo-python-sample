@@ -4,7 +4,7 @@ import pytest
 from greeting.greeting import Greeting
 from greeting.app import create_app
 from greeting.greeting_configuration import GreetingConfiguration
-from environment.environment_variables import reset_environment_variables
+from environment.service_environment import clear_service_environment
 
 
 @pytest.fixture(params=[2, 5, 0])
@@ -17,7 +17,7 @@ def mock_config_provider(request):
 
 @pytest.fixture()
 def app(mock_config_provider):
-    reset_environment_variables()
+    clear_service_environment()
     os.environ['PLATFORM'] = 'local'
     os.environ['STAGE'] = 'dev'
 
