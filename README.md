@@ -182,7 +182,7 @@ flask --app app.py run --debug
 ### 2.Running lambda locally using SAM CLI
 * Use `sam local invoke` for invoking lambdas without API (e.g. hello-world).
 * Use `sam start-api` to invoke lambdas with API (e.g. greeting).
-* Remove this line from [greeting/samconfig.toml](./services/greeting/samconfig.toml)and [hello-world/samconfig.toml](./services/hello-world/samconfig.toml) if you are not runing on Mac: `container_host = 'host.docker.internal'`
+* Remove this line from [greeting/samconfig.toml](./services/greeting/samconfig.toml)and [hello-world/samconfig.toml](./services/hello-world/samconfig.toml) if you are not running on Mac: `container_host = 'host.docker.internal'`
 
 #### Building & Invoking Hello-world lambda (Zip)
 ```shell
@@ -298,7 +298,7 @@ Use the service name as repository name, `greeting` in this example.
 ```shell
 aws ecr create-repository --repository-name greeting --query 'repository.repositoryUri' > repoUri.txt
 ```
-Get the respository URI from repoUri.txt and delete repoUri.txt.
+Get the repository URI from repoUri.txt and delete repoUri.txt.
 
 Now, deploy to localstack using sam deploy (open a new bash window):
 Use `prod` or `dev` as config env. For `prod`, det `DockerTag` to be the recent greeting package version.
