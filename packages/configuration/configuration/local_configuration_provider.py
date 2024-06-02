@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Type
 from configuration.configuration import Configuration, ConfigurationSection
 from configuration.configuration_provider import IConfigurationProvider
 from configuration.secret import is_secret, try_get_secret_name, parse_secret_value
-from environment.environment_variables import EnvironmentVariables, is_cloud_platform
+from environment.service_environment import ServiceEnvironment, is_cloud_platform
 
 logger = logging.getLogger()
 
@@ -13,13 +13,13 @@ logger = logging.getLogger()
 class LocalConfigurationProvider(IConfigurationProvider):
     """ Local Configuration Provider.
         Provides configuration based on local configuration file and Environment Variables"""
-    _env_variables = {}
+    _service_env = {}
     _config_file_path = ''
 
-    def __init__(self, env_variables: EnvironmentVariables):
+    def __init__(self, service_env: ServiceEnvironment):
         super().__init__()
 
-        self._env_variables = env_variables
+        self._service_env = service_env
         self._config_file_path = self._get_config_file_path()
 
         logger.debug(f"LocalConfigurationProvider _local_config_path set to: {self._config_file_path}")
@@ -47,13 +47,13 @@ class LocalConfigurationProvider(IConfigurationProvider):
 
     def _get_config_file_path(self) -> str:
         default_config_folder = os.path.join(os.getcwd(), 'config')
-        local_config_folder = self._env_variables.local_configuration_folder or default_config_folder
+        local_config_folder = self._service_env.local_configuration_folder or default_config_folder
 
-        platform = self._env_variables.platform.value.lower()
-        stage = self._env_variables.stage.value.lower()
-        region = self._env_variables.region
+        platform = self._service_env.platform.value.lower()
+        stage = self._service_env.stage.value.lower()
+        region = self._service_env.region
 
-        if is_cloud_platform(self._env_variables.platform):
+        if is_cloud_platform(self._service_env.platform):
             return os.path.join(local_config_folder, f'{platform}.{stage}.{region}.json')
         else:
             return os.path.join(local_config_folder, f'{platform}.{stage}.json')

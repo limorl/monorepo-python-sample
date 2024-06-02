@@ -10,7 +10,7 @@ Globals:
     Timeout: 5
 
 Resources:
-  Function:
+  HelloWorldLambda:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: "hello-world"

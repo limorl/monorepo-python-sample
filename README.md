@@ -1,34 +1,36 @@
 # Sample Python Monorepo [A work in progress]
 
-This is a sample monorepo that can be used as a starting point for a python project, to ramp up on the following concepts:
+This is a sample monorepo that can be used as a starting point for a serverless python project on AWS, using SAM and lambda containers.
+
+It includes two sample lambda services:
+1. **hello-world** - a simple lambda handler without API, packaged as Zip (uploaded to s3 bucket)
+2. **greeting** - a simple lambda service with API, using Flask service framework, deployed as container (image uploaded to ECR)
+
+The repo is great for ramping up on the following concepts:
 * Developing inside Devcontainer (dockerized development environment)
+* Using Poetry for dependency management and packaging
+* Unit testing lambda services
 * Working with Localstack
 * Building and running serverlass apps locally using sam cli
-* Poetry for dependency management and packaging
 * pre-commit hooks
-* Unit testing lambda services
 * Terraform
-* Github wrkflows
+* Github workflows
 * Changeset for package versions
 
 ### Next Steps
 The monorepo will be extendedt to support:
-1. Update AppConfigConfigurationProvider to use SSM ParameterStore instead of SecretsManager (cheapper, no need to auto-rotate keys at this point)
-2. When running in AWS mode,  Start Lambda with AppConfigConfigurationProvider when runs on AWS + Define IAM role to access AppConfig and SecretsManager
-2. Logging using [aws-powertools] (https://github.com/aws-powertools/powertools-lambda-python)
-3. Use Lambda Extensions to better handle calls to AppConfig and SSM
-4. Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/)
-5. Terraform to deploy infra on localstack and on AWS
-6. Add a deployment.yml workflow to deploy to AWS and to Localstack
-7. Add e2e.yml workflow with a simple e2e test which runs nightly (every night)
+* When running in AWS mode,  Start Lambda with AppConfigConfigurationProvider when runs on AWS + Define IAM role to access AppConfig and SecretsManager
+* Logging using [aws-powertools] (https://github.com/aws-powertools/powertools-lambda-python)
+* Use Lambda Extensions to better handle calls to AppConfig and SSM
+* Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/)
+* Terraform to deploy infra on localstack and on AWS
+* Remove IAM Role and Policy resources from SAM templates 
+* Add a deployment.yml workflow to deploy to AWS and to Localstack
+* Add e2e.yml workflow with a simple e2e test which runs nightly (every night)
 
-## Issues
-* Semantic released was not tested / verified
+### Issues
+* Semantic released is not used until sample key concepts are implemented.
 
-## Sample
-The sample includes two lambda services:
-1. hello_world - a simple lambda handler without API
-2. greeting - a simple lambda service with API, using Flask service framework
 
 ## Setup Development Environment
 
@@ -118,8 +120,6 @@ Upon merging changes into the release branch (e.g., main), the CI pipeline shoul
 - Tag the release in the VCS (Version Control System, e.g., Git).
 - Optionally, upload the package to PyPI or another package repository if configured.
 
-
-## Running Locally
 ### Local Dev environment
 We're using VS Code DevContainer to run our dockerized development environment.
 To run the development environment locally, click `Shift+Command+p -> Reopen in Container`
@@ -150,7 +150,7 @@ poetry run pytest
 
 If you have package sependency, such as packages.package-a dependes on package-b, poetry can install the local packages and they can be imported. See package-a and package-b examples.
 
->> NOTE: When running on S code, you may see that the dependency local package is not recognized by pylance. Please ignore it.
+>> NOTE: When running on VS Code, you may see that the dependency local package is not recognized by pylance. Please ignore it.
 
 To install *all packages* run from the monorepo root:
 
@@ -162,141 +162,186 @@ In general, every script defined in `packages/scripts` pyproject.toml can be run
 ```shell
 python run_script.py <script-name>
 ```
-### Running Service Locally
+
+## Running and Testing Services Locally
 
 There are several options to run services locally:
-1. Run the flask app
+1. Run the flask app directly
 2. Run local lambda using sam cli
-3. Deploy the lambda to localstack 
+3. Deploy the lambda to localstack using sam cli
 
-#### 1. Running the flask application directly
+>> Note: We use [samconfig.toml](./services/greeting/samconfig.toml) file to configure SAM CLI. We will use `--config-env` command argument to specify which configuration to use. The default configuration is used for local dev environment.
+
+### 1. Running the flask application directly
 
 ```shell
 cd services/<my-service>
 flask --app app.py run --debug
 ```
 
-#### 2.Running lambda locally using SAM CLI
-* On MacOS
-   Make sure your workspace folder is shared from the docker host.
-  * Lambda handler with API:
-  ```shell
-  cd services/<service-folder> 
-  sam build
-  sudo sam local start-api --container-host host.docker.internal --env-vars local.dev.env.json
-  ```
-  * Lambda handler without API:
-  ```shell
-  cd services/<service-folder>  
-  sam build
-  sudo sam local invoke --container-host host.docker.internal --env-vars local.dev.env.json
-  ```
+### 2.Running lambda locally using SAM CLI
+* Use `sam local invoke` for invoking lambdas without API (e.g. hello-world).
+* Use `sam start-api` to invoke lambdas with API (e.g. greeting).
+* Remove this line from [greeting/samconfig.toml](./services/greeting/samconfig.toml)and [hello-world/samconfig.toml](./services/hello-world/samconfig.toml) if you are not running on Mac: `container_host = 'host.docker.internal'`
 
-* Other Linux machines
-  * Lambda handler with API:
-  ```shell
-  cd services/<service-folder>
-  sam build
-  sudo sam local start-api --env-vars local.dev.env.json
-  ```
-  * Lambda handler without  API:
-  ```shell
-  cd services/<service-folder>
-  sam build
-  sudo sam local invoke --env-vars local.dev.env.json
-  ```
-
-#### 3. Deploying lambda to Localstack using SAM CLI
-To deploy using SAM CLI to LocalStack, set the --endpoint-url parameter to point to LocalStack for all service commands. Here's how you can package and deploy your application (Greeting service for example).
-
-First, create an S3 bucket in local stack for the lambdas packaged using sam cli:
+#### Building & Invoking Hello-world lambda (Zip)
 ```shell
-aws-localstack s3api create-bucket --bucket sam-build-lambda-code-greeting
+cd services/hello-world
+sam build
+sudo sam local invoke
 ```
 
-Here's an example on how to build and deploy the greeting service:
-
+#### Building & Invoking Greeting lambda (container)
 ```shell
 cd services/greeting
 sam build
+sudo sam local start-api
 ```
 
-Then, deploy to localstack using sam deploy (open a new bash window):
+Open your browser and ensure the endpoints work correctly:
+* `http://127.0.0.1:3000/hello`
+* `http://127.0.0.1:3000/hello/Dan`
+
+
+### 3. Deploying lambda to Localstack using SAM CLI
+You can deploy the lambda function to localstack similarly to deploying to aws, by using `aws-localstack` alias.
+
+>> Note: Use local dev configuration and Zip build when deploying to localstack if you don;t have Pro Loaclstack account (ECR, AppConfig and SecretsManager are pro features)
+
+#### Building and Deploying Hello-world lambda to localstack
+First, create an S3 bucket in local stack for the lambdas packaged using sam cli:
+
 ```shell
-sam-localstack deploy \
---stack-name greeting-service \
---capabilities CAPABILITY_IAM \
---region us-east-1 \
---s3-bucket sam-build-lambda-code-greeting \
---parameter-overrides 'Stage=dev Platform=local'
+aws-localstack s3api create-bucket --bucket sam-lambda-code-hello-world
 ```
 
-**NOTE:** If you want to deploy the lambda functions with production configuration, then use `--parameter-overrides Stage=prod Platform=aws`
+Then, build and deploy:
+```shell
+cd services/hello-world
+sam build
+sam-localstack deploy
+```
 
 Once deployed to localstack, all lambdas are available on a single endpoint and can be invoked using function name.
-
-You can list all functions by running:
+Get the FunctionName from the result of running:
 ```shell
 aws-localstack lambda list-functions
 ```
 
-Use the `FunctionName` in the returned list when invoking the lambda.
-For example, for greeting service, invoke the lambda function:
+Invoke the lambda on localstack with the relevant FunctionName:
 ```shell
 aws-localstack lambda invoke \
---function-name greeting-service-GreetingLambda-8fc0648c \
---payload '{"headers": {}, "path": "/hello", "httpMethod": "GET"}' \
---cli-binary-format raw-in-base64-out \
-output.txt
-
-aws-localstack lambda invoke \
---function-name greeting-service-GreetingLambda-8fc0648c \
---payload '{"headers": {}, "path": "/hello/Danny", "httpMethod": "GET"}' \
+--function-name <FunctionName> \
+--payload '{}' \
 --cli-binary-format raw-in-base64-out \
 output.txt
 ```
-
-<!--Get the id of your service and your service is available on this endpoint:
-`http://localhost:4566/restapis/<restapi-id>/dev/_user_request_/hello`
--->
-
 To view localstack logs run:
 ```shell
 sudo docker logs localstack-main
 ```
 
-## Deploying services to AWS using Sam CLI
+## Deploying services to AWS
+Make sure you are logged in to **AWS Dev** account using `aws sso login`.
+If your SSO login is not configured, run:
 
-Make sure you are logged in to AWS:
 ```shell
     aws configure sso
 ```
 
 Skip SSO session name and set the profile name to `default`.
-If you are using multiple profiles, add `--profile-name <profile>` to each command.
+If you are using multiple profiles (e.g. prod and dev), add `--profile-name <profile>` to each command.
 
-Then build and deploy:
+
+>> Note: Deploy will [automatically use the template under .aws-sam/build](https://stackoverflow.com/questions/59815363/aws-sam-cli-ignoring-my-python-dependencies-during-build-package-and-deplo).
+
+
+### Building and Dwploying Hello-world to AWS (Zip)
+
 ```shell
+aws s3api create-bucket --bucket sam-lambda-code-hello-world
+```
+
+Then, build and deploy:
+```shell
+cd services/hello-world
 sam build
-sam deploy \
---stack-name greeting-service \
---capabilities CAPABILITY_IAM \
---region us-east-1 \
---s3-bucket sam-build-lambdas
+sam deploy
 ```
 
-Deploy will [automatically use the template under .aws-sam/build](https://stackoverflow.com/questions/59815363/aws-sam-cli-ignoring-my-python-dependencies-during-build-package-and-deplo).
-
-You can issue an http request against the lambda:
+Once deployed to localstack, all lambdas are available on a single endpoint and can be invoked using function name.
+Get the FunctionName from the result of running:
 ```shell
-curl https://8fwcdbjd95.execute-api.us-east-1.amazonaws.com/prod/hello
+aws lambda list-functions
 ```
+
+Invoke the lambda on localstack with the relevant FunctionName:
+```shell
+aws lambda invoke \
+--function-name hello-world \
+--payload '{}' \
+--cli-binary-format raw-in-base64-out \
+output.txt
+```
+
+### Building and Deploying Greeting lambda container
+
+Build the container (note that in samconfig.toml the --use-container is set to true, hence no need to explicitly specify it here:). Use the greeting package version as DockerTag when deployng to AWS.
 
 ```shell
-curl https://8fwcdbjd95.execute-api.us-east-1.amazonaws.com/prod/hello/Danny
+cd services/greeting
+sam build --config-env <prod|dev> --parameter-overrides 'DockerTag=<package-version>'
+```
+Ensure there's an ECR repository for the lambda images, or create one.
+Use the service name as repository name, `greeting` in this example.
+
+```shell
+aws ecr create-repository --repository-name greeting --query 'repository.repositoryUri' > repoUri.txt
+```
+Get the repository URI from repoUri.txt and delete repoUri.txt.
+
+Now, deploy to localstack using sam deploy (open a new bash window):
+Use `prod` or `dev` as config env. For `prod`, det `DockerTag` to be the recent greeting package version.
+
+```shell
+sam deploy --config-env <prod|dev> --parameter-override 'DockerTage=<package-version>'
 ```
 
-**NOTE:** When deployed remotely, the greeting message returns with 5 exclamation points, according to the remote config, but when running locally or on local stack, it is returned with a single exclamation point. 
+You can list the functions and see that the newly deployed lambda appears in the list:
+```shell
+aws lambda list-functions
+```
+
+To invoke the function:
+```shell
+aws lambda invoke \
+--function-name greeting \
+--payload '{"headers": {}, "path": "/hello", "httpMethod": "GET"}' \
+--cli-binary-format raw-in-base64-out \
+output.txt
+
+aws lambda invoke \
+--function-name greeting \
+--payload '{"headers": {}, "path": "/hello/Danny", "httpMethod": "GET"}' \
+--cli-binary-format raw-in-base64-out \
+output.txt
+```
+
+You can also go to test the service via the AWS console:
+1. Lambda dashboard -> Functions -> greeting -> greeting-service -> Greeting API
+2. Select the enfpoint
+3. Use the `Test` tab
+
+If needed, a Function URL can be set, but we'll skip it for now.
+
+
+>> Note: When deployed remotely, the greeting message returns with 5 exclamation points, according to the remote config, but when running locally or on local stack, it is returned with a single exclamation point. Make sure this is indeed what you are observing when running locally or remptly.
+
+
+<!--Get the id of your service and your service is available on this endpoint:
+`http://localhost:4566/restapis/<restapi-id>/dev/_user_request_/hello`
+-->
+
 
 ## Testing
 

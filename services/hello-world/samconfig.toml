@@ -1,0 +1,14 @@
+version = 0.1
+
+# Local invoke  (default configured for local dev)
+[default.build.parameters]
+container_host = 'host.docker.internal'  # Use for Mac only, else remove
+
+[default.local_invoke.parameters]
+container_host = 'host.docker.internal'  # Use for Mac only, else remove
+
+[default.deploy.parameters]
+stack_name = 'hello-world-service'
+capabilities = 'CAPABILITY_IAM'
+region = 'us-east-1'
+s3_bucket = 'sam-lambda-code-hello-world'

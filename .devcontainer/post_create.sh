@@ -8,6 +8,9 @@ WORKSPACE_DIR=$(pwd)
 poetry config cache-dir "${WORKSPACE_DIR}/.cache"
 poetry config virtualenvs.in-project true
 
+# Enabling sharing the same host
+sudo chmod 666 /var/run/docker.sock
+
 # Install all dependencies
 poetry install
 python run_script.py install-all

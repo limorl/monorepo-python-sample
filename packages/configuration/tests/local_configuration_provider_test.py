@@ -3,14 +3,16 @@ import pytest
 import pathlib
 from configuration.configuration import Configuration, ConfigurationSection
 from configuration.local_configuration_provider import LocalConfigurationProvider
-from environment.environment_variables import EnvironmentVariables, reset_environment_variables
+from environment.service_environment import ServiceEnvironment, clear_service_environment, restore_local_dev_service_environment
 
 
 @pytest.fixture()
 def reset_env():
-    reset_environment_variables()
+    clear_service_environment()
     config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
     os.environ['LOCAL_CONFIGURATION_FOLDER'] = config_folder
+    yield
+    restore_local_dev_service_environment()
 
 
 class FooConfiguration(Configuration):
@@ -36,8 +38,8 @@ def test_get_configuration_local_dev_with_env_secrets(reset_env):
     os.environ['FAKE_SECRET_PLAIN'] = 'fake-secret'
     os.environ['FAKE_SECRET_PAIR'] = '{"username": "fake-user", "password": "fake-password"}'
 
-    env_variables = EnvironmentVariables()
-    config_provider = LocalConfigurationProvider(env_variables)
+    service_env = ServiceEnvironment()
+    config_provider = LocalConfigurationProvider(service_env)
     config_provider.init_configuration()
 
     config: BarConfiguration = config_provider.get_configuration(BarConfiguration)
@@ -61,8 +63,8 @@ def test_get_configuration_local_dev_dotenv_secrets(reset_env):
     os.environ['SERVICE_NAME'] = 'hello'
 
     dotenv_path = os.path.join(pathlib.Path(__file__).parent.resolve(), '.env.test')
-    env_variables = EnvironmentVariables(dotenv_path)
-    config_provider = LocalConfigurationProvider(env_variables)
+    service_env = ServiceEnvironment(dotenv_path)
+    config_provider = LocalConfigurationProvider(service_env)
     config_provider.init_configuration()
 
     config: BarConfiguration = config_provider.get_configuration(BarConfiguration)
@@ -86,8 +88,8 @@ def test_get_configuration_aws_prod(reset_env):
     os.environ['REGION'] = 'us-east-1'
     os.environ['SERVICE_NAME'] = 'hello'
 
-    env_variables = EnvironmentVariables()
-    config_provider = LocalConfigurationProvider(env_variables)
+    service_env = ServiceEnvironment()
+    config_provider = LocalConfigurationProvider(service_env)
     config_provider.init_configuration()
 
     config: FooConfiguration = config_provider.get_configuration(FooConfiguration)
