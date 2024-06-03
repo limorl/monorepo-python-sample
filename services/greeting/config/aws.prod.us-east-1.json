@@ -1,6 +1,6 @@
 {
     "AppConfiguration": {
-        "html_headings": "h1"
+        "html_heading": "h1"
     },
     "GreetingConfiguration": {
         "num_of_exclamations": 5

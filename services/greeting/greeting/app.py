@@ -14,7 +14,7 @@ logger = get_lambda_logger()
 
 class AppConfiguration(Configuration):
     def __init__(self, data: dict):
-        self.html_headings: str = data['html_headings']
+        self.html_heading: str = data['html_heading']
 
 
 def create_app(config_provider: IConfigurationProvider, greeting: IGreeting) -> Any:
@@ -26,14 +26,14 @@ def create_app(config_provider: IConfigurationProvider, greeting: IGreeting) -> 
 
     @app.route('/hello')
     def hello() -> str:
-        if config and config.html_headings:
-            return f'<{config.html_headings}>{greeting.hello()}</{config.html_headings}>'
+        if config and config.html_heading:
+            return f'<{config.html_heading}>{greeting.hello()}</{config.html_heading}>'
         return greeting.hello()
 
     @app.route('/hello/<name>')
     def hello_name(name: str) -> str:
-        if config and config.html_headings:
-            return f'<{config.html_headings}>{greeting.hello(name)}</{config.html_headings}>'
+        if config and config.html_heading:
+            return f'<{config.html_heading}>{greeting.hello(name)}</{config.html_heading}>'
         return greeting.hello(name)
 
     return app

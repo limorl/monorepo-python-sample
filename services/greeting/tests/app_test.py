@@ -10,7 +10,7 @@ from environment.service_environment import clear_service_environment
 @pytest.fixture(params=[['h1', 2], ['h3', 5], ['', 0]])
 def mock_config_provider(request):
     mock_config_provider = Mock()
-    app_configuration = AppConfiguration({'html_headings': request.param[0]})
+    app_configuration = AppConfiguration({'html_heading': request.param[0]})
     greetign_configuration = GreetingConfiguration({'num_of_exclamations': request.param[1]})
     mock_config_provider.get_configuration.side_effect = (lambda type: app_configuration if type.__name__ == 'AppConfiguration' else greetign_configuration)
     return mock_config_provider
@@ -59,6 +59,6 @@ def test_hello_name(app, mock_config_provider):
 
 
 def _get_heading_tags(app_configuration: AppConfiguration) -> tuple[str, str]:
-    if app_configuration.html_headings:
-        return f'<{app_configuration.html_headings}>', f'</{app_configuration.html_headings}>'
+    if app_configuration.html_heading:
+        return f'<{app_configuration.html_heading}>', f'</{app_configuration.html_heading}>'
     return '', ''
