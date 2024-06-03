@@ -12,7 +12,7 @@ repos:
         - id: ruff
           types_or: [ python, pyi, jupyter ]
           args: []  # [ --fix ]
-          stages: [commit]
+          stages: [push]
         - id: ruff-format
           types_or: [ python, pyi, jupyter ]
           stages: [push]
