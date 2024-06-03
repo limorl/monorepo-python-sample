@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+
 from configuration.configuration_provider import IConfigurationProvider
+
 from .greeting_configuration import GreetingConfiguration
 
 

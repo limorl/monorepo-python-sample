@@ -18,7 +18,6 @@ nox-poetry = "1.0.3"
 pytest = "8.2.0"
 pytest-asyncio = "0.23.6"
 pytest-cov = "3.0.0"
-flake8 = "7.0.0"
 pydevd-pycharm = "241.15989.155"
 pylint = "2.17.7"
 pyright = "1.1.296"
@@ -26,6 +25,9 @@ pre-commit = "3.6.2"
 debugpy = "1.8.1"
 localstack = "3.3.0"
 scripts = { path = "packages/scripts", develop = false }
+
+[tool.poetry.plugins."poetry.application.plugin"]
+export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
 
 # We're adding test paths here for pytest discoverability in vs code testing extension (and also running pytest from monorepo root)
 # Note that due to how pytest handles test discovery, the order of paths matter. Changing the order can cause issues.

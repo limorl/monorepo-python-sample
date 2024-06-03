@@ -1,0 +1,141 @@
+
+# =============================================================================================== #
+#              FULL LIST OF RUFF SETTINGS: https://docs.astral.sh/ruff/settings/                  #
+# =============================================================================================== #
+
+# ----------------------------------------------------------------------------------------------- #
+#                                             GENERAL                                             #
+# ----------------------------------------------------------------------------------------------- #
+target-version    = "py312"
+line-length       = 120
+indent-width      = 4
+respect-gitignore = true
+
+include = ["*.py"]  # A list of file (not dir) patterns to include when linting. This is glob-based.
+
+# Ignore test folders. For some reason this doesn't work in "exclude" section.
+extend-exclude = ["*tests/", "*_test.py"]
+
+force-exclude = true      # Enforce exclusions, even for paths passed to Ruff directly
+                          # on the command-line
+
+
+# ----------------------------------------------------------------------------------------------- #
+#                                        [FORMAT] SECTION                                         #
+#                        This section configures the way Ruff formats our code.                   #
+# ----------------------------------------------------------------------------------------------- #
+[format]
+
+indent-style = "space"   # Use spaces for indentation (instead of tabs)
+quote-style  = "single"  # Use single quotes as opposed to double quotes
+line-ending  = "auto"    # Automatically detect the appropriate line ending
+
+skip-magic-trailing-comma = false  # Ruff uses existing trailing commas as an indication that
+                                   # short lines should be left separate. If this option is set
+                                   # to true, the magic trailing comma is ignored.
+
+
+# ----------------------------------------------------------------------------------------------- #
+#                                         [LINT] SECTION                                          #
+#                        This section configures how Ruff checks our code.                        #
+# ----------------------------------------------------------------------------------------------- #
+[lint]
+
+#
+# Rules for Ruff checking. Full list of rules: https://docs.astral.sh/ruff/rules/
+#
+select = [
+    "ALL",
+    # "F",   # https://beta.ruff.rs/docs/rules/#pyflakes-f
+    # "W",   # https://beta.ruff.rs/docs/rules/#warning-w
+    # "E",   # https://beta.ruff.rs/docs/rules/#error-e
+    # "I",   # https://beta.ruff.rs/docs/rules/#isort-i
+    # "N",   # https://beta.ruff.rs/docs/rules/#pep8-naming-n
+    # "ANN", # https://beta.ruff.rs/docs/rules/#flake8-annotations-ann
+    # "B",   # https://beta.ruff.rs/docs/rules/#flake8-bugbear-b
+    # "RUF", # https://beta.ruff.rs/docs/rules/#ruff-specific-rules-ruf
+    # "PT",  # https://beta.ruff.rs/docs/rules/#flake8-pytest-style-pt
+    # "D",
+]
+
+# Rules that will be ignored by Ruff:
+ignore = [
+    "ERA001",   # <eradicate>             Found commented-out code
+    "ANN101",   # <flake8-annotations>    Missing self type annotation; it's slated for removal anyway
+    "ANN204",   # <flake8-annotations>    Missing return type in magic methods
+    "ANN401",   # <flake8-annotations>    Usage of 'Any' type annotation
+    "BLE001",   # <flake8-blind-except>   Too broad Except clause
+    "FBT001",   # <flake8-boolean-trap>   Boolean default positional args
+    "FBT002",   # <flake8-boolean-trap>   Boolean default positional args
+    "G004",     # <flake8-logging-format> Usage of f-strings inside logging
+    "S101",     # <flake8-bandit>         Usage of 'assert' keyword
+    "S105",     # <flake8-bandit>         Possible hardcoded password assigned to: "SECRET_PREFIX" (handled by detect-secrets)
+    "S324",     # <flake8-bandit>         Hashlib's SHA-1 usage
+    "S6",       # <flake8-bandit>         Untrusted stuff
+    "EM101",    # <flake8-errmsg>         Raw string in exception
+    "EM102",    # <flake8-errmsg>         F-string in exception
+    "EXE002",   # <flake8-executable>
+    "FIX002",   # <flake8-fixme>          TODO-related
+    "INP001",   # <flake8-no-pep420>      Missing __init__.py file on implicit namespace packages
+    "T201",     # <flake8-print>          Print statement found
+    "Q000",     # <flake8-quotes>         Preferred double quotes
+    "TD",       # <flake8-todos>          TODO-related rules: missing author, missing issue, ticket, etc.
+    "PTH",      # <flake8-use-pathlib>    Pathlib stuff (like Path) warnings
+    # "D"       #
+    "D100",     # <pycodestyle>           Missing docstring in public module
+    "D101",     # <pycodestyle>           Missing docstring in public class
+    "D102",     # <pycodestyle>           Missing docstring in public method
+    "D103",     # <pycodestyle>           Missing docstring in public function
+    "D104",     # <pydocstyle>            Missing docstring in public package (in __init__.py)
+    "D105",     # <pydocstyle>            Missing docstring in dunder methods (like __post_init__, __repr__, etc.)
+    "D107",     # <pydocstyle>            Missing docstring in __init__ method
+    "D2", "D4", # <pydocstyle>            Docstring styling (imperative mood, etc.)
+    "TRY003",   # <raise-vanilla-args>    Long exception messages
+    "UP035",    # <pyupgrade>             Usage of deprecated functions
+    "PLR2004",  # <pylint>                Magic value used in comparison"
+    # Proposed to ignore by formatter:
+    "COM812", "ISC001", "Q000", "Q003"
+]
+
+# Fixable and unfixable rules (when '--fix' is provided):
+fixable   = ["ALL"]
+unfixable = [
+    "CPY001"  # As an example: don't try to fix CPY-001 (missing copyright notice)
+]
+
+# Allow unused variables when underscore-prefixed:
+# dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# pydocstyle.convention = "numpy"  # Docstyle conventions: "google", "numpy", "pep257"
+
+# Exclude: a list of file patterns to exclude from linting in addition to the files
+# excluded globally (see exclude, and extend-exclude):
+exclude = [
+    # Environments:
+    ".pyenv", ".env", ".venv", "env/", "venv/", "ENV/", "env.bak/", "venv.bak/",
+    ".direnv", "venv",
+    # Jupyter Notebooks and IPython in general:
+    ".ipynb_checkpoints",
+    # Type checkers:
+    ".mypy_cache", ".pytype",
+    # Build tools:
+    ".bzr", ".eggs", "__pypackages__", "_build", "build", "dist", "site-packages",
+    # Git:
+    ".git", ".git-rewrite",
+    # Tests:
+    "tests/", ".nox", ".pytest_cache", ".tox",
+    # Cache:
+    ".ruff_cache", "__pycache__/", ".__pycache__/", ".pytest_cache/", ".pytest_cache",
+    # VSCode:
+    ".vscode",
+    # Misc:
+    ".pants.d",
+    "buck-out",
+    # Log files:
+    ".log",
+    # Files prefixed with x__, noruff__ and nolint__:
+    "x__*", "noruff__*", "nolint__*"
+]
+
+[lint.pylint]
+max-args = 7

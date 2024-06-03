@@ -1,7 +1,7 @@
-from enum import Enum
-from dotenv import load_dotenv
 import os
+from enum import Enum
 
+from dotenv import load_dotenv
 
 AWS_PRIMARY_REGION_PROD = 'us-east-1'
 AWS_PRIMARY_REGION_DEV = 'us-east-1'
@@ -18,13 +18,13 @@ class Stage(Enum):
     DEV = 'dev'             # local dev/ci environment
 
 
-def is_cloud_platform(platform: Platform):
+def is_cloud_platform(platform: Platform) -> bool:
     return platform == Platform.AWS
 
 
 class ServiceEnvironment:
 
-    def __init__(self, dotenvpath: str = None):
+    def __init__(self, dotenvpath: str | None = None):
         if dotenvpath:
             load_dotenv(dotenvpath)  # loads environment variables from .env file under project's folder
 
@@ -58,7 +58,7 @@ def get_primary_region(stage: Stage) -> str:
     return None
 
 
-def clear_service_environment():
+def clear_service_environment() -> None:
     if os.getenv('PLATFORM'):
         del os.environ['PLATFORM']
     if os.getenv('REGION'):
@@ -73,7 +73,7 @@ def clear_service_environment():
         del os.environ['LOCAL_CONFIGURATION_FOLDER']
 
 
-def restore_local_dev_service_environment():
+def restore_local_dev_service_environment() -> None:
     clear_service_environment()
     os.environ['PLAFORM'] = Platform.LOCAL.value
     os.environ['STAGE'] = Stage.DEV.value

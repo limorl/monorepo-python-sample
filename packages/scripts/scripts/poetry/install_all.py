@@ -1,21 +1,22 @@
-import os
 import subprocess
 from pathlib import Path
+
 from scripts.utils.packages import get_package_paths, is_service_path
 
 
-def export_requirements_to_directory(directory: Path):
+def export_requirements_to_directory(directory: Path) -> None:
     print(f"Exporting dependencies to: {directory}/requirements.txt")
-    subprocess.run(["poetry", "export", "-f", "requirements.txt", "--output", "./requirements.txt", "--without-hashes"], cwd=directory)
+    subprocess.run(["poetry", "export", "-f", "requirements.txt", "--output", "./requirements.txt", "--without-hashes"],
+                   cwd=directory, check=True)
 
 
-def install_dependencies_in_directory(directory: Path):
+def install_dependencies_in_directory(directory: Path) -> None:
     print(f"Installing dependencies in: {directory}")
-    subprocess.run(["poetry", "lock", "--no-update"], cwd=directory)
-    subprocess.run(["poetry", "install"], cwd=directory)
+    subprocess.run(["poetry", "lock", "--no-update"], cwd=directory, check=True)
+    subprocess.run(["poetry", "install"], cwd=directory, check=True)
 
 
-def find_and_install_packages(start_directory: Path):
+def find_and_install_packages() -> None:
     package_paths = get_package_paths()
     for path in package_paths:
         install_dependencies_in_directory(path)
@@ -23,10 +24,9 @@ def find_and_install_packages(start_directory: Path):
             export_requirements_to_directory(path)
 
 
-def install_all():
-    root_path = Path(os.getcwd())
+def install_all() -> None:
     print("Starting installation of all packages...")
-    find_and_install_packages(root_path)
+    find_and_install_packages()
     print("Finished installing dependencies for all packages.")
 
 

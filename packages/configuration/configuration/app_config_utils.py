@@ -1,15 +1,16 @@
-import boto3
-from botocore.exceptions import ClientError
-from enum import Enum
 import json
 import logging
 import os
 import pathlib
 import time
-from typing import Any, Callable, Dict
-from .configuration import ConfigurationSection
+from enum import Enum
+from typing import Any, Callable
+
+import boto3
+from botocore.exceptions import ClientError
 from environment.service_environment import Platform, Stage, get_primary_region
 
+from .configuration import ConfigurationSection
 
 logger = logging.getLogger()
 
@@ -42,27 +43,34 @@ def get_config_name(platform: Platform, stage: Stage, region: str) -> str:
 def app_config_get_application_id(appconfig: Any, app_name: str, create_if_not_exists: bool = False) -> str:
     return _get_or_create_id(
         app_name,
-        lambda next_token: appconfig.list_applications(NextToken=next_token) if next_token else appconfig.list_applications(),
+        (lambda next_token: appconfig.list_applications(NextToken=next_token)
+         if next_token
+         else appconfig.list_applications()),
         create_if_not_exists and (lambda: appconfig.create_application(Name=app_name))
     )
 
 
-def app_config_get_environment_id(appconfig: Any, app_id: str, env_name: str, create_if_not_exists: bool = False) -> str:
+def app_config_get_environment_id(appconfig: Any,
+                                  app_id: str, env_name: str, create_if_not_exists: bool = False) -> str:
     return _get_or_create_id(
         env_name,
-        lambda next_token: appconfig.list_environments(ApplicationId=app_id, NextToken=next_token) if next_token else appconfig.list_environments(ApplicationId=app_id),
+        (lambda next_token: appconfig.list_environments(ApplicationId=app_id, NextToken=next_token)
+         if next_token
+         else appconfig.list_environments(ApplicationId=app_id)),
         create_if_not_exists and (lambda: appconfig.create_environment(ApplicationId=app_id, Name=env_name))
     )
 
 
 def app_config_get_deployment_strategy_id(appconfig: Any, strategy_name: str) -> str:
-    id = _get_id_by_name(
+    strategy_id = _get_id_by_name(
         strategy_name,
-        lambda next_token: appconfig.list_deployment_strategies(NextToken=next_token) if next_token else appconfig.list_deployment_strategies()
+        (lambda next_token: appconfig.list_deployment_strategies(NextToken=next_token)
+         if next_token
+         else appconfig.list_deployment_strategies())
     )
 
-    if id:
-        return id
+    if strategy_id:
+        return strategy_id
 
     raise KeyError(f'Deployment strategy with name ${strategy_name} does not exist')
 
@@ -70,12 +78,17 @@ def app_config_get_deployment_strategy_id(appconfig: Any, strategy_name: str) ->
 def app_config_get_profile_id(appconfig: Any, app_id: str, config_name: str, create_if_not_exists: bool = False) -> str:
     return _get_or_create_id(
         config_name,
-        lambda next_token: appconfig.list_configuration_profiles(ApplicationId=app_id, NextToken=next_token) if next_token else appconfig.list_configuration_profiles(ApplicationId=app_id),
-        create_if_not_exists and (lambda: appconfig.create_configuration_profile(ApplicationId=app_id, Name=config_name, LocationUri='hosted'))
+        (lambda next_token: appconfig.list_configuration_profiles(ApplicationId=app_id, NextToken=next_token)
+         if next_token
+         else appconfig.list_configuration_profiles(ApplicationId=app_id)),
+        create_if_not_exists and (
+            lambda: appconfig.create_configuration_profile(ApplicationId=app_id, Name=config_name, LocationUri='hosted')
+        )
     )
 
 
-def app_config_create_hosted_configuration_version(appconfig: Any, app_id: str, config_profile_id: str, configuration: Dict[str, ConfigurationSection]) -> int:
+def app_config_create_hosted_configuration_version(appconfig: Any, app_id: str, config_profile_id: str,
+                                                   configuration: dict[str, ConfigurationSection]) -> int:
     config_bytes = json.dumps(configuration).encode('utf-8')
 
     version = appconfig.create_hosted_configuration_version(
@@ -88,7 +101,8 @@ def app_config_create_hosted_configuration_version(appconfig: Any, app_id: str, 
     return version.get('VersionNumber')
 
 
-def app_config_data_get_latest_configuration(appconfigdata: Any, app_id: str, env_id: str, config_profile_id: str) -> Dict[str, Any]:
+def app_config_data_get_latest_configuration(appconfigdata: Any, app_id: str, env_id: str,
+                                             config_profile_id: str) -> dict[str, Any]:
     initial_configuration_token = appconfigdata.start_configuration_session(
         ApplicationIdentifier=app_id,
         EnvironmentIdentifier=env_id,
@@ -101,12 +115,14 @@ def app_config_data_get_latest_configuration(appconfigdata: Any, app_id: str, en
     )
 
     configuration_json = response['Configuration'].read()
-    configuration: Dict[str, Any] = json.loads(configuration_json)
+    configuration: dict[str, Any] = json.loads(configuration_json)
 
     return configuration
 
 
-def app_config_deploy_service_configuration(service_name: str, platform: Platform, stage: Stage, region: str, deployment_strategy_name: str = SERVICE_DEFAULT_DEPLOYMENT_STARTEGY, config_dir: str = None) -> None:
+def app_config_deploy_service_configuration(service_name: str, platform: Platform, stage: Stage, region: str,
+                                            deployment_strategy_name: str = SERVICE_DEFAULT_DEPLOYMENT_STARTEGY,
+                                            config_dir: str | None = None) -> None:
     config_name = get_config_name(platform, stage, region)
 
     monorepo_root = pathlib.Path(__file__).parent.parent.parent.parent.resolve()
@@ -122,19 +138,21 @@ def app_config_deploy_service_configuration(service_name: str, platform: Platfor
     appconfig = boto3.client('appconfig', **options)
 
     app_name = get_app_name(service_name)
-    app_id = app_config_get_application_id(appconfig, app_name, True)
-    env_id = app_config_get_environment_id(appconfig, app_id, stage.value, True)
+    app_id = app_config_get_application_id(appconfig, app_name, create_if_not_exists=True)
+    env_id = app_config_get_environment_id(appconfig, app_id, stage.value, create_if_not_exists=True)
     service_deployment_strategy_id = app_config_get_deployment_strategy_id(appconfig, deployment_strategy_name)
 
     try:
-        with open(config_file, 'r') as file:
+        with open(config_file) as file:
             logger.debug(f'Loading configuration file: {config_file}')
-            config_json: Dict[str, ConfigurationSection] = json.load(file)
+            config_json: dict[str, ConfigurationSection] = json.load(file)
 
-            config_profile_id = app_config_get_profile_id(appconfig, app_id, config_name, True)
-            version_number = app_config_create_hosted_configuration_version(appconfig, app_id, config_profile_id, config_json)
+            config_profile_id = app_config_get_profile_id(appconfig, app_id, config_name, create_if_not_exists=True)
+            version_number = app_config_create_hosted_configuration_version(
+                appconfig, app_id, config_profile_id, config_json
+            )
 
-            logger.info(f'Starting configuration deployment for app: {app_name}, config name: {config_name}, app id: {app_id}, profile: {config_profile_id}, version: {version_number}')
+            logger.info(f'Starting configuration deployment for app: {app_name}, config name: {config_name}, app id: {app_id}, profile: {config_profile_id}, version: {version_number}')  # noqa: E501
 
             deployment = appconfig.start_deployment(
                 ApplicationId=app_id,
@@ -147,20 +165,22 @@ def app_config_deploy_service_configuration(service_name: str, platform: Platfor
             deployment = _wait_until_deployment_completes(appconfig, deployment)
 
     except json.JSONDecodeError:
-        logger.error(f'Failed to decode JSON from configuration file: {config_file}')
+        logger.exception(f'Failed to decode JSON from configuration file: {config_file}')
     except ClientError as err:
-        logger.error(f'Failed to deploy configuration for service: {service_name}. Error Code: {err["Error"]["Code"]} error: {err}')
-    except DeploymentError as err:
-        logger.error(f'Failed to deploy configuration for service: {service_name}. Error: {err}')
+        error_code = err["Error"]["Code"]
+        logger.exception(f'Failed to deploy configuration for service: {service_name}. Error Code: {error_code}')
+    except DeploymentError:
+        logger.exception(f'Failed to deploy configuration for service: {service_name}.')
 
 
-def _wait_until_deployment_completes(appconfig: Any, deployment: Dict[str, Any]) -> Dict[str, Any]:
+def _wait_until_deployment_completes(appconfig: Any, deployment: dict[str, Any]) -> dict[str, Any]:
     deployment_state = DeploymentState(deployment.get('State'))
 
     while deployment_state != DeploymentState.COMPLETE:
-        if deployment_state == DeploymentState.ROLLED_BACK or deployment_state == DeploymentState.ROLLING_BACK:
-            event_log = deployment.get('EventLog') and map(lambda entry: entry.get('Description').join('\n'), deployment.get('EventLog'))
-            raise DeploymentError(f'Configuration deployment failed. Details:\n ${event_log}')
+        if deployment_state in (DeploymentState.ROLLED_BACK, DeploymentState.ROLLING_BACK):
+            event_log = deployment.get('EventLog')
+            event_log_str = event_log and (entry.get('Description').join('\n') for entry in event_log)
+            raise DeploymentError(f'Configuration deployment failed. Details:\n ${event_log_str}')
 
         time.sleep(1)
         deployment = appconfig.get_deployment(
@@ -172,13 +192,14 @@ def _wait_until_deployment_completes(appconfig: Any, deployment: Dict[str, Any])
     return deployment
 
 
-def _get_or_create_id(name: str, list_func: Callable[[str], Dict], create_func: Callable[[], Dict] = None) -> str:
-    id = _get_id_by_name(name, list_func)
+def _get_or_create_id(name: str, list_func: Callable[[str], dict],
+                      create_func: Callable[[], dict] | None = None) -> str:
+    item_id = _get_id_by_name(name, list_func)
 
-    return id or (create_func and create_func().get('Id'))
+    return item_id or (create_func and create_func().get('Id'))
 
 
-def _get_id_by_name(name: str, list_func: Callable[[str], Dict]) -> str:
+def _get_id_by_name(name: str, list_func: Callable[[str], dict]) -> str:
     next_token: str = None
     first_time: bool = True
 
