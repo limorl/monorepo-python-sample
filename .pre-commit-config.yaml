@@ -13,9 +13,9 @@ repos:
           types_or: [ python, pyi, jupyter ]
           args: []  # [ --fix ]
           stages: [push]
-        - id: ruff-format
-          types_or: [ python, pyi, jupyter ]
-          stages: [push]
+        # - id: ruff-format
+        #  types_or: [ python, pyi, jupyter ]
+        #  stages: [push]
 
     - repo: https://github.com/pycqa/flake8
       rev: 7.0.0

@@ -13,9 +13,9 @@ class Platform(Enum):
 
 
 class Stage(Enum):
-    PROD = 'prod'           # production
-    STAGING = 'staging'     # remote staging env
-    DEV = 'dev'             # local dev/ci environment
+    PROD = 'prod'  # production
+    STAGING = 'staging'  # remote staging env
+    DEV = 'dev'  # local dev/ci environment
 
 
 def is_cloud_platform(platform: Platform) -> bool:

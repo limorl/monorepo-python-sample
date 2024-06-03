@@ -166,7 +166,7 @@ def app_config_deploy_service_configuration(
             )
 
             logger.info(
-                f'Starting configuration deployment for app: {app_name}, config name: {config_name}, app id: {app_id}, profile: {config_profile_id}, version: {version_number}' # noqa: E501
+                f'Starting configuration deployment for app: {app_name}, config name: {config_name}, app id: {app_id}, profile: {config_profile_id}, version: {version_number}'  # noqa: E501
             )
 
             deployment = appconfig.start_deployment(
