@@ -7,7 +7,7 @@ logger = logging.getLogger()
 
 
 class IConfigurationProvider(ABC):
-    """ Synchronous Configuration Provider, initialized before creating apps (services) """
+    """Synchronous Configuration Provider, initialized before creating apps (services)"""
 
     __initiated = False
     __initiating = False
@@ -22,7 +22,7 @@ class IConfigurationProvider(ABC):
         self.__initiating = False
         self.__initiated = True
 
-        logger.debug(f"init_configuration: __config_dict: {self.__configuration}")
+        logger.debug(f'init_configuration: __config_dict: {self.__configuration}')
 
     def get_configuration[T: Configuration](self, config_type: type[T]) -> T:  # pylint: disable=invalid-syntax
         if not self.__initiated:

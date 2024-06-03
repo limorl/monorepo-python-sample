@@ -14,9 +14,5 @@ def load_gitignore(root_dir: str) -> None:
 
 
 def get_changed_files(directory: str) -> list[str]:
-    changed_files = subprocess.check_output(
-        ["git", "diff", "--name-only", "origin/main"],
-        cwd=directory,
-        text=True
-    )
+    changed_files = subprocess.check_output(['git', 'diff', '--name-only', 'origin/main'], cwd=directory, text=True)
     return changed_files.splitlines()

@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-excluded_directories = [".aws-sam", "__pycache__"]
-service_directories = ["services"]
+excluded_directories = ['.aws-sam', '__pycache__']
+service_directories = ['services']
 
 
 def is_excluded(path: Path) -> bool:
@@ -14,7 +14,7 @@ def is_service_path(path: Path) -> bool:
 
 
 def is_root_pyproject(path: Path) -> bool:
-    root_path = Path(os.path.join(os.environ["PWD"], 'pyproject.toml'))
+    root_path = Path(os.path.join(os.environ['PWD'], 'pyproject.toml'))
     return path == root_path
 
 
@@ -25,5 +25,5 @@ def get_package_paths() -> list[Path]:
     return [x.parent for x in project_paths if not is_excluded(x)]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     get_package_paths()

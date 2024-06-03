@@ -22,7 +22,7 @@ def handler(event: dict, context: dict) -> Any:
 
 def create_and_init_configuration_provider() -> IConfigurationProvider:
     service_env = ServiceEnvironment()
-    logger.debug(f"greeting-service created with service environment: {service_env}")
+    logger.debug(f'greeting-service created with service environment: {service_env}')
 
     config_provider: IConfigurationProvider = None
 

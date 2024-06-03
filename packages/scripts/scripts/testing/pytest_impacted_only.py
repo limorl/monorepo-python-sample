@@ -21,10 +21,12 @@ def _get_test_file(file_path: str, package_paths: list[str]) -> str:
             package_code_dir = os.path.join(package_path, package_name)
             package_test_dir = os.path.join(package_path, 'tests')
 
-            test_file_path_1 = file_path.replace(package_code_dir, package_test_dir).replace(file_name,
-                                                                                             test_file_name_1)
-            test_file_path_2 = file_path.replace(package_code_dir, package_test_dir).replace(file_name,
-                                                                                             test_file_name_2)
+            test_file_path_1 = file_path.replace(package_code_dir, package_test_dir).replace(
+                file_name, test_file_name_1
+            )
+            test_file_path_2 = file_path.replace(package_code_dir, package_test_dir).replace(
+                file_name, test_file_name_2
+            )
 
             if os.path.exists(test_file_path_1):
                 return test_file_path_1
@@ -75,5 +77,5 @@ def pytest_impacted_unit_tests() -> None:
         run_unit_tests_in_files(root_dir, impacted_test_files)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     pytest_impacted_unit_tests()

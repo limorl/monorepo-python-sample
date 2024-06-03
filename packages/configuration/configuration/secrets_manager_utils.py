@@ -23,11 +23,11 @@ def secrets_manager_get_secret_value(secretesmanager: Any, secret_config_val: st
             secret_value = secret_binary and parse_secret_value(secret_binary.decode('utf-8'))
         if not secret_value:
             raise ValueError(
-                f"SSM failed to retrieve secret {secret_name}. Both SecretString and SecretBinary are None."
+                f'SSM failed to retrieve secret {secret_name}. Both SecretString and SecretBinary are None.'
             )
 
     except ClientError:
-        logger.exception(f"SSM failed to retrieve secret {secret_name}.")
+        logger.exception(f'SSM failed to retrieve secret {secret_name}.')
         raise
 
     return secret_value

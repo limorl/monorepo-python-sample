@@ -23,7 +23,6 @@ def is_cloud_platform(platform: Platform) -> bool:
 
 
 class ServiceEnvironment:
-
     def __init__(self, dotenvpath: str | None = None):
         if dotenvpath:
             load_dotenv(dotenvpath)  # loads environment variables from .env file under project's folder
@@ -49,7 +48,7 @@ class ServiceEnvironment:
             raise ValueError('Missing service name for cloud platform')
 
     def __str__(self):
-        return str(self.__class__.__name__) + ": " + str(self.__dict__)
+        return str(self.__class__.__name__) + ': ' + str(self.__dict__)
 
 
 def get_primary_region(stage: Stage) -> str:

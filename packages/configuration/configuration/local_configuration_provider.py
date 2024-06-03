@@ -13,8 +13,9 @@ logger = logging.getLogger()
 
 
 class LocalConfigurationProvider(IConfigurationProvider):
-    """ Local Configuration Provider.
-        Provides configuration based on local configuration file and Environment Variables"""
+    """Local Configuration Provider.
+    Provides configuration based on local configuration file and Environment Variables"""
+
     _service_env: ServiceEnvironment = None
     _config_file_path: str = ''
 
@@ -24,7 +25,7 @@ class LocalConfigurationProvider(IConfigurationProvider):
         self._service_env = service_env
         self._config_file_path = self._get_config_file_path()
 
-        logger.debug(f"LocalConfigurationProvider _local_config_path set to: {self._config_file_path}")
+        logger.debug(f'LocalConfigurationProvider _local_config_path set to: {self._config_file_path}')
 
     def get_configuration[T: Configuration](self, config_type: type[T]) -> T:  # pylint: disable=invalid-syntax
         return super().get_configuration(config_type)
@@ -32,7 +33,7 @@ class LocalConfigurationProvider(IConfigurationProvider):
     def _read_configuration(self) -> dict[str, ConfigurationSection]:
         try:
             with open(self._config_file_path) as file:
-                logger.debug(f"LocalConfigurationProvider loading configuration file: {self._config_file_path}")
+                logger.debug(f'LocalConfigurationProvider loading configuration file: {self._config_file_path}')
                 configuration_dict: dict[str, Any] = json.load(file)
                 configuration_with_secrets: dict[str, ConfigurationSection] = {}
 
@@ -41,10 +42,10 @@ class LocalConfigurationProvider(IConfigurationProvider):
 
                 return configuration_with_secrets
         except FileNotFoundError:
-            logger.exception(f"Configuration file not found: {self._config_file_path}")
+            logger.exception(f'Configuration file not found: {self._config_file_path}')
             return None
         except json.JSONDecodeError:
-            logger.exception(f"Failed to decode JSON from configuration: {self._config_file_path}")
+            logger.exception(f'Failed to decode JSON from configuration: {self._config_file_path}')
             return None
 
     def _get_config_file_path(self) -> str:
