@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 
 class Configuration:
@@ -6,4 +6,4 @@ class Configuration:
         pass
 
 
-ConfigurationSection = Dict[str, Any]
+ConfigurationSection = dict[str, Any]

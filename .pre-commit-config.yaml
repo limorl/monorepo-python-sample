@@ -5,6 +5,17 @@ repos:
         - id: detect-secrets
           args: ["--exclude-lines", "SECRET_PREFIX = 'secret:'|.*secretsmanager:GetSecretValue.*", "--exclude-secrets", ".*fake-secret.*|.*fake-password.*|.*FAKE_SECRET.*"]
           stages: [commit]
+    
+    - repo: https://github.com/astral-sh/ruff-pre-commit
+      rev: v0.4.7
+      hooks:
+        - id: ruff
+          types_or: [ python, pyi, jupyter ]
+          args: []  # [ --fix ]
+          stages: [push]
+        # - id: ruff-format
+        #  types_or: [ python, pyi, jupyter ]
+        #  stages: [push]
 
     - repo: https://github.com/pycqa/flake8
       rev: 7.0.0
@@ -23,7 +34,6 @@ repos:
         types: [text]
         stages: [push]
 
-    # This will be updated to run recursively after Poetry is added and to run only on impacted tests. The ci.yml workflow should run all unit tests
     - repo: local
       hooks:
         - id: unit-tests

@@ -1,4 +1,7 @@
 {
+    "AppConfiguration": {
+        "html_heading": "h3"
+    },
     "GreetingConfiguration": {
         "num_of_exclamations": 1
     }

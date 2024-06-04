@@ -23,6 +23,7 @@
         "python.testing.pytestEnabled": true,
     },
     "extensions": [
+        "charliermarsh.ruff",
         "rangav.vscode-thunder-client",
         "ms-azuretools.vscode-docker",
         "redhat.vscode-yaml",

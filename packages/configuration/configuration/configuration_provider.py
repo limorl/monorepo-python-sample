@@ -1,17 +1,17 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Dict, Type
+
 from configuration.configuration import Configuration, ConfigurationSection
 
 logger = logging.getLogger()
 
 
 class IConfigurationProvider(ABC):
-    """ Synchronous Configuration Provider, initialized before creating apps (services) """
+    """Synchronous Configuration Provider, initialized before creating apps (services)"""
 
     __initiated = False
     __initiating = False
-    __configuration: Dict[str, ConfigurationSection] = {}
+    __configuration: dict[str, ConfigurationSection] = None
 
     def init_configuration(self) -> None:
         if self.__initiated or self.__initiating:
@@ -22,9 +22,9 @@ class IConfigurationProvider(ABC):
         self.__initiating = False
         self.__initiated = True
 
-        logger.debug(f"init_configuration: __config_dict: {self.__configuration}")
+        logger.debug(f'init_configuration: __config_dict: {self.__configuration}')
 
-    def get_configuration[T: Configuration](self, config_type: Type[T]) -> T:  # pylint: disable=invalid-syntax
+    def get_configuration[T: Configuration](self, config_type: type[T]) -> T:  # pylint: disable=invalid-syntax
         if not self.__initiated:
             raise RuntimeError('Configuration provider is not initiated.')
 
@@ -35,5 +35,5 @@ class IConfigurationProvider(ABC):
         return config_type(config_data)
 
     @abstractmethod
-    def _read_configuration(self) -> Dict[str, ConfigurationSection]:
+    def _read_configuration(self) -> dict[str, ConfigurationSection]:
         pass

@@ -1,61 +1,46 @@
-import argparse
 import os
-from pathlib import Path
-import pathspec
 import subprocess
+from argparse import ArgumentParser
+from pathlib import Path
 
 from scripts.utils.packages import get_package_paths
 
 
-def load_gitignore(root_dir):
-    gitignore_path = os.path.join(root_dir, '.gitignore')
-    patterns = []
-    if os.path.exists(gitignore_path):
-        with open(gitignore_path, 'r') as file:
-            patterns = file.readlines()
-    return pathspec.PathSpec.from_lines('gitwildmatch', patterns)
-
-
-def find_packages_not_ignored(root_dir, spec):
-    for dirpath, dirnames, filenames in os.walk(root_dir):
-        if spec.match_file(dirpath):
-            continue
-        if "__init__.py" in filenames:
-            yield dirpath
-
-        # Remove ignored directories
-        dirnames[:] = [d for d in dirnames if not spec.match_file(os.path.join(dirpath, d))]
-
-
-def has_tests_folder(package_dir):
+def has_tests_folder(package_dir: Path) -> bool:
     return os.path.exists(os.path.join(package_dir, 'tests'))
 
 
-def run_pytest_for_package(package_dir: Path, type: str):
+def run_pytest_for_package(package_dir: Path, test_type: str) -> None:
     if package_dir and has_tests_folder(package_dir):
-        if type == "all":
-            subprocess.run(["pytest"], cwd=package_dir)
-        elif type == 'unit':
-            subprocess.run(["pytest", "-m", "not integration and not e2e"], cwd=package_dir)
+        if test_type == 'all':
+            subprocess.run(['pytest'], cwd=package_dir, check=False)
+        elif test_type == 'unit':
+            subprocess.run(['pytest', '-m', 'not integration and not e2e'], cwd=package_dir, check=False)
         else:
-            subprocess.run(["pytest", "-m", type], cwd=package_dir)
+            subprocess.run(['pytest', '-m', test_type], cwd=package_dir, check=False)
 
 
-def pytest_all(type: str):
+def pytest_all(test_type: str) -> None:
     package_paths = get_package_paths()
     for path in package_paths:
-        print("Running Pytest for package: ", path)
-        run_pytest_for_package(path, type)
+        print('Running Pytest for package: ', path)
+        run_pytest_for_package(path, test_type)
 
 
-def _create_arg_parser():
-    parser = argparse.ArgumentParser(prog='pytest_all.py', description='Run all tests if given type using Pytest')
-    parser.add_argument('--type', type=str, required=False, default='all', help='The pytest mark to run [all|unit|integration|e2e]')
+def _create_arg_parser() -> ArgumentParser:
+    parser = ArgumentParser(prog='pytest_all.py', description='Run all tests if given type using Pytest')
+    parser.add_argument(
+        '--type', type=str, required=False, default='all', help='The pytest mark to run [all|unit|integration|e2e]'
+    )
     return parser
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = _create_arg_parser()
     args = parser.parse_args()
 
     pytest_all(args.type)
+
+
+if __name__ == '__main__':
+    main()

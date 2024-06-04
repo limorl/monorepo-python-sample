@@ -59,7 +59,7 @@ url = "../configuration"
 [[package]]
 name = "environment"
 version = "0.1.0"
-description = "Environment Variables"
+description = "Service Environment"
 optional = false
 python-versions = "^3.12"
 files = []
