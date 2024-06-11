@@ -1,14 +1,11 @@
 import os
 import pytest
 import pathlib
-from configuration.app_config_utils import app_config_deploy_service_configuration
+from configuration.app_config_utils import app_config_deploy_service_configuration, DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_DEV
 from configuration.app_config_configuration_provider import AppConfigConfigurationProvider
 from configuration.configuration_provider import ConfigurationSection
 from configuration.configuration import Configuration
 from environment.service_environment import ServiceEnvironment, clear_service_environment, restore_local_dev_service_environment
-
-
-DEPLOYMENT_STRATEGY = 'Test.Linear.AllatOnce'
 
 
 class GooConfiguration(Configuration):
@@ -68,7 +65,8 @@ def app_configuration_provider(service_env):
 
 
 """ This test assumes the following resources exists in Dev/Test env:
-    Test.Linear.AllatOnce configuration deployment strategy (all at once with 0 interval and 0 bake time)
+    
+    Test.Linear.AllatOnce configuration deployment strategy (all at once with duration 0 and bake time 0)
 
     Two secrets are stored on Secretes Manager:
     - Plain text secret: 'test/app/fake-secret-plain' = fake-secret-val
@@ -86,7 +84,7 @@ def test_init_and_get_configuration__success(
     service_env,
     configuration_with_populated_secrets,
 ):
-    app_config_deploy_service_configuration(service_env.service_name, service_env.platform, service_env.stage, service_env.region, DEPLOYMENT_STRATEGY, service_env.local_configuration_folder)
+    app_config_deploy_service_configuration(service_env.service_name, service_env.platform, service_env.stage, service_env.region, None, service_env.local_configuration_folder)
 
     app_configuration_provider = AppConfigConfigurationProvider(service_env)
     app_configuration_provider.init_configuration()

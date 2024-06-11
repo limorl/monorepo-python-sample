@@ -14,10 +14,10 @@ from .configuration import ConfigurationSection
 
 logger = logging.getLogger()
 
-# This assumes this service deployment strategy was created using Terraform. For now it was created manually.
-SERVICE_DEFAULT_DEPLOYMENT_STARTEGY = 'ServiceDefault.Linear'
-SERVICE_DEV_DEPLOYMENT_STRATEGY = 'Test.Linear.AllatOnce'
-
+# This assumes these service deployment strategy was created using Terraform. For now it was created manually.
+DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_DEV = 'Test.Linear.AllatOnce'
+DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_STAGING = 'Test.Linear.AllatOnce'
+DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_PROD = 'ServiceDefault.Linear'
 
 class DeploymentError(Exception):
     pass
@@ -39,6 +39,14 @@ def get_app_name(service_name: str) -> str:
 def get_config_name(platform: Platform, stage: Stage, region: str) -> str:
     return f'{platform.value.lower()}.{stage.value}.{region}'
 
+def get_default_configuration_deployment_strategy_name(stage: Stage) -> str:
+    match stage:
+        case Stage.DEV:
+            return DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_DEV
+        case Stage.STAGING:
+            return DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_STAGING
+        case Stage.PROD:
+            return DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_PROD
 
 def app_config_get_application_id(appconfig: Any, app_name: str, create_if_not_exists: bool = False) -> str:
     return _get_or_create_id(
@@ -133,7 +141,7 @@ def app_config_deploy_service_configuration(
     platform: Platform,
     stage: Stage,
     region: str,
-    deployment_strategy_name: str = SERVICE_DEFAULT_DEPLOYMENT_STARTEGY,
+    deployment_strategy_name: str | None = None,
     config_dir: str | None = None,
 ) -> None:
     config_name = get_config_name(platform, stage, region)
@@ -153,6 +161,8 @@ def app_config_deploy_service_configuration(
     app_name = get_app_name(service_name)
     app_id = app_config_get_application_id(appconfig, app_name, create_if_not_exists=True)
     env_id = app_config_get_environment_id(appconfig, app_id, stage.value, create_if_not_exists=True)
+
+    deployment_strategy_name = deployment_strategy_name or get_default_configuration_deployment_strategy_name(stage)
     service_deployment_strategy_id = app_config_get_deployment_strategy_id(appconfig, deployment_strategy_name)
 
     try:
