@@ -9,9 +9,10 @@ logger = logging.getLogger()
 class IConfigurationProvider(ABC):
     """Synchronous Configuration Provider, initialized before creating apps (services)"""
 
-    __initiated = False
-    __initiating = False
-    __configuration: dict[str, ConfigurationSection] = None
+    def __init__(self):
+        self.__initiated = False
+        self.__initiating = False
+        self.__configuration: dict[str, ConfigurationSection] = None
 
     def init_configuration(self) -> None:
         if self.__initiated or self.__initiating:

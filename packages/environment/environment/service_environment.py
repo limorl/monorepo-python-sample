@@ -3,8 +3,10 @@ from enum import Enum
 
 from dotenv import load_dotenv
 
-AWS_PRIMARY_REGION_PROD = 'us-east-1'
+# Update regions according to your setup
 AWS_PRIMARY_REGION_DEV = 'us-east-1'
+AWS_PRIMARY_REGION_STAGING = 'us-east-1'
+AWS_PRIMARY_REGION_PROD = 'us-east-1'
 
 
 class Platform(Enum):
@@ -52,9 +54,13 @@ class ServiceEnvironment:
 
 
 def get_primary_region(stage: Stage) -> str:
-    if stage:
-        return AWS_PRIMARY_REGION_PROD if stage == Stage.PROD else AWS_PRIMARY_REGION_DEV
-    return None
+    match stage:
+        case Stage.DEV:
+            return AWS_PRIMARY_REGION_DEV
+        case Stage.STAGING:
+            return AWS_PRIMARY_REGION_STAGING
+        case Stage.PROD:
+            return AWS_PRIMARY_REGION_PROD
 
 
 def clear_service_environment() -> None:
