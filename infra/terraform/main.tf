@@ -1,31 +1,17 @@
-module "hello_world_lambda" {
-  source = "./modules/lambda"
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
 
-  function_name = "hello_world"
-  s3_bucket     = "your_bucket_name"
-  s3_key        = "hello_world.zip"
-  handler       = "index.handler"
-  runtime       = "nodejs14.x"
+  backend "s3" {
+    bucket  = "terraform-state-github"
+    region  = var.aws_region
+  }
 }
 
-module "hello_world_lambda" {
-  source             = "./modules/lambda"
-  function_name      = "hello_world"
-  s3_key             = "hello_world.zip"
-  handler            = "index.handler"
-  runtime            = "nodejs14.x"
-  environment        = "Dev"
-  subnet_ids         = ["subnet-xxxxxx", "subnet-yyyyyy"]
-  security_group_ids = ["sg-xxxxxx"]
-}
-
-
-module "greeting_lambda" {
-  source = "./modules/lambda"
-
-  function_name = "greeting"
-  s3_bucket     = "your_bucket_name"
-  s3_key        = "greeting.zip"
-  handler       = "index.handler"
-  runtime       = "nodejs14.x"
+provider "aws" {
+  region     = var.aws_region
 }

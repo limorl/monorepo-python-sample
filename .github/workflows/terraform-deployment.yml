@@ -1,0 +1,50 @@
+name: Terraform Deployment - Primary Region
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - infra/terraform/**
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  terraform-deploy-to-dev:
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v3.0.0
+        with:
+          fetch-depth: 0
+      
+      - name: Create .env File
+        run: |
+          cp .devcontainer/.env.ci .devcontainer/.env
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+            role-to-assume: ${{ env.AWS_GITHUB_ACTIONS_ROLE }}
+            role-session-name: TerraformDeployment
+            aws-region: ${{ env.AWS_PRIMARY_REGION }}
+      
+      # - name: Terraform init, validate plan
+      #   uses: devcontainers/ci@v0.3
+      #   with:
+      #     runCmd: terraform init && terraform plan
+      
+      # - uses: trstringer/manual-approval@v1
+      #   with:
+      #     secret: ${{ github.TOKEN }}
+      #     approvers: limorl
+      #     minimum-approvals: 1
+      #     issue-title: "Deploying infra to Dev"
+      #     issue-body: "Review the terraform plan, then approve or deny the deployment to prod."
+      #     exclude-workflow-initiator-as-approver: false
+  
+  # TODO (@limorl): add deployment to `staging` and `prod`
