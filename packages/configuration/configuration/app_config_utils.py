@@ -19,6 +19,7 @@ DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_DEV = 'Test.Linear.AllatOnce'
 DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_STAGING = 'Test.Linear.AllatOnce'
 DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_PROD = 'ServiceDefault.Linear'
 
+
 class DeploymentError(Exception):
     pass
 
@@ -39,6 +40,7 @@ def get_app_name(service_name: str) -> str:
 def get_config_name(platform: Platform, stage: Stage, region: str) -> str:
     return f'{platform.value.lower()}.{stage.value}.{region}'
 
+
 def get_default_configuration_deployment_strategy_name(stage: Stage) -> str:
     match stage:
         case Stage.DEV:
@@ -47,6 +49,7 @@ def get_default_configuration_deployment_strategy_name(stage: Stage) -> str:
             return DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_STAGING
         case Stage.PROD:
             return DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_PROD
+
 
 def app_config_get_application_id(appconfig: Any, app_name: str, create_if_not_exists: bool = False) -> str:
     return _get_or_create_id(
