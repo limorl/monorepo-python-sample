@@ -1,8 +1,9 @@
 import logging
-from botocore.exceptions import ClientError
 from typing import Any
-from configuration.secret import parse_secret_value, try_get_secret_name
 
+from botocore.exceptions import ClientError
+
+from configuration.secret import parse_secret_value, try_get_secret_name
 
 logger = logging.getLogger()
 
@@ -12,16 +13,21 @@ def secrets_manager_get_secret_value(secretesmanager: Any, secret_config_val: st
 
     try:
         response = secretesmanager.get_secret_value(SecretId=secret_name)
-        secret_value = parse_secret_value(response.get('SecretString'))  # if secret were created by secrets manager console
+        # secrets created by secrets manager console
+        secret_string = response.get('SecretString')
+        secret_value = secret_string and parse_secret_value(secret_string)
 
         if not secret_value:
             # secret was created in cli
-            secret_value = response.get('SecretBinary') and parse_secret_value(response.get('SecretBinary').decode('utf-8'))
+            secret_binary = response.get('SecretBinary')
+            secret_value = secret_binary and parse_secret_value(secret_binary.decode('utf-8'))
         if not secret_value:
-            raise ValueError((f"SSM failed to retrieve secret {secret_name}. Both SecretString and SecretBinary are None."))
+            raise ValueError(
+                f'SSM failed to retrieve secret {secret_name}. Both SecretString and SecretBinary are None.'
+            )
 
-    except ClientError as err:
-        logger.error(f"SSM failed to retrieve secret {secret_name}. Error: {err}")
-        raise err
+    except ClientError:
+        logger.exception(f'SSM failed to retrieve secret {secret_name}.')
+        raise
 
     return secret_value

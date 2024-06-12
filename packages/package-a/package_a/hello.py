@@ -1,2 +1,2 @@
-def say_hello():
-    return "Hello, World A!"
+def say_hello() -> None:
+    return 'Hello, World A!'

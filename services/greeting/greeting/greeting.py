@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+
 from configuration.configuration_provider import IConfigurationProvider
+
 from .greeting_configuration import GreetingConfiguration
 
 
@@ -10,7 +12,6 @@ class IGreeting(ABC):
 
 
 class Greeting(IGreeting):
-
     def __init__(self, config_provider: IConfigurationProvider):
         self._config = config_provider.get_configuration(GreetingConfiguration)
 

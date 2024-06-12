@@ -1,16 +1,16 @@
 import os
 import subprocess
+from typing import Any, list
 
+from scripts.utils.git import get_changed_files, load_gitignore
 from scripts.utils.packages import get_package_paths
-from scripts.utils.git import load_gitignore, get_changed_files
-from typing import List, Any
 
 
 def _is_python_file(file_path: str) -> bool:
     return file_path.endswith('.py')
 
 
-def _get_test_file(file_path: str, package_paths: List[str]) -> str:
+def _get_test_file(file_path: str, package_paths: list[str]) -> str:
     file_name = os.path.basename(file_path)
     test_file_name_1 = file_name.replace('.py', '_test.py')
     test_file_name_2 = f'test_{file_name}'
@@ -21,13 +21,18 @@ def _get_test_file(file_path: str, package_paths: List[str]) -> str:
             package_code_dir = os.path.join(package_path, package_name)
             package_test_dir = os.path.join(package_path, 'tests')
 
-            test_file_path_1 = file_path.replace(package_code_dir, package_test_dir).replace(file_name, test_file_name_1)
-            test_file_path_2 = file_path.replace(package_code_dir, package_test_dir).replace(file_name, test_file_name_2)
+            test_file_path_1 = file_path.replace(package_code_dir, package_test_dir).replace(
+                file_name, test_file_name_1
+            )
+            test_file_path_2 = file_path.replace(package_code_dir, package_test_dir).replace(
+                file_name, test_file_name_2
+            )
 
             if os.path.exists(test_file_path_1):
                 return test_file_path_1
             if os.path.exists(test_file_path_2):
                 return test_file_path_2
+    return None
 
 
 def _file_ignored(file_path: str, spec: Any) -> bool:
@@ -36,7 +41,7 @@ def _file_ignored(file_path: str, spec: Any) -> bool:
     return spec.match_file(file_path) or spec.match_file(dir_path)
 
 
-def get_impacted_test_files(changed_files: List[str], package_paths: List[str]) -> List[str]:
+def get_impacted_test_files(changed_files: list[str], package_paths: list[str]) -> list[str]:
     impacted_test_files = []
 
     for file in changed_files:
@@ -49,19 +54,19 @@ def get_impacted_test_files(changed_files: List[str], package_paths: List[str]) 
     return impacted_test_files
 
 
-def run_unit_tests_in_files(dir: str, files) -> List[str]:
+def run_unit_tests_in_files(wdir: str, files: list[str]) -> list[str]:
     if files:
-        subprocess.run(['pytest', '-m', 'not integration and not e2e', '-vs', ' '.join(files)], cwd=dir)
+        subprocess.run(['pytest', '-m', 'not integration and not e2e', '-vs', ' '.join(files)], cwd=wdir, check=True)
 
 
 def _get_relative_path(full_path: str, relative_path: str) -> str:
     return os.path.relpath(full_path, relative_path)
 
 
-def pytest_impacted_unit_tests():
+def pytest_impacted_unit_tests() -> None:
     root_dir = os.getcwd()
     spec = load_gitignore(root_dir)
-    package_paths = list(map(lambda x: _get_relative_path(str(x), root_dir), get_package_paths()))
+    package_paths = [_get_relative_path(str(x), root_dir) for x in get_package_paths()]
     changed_py_files = list(filter(_is_python_file, get_changed_files(root_dir)))
     changed_py_files_not_ignored = list(filter(lambda x: not _file_ignored(x, spec), changed_py_files))
 
@@ -72,5 +77,5 @@ def pytest_impacted_unit_tests():
         run_unit_tests_in_files(root_dir, impacted_test_files)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     pytest_impacted_unit_tests()

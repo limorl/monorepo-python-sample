@@ -1,14 +1,20 @@
 import pytest
-from configuration.app_config_utils import compose_app_name, compose_config_name, app_config_get_application_id, app_config_get_environment_id, app_config_get_deployment_strategy_id, app_config_data_get_latest_configuration, app_config_get_profile_id, app_config_create_hosted_configuration_version
-from environment.environment_variables import Platform, Stage
+from configuration.app_config_utils import get_app_name, get_config_name, get_default_configuration_deployment_strategy_name, DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_DEV, DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_STAGING, DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_PROD, app_config_get_application_id, app_config_get_environment_id, app_config_get_deployment_strategy_id, app_config_data_get_latest_configuration, app_config_get_profile_id, app_config_create_hosted_configuration_version
+from environment.service_environment import Platform, Stage
 
 
-def test_compose_app_name():
-    assert compose_app_name('test') == 'test-app'
+def test_get_app_name():
+    assert get_app_name('test') == 'test-service'
 
 
-def test_compose_config_name():
-    assert compose_config_name(Platform.AWS, Stage.PROD, 'us-east-1') == 'aws.prod.us-east-1'
+def test_get_config_name():
+    assert get_config_name(Platform.AWS, Stage.PROD, 'us-east-1') == 'aws.prod.us-east-1'
+
+
+def test_get_default_configuration_deployment_strategy_name():
+    assert get_default_configuration_deployment_strategy_name(Stage.DEV) == DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_DEV
+    assert get_default_configuration_deployment_strategy_name(Stage.STAGING) == DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_STAGING
+    assert get_default_configuration_deployment_strategy_name(Stage.PROD) == DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_PROD
 
 
 # TODO (limorl): Add tests with NextToken and to handle when create_if_not_exists = False
