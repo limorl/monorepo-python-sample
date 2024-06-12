@@ -7,10 +7,11 @@ terraform {
   }
 
   backend "s3" {
-    bucket  = "terraform-state-github"
+    bucket  = "terraform-state-github-workflow"
     region  = var.aws_region
   }
 }
+
 
 provider "aws" {
   region     = var.aws_region
