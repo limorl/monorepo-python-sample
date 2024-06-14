@@ -31,22 +31,24 @@ However, we are using a **resource naming convention that assumes a multi-region
 
 
 ## Terraform Deployment
-Terraform deployment is done by github workflow.
-You can run `terraform init` and `terraform init` locally but avoid running `terraform apply` or `terraform destroy` from local machine.
+Terraform deployment is done by github workflow `terraform-deployment.yml`.
+To enable that, an IAM Role was created with [Open ID Connect identity provider (OIDC)](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
+
+To test the `terraform-deployment.yml`, a pull request to main needs to be created, and then the workflow appears on the Github Actions tab and can be triggered manually.
 
 In any case, it's recommended to add lock key management using DynamoDB.
 
-For Stage.DEV:
+For AWS Dev:
 ```shell
 terraform init -backend-config=backend.dev.tfvars
 ```
 
-For Stage.STAGING
+For AWS Staging:
 ```shell
 terraform init -backend-config=backend.staging.tfvars
 ```
 
-For Stage.PROD
+For AWS Prod:
 ```shell
 terraform init -backend-config=backend.prod.tfvars
 ```

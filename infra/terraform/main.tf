@@ -8,6 +8,7 @@ terraform {
 
   backend "s3" {
     # TODO (@limorl): Add state locking using DynamoDB
+    # Backend configuration in backend.*.tfvars file
   }
 }
 
