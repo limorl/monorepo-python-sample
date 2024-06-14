@@ -48,7 +48,7 @@ def service_env():
     os.environ['PLATFORM'] = 'AWS'
     os.environ['STAGE'] = 'dev'
     os.environ['REGION'] = 'us-west-2'
-    os.environ['SERVICE_NAME'] = 'test'
+    os.environ['SERVICE_NAME'] = 'test-appconfig'
 
     config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
     os.environ['LOCAL_CONFIGURATION_FOLDER'] = config_folder
