@@ -36,7 +36,7 @@ jobs:
         with:
             role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
             role-session-name: GithubWorkflow-TerraformDeployment-Dev
-            aws-region: ${{ varss.AWS_PRIMARY_REGION }}
+            aws-region: ${{ vars.AWS_PRIMARY_REGION }}
       
       # - name: Create .env File
       #   run: |
