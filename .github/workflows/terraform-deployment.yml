@@ -1,21 +1,24 @@
 name: Terraform Deployment - To Primary Region of Environment (Stage)
 
 # on:
-#   push:
-#     branches:
-#       - main
-#     paths:
-#       - infra/terraform/**
+
 on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      stage:
-        description: 'Stage [dev | staging | prod]'
-        required: true
-        type: string
+    paths:
+      - infra/terraform/**
+  push:
+    branches:
+      - main
+    paths:
+      - infra/terraform/**
+  # workflow_dispatch:
+  #   inputs:
+  #     stage:
+  #       description: 'Stage [dev | staging | prod]'
+  #       required: true
+  #       type: string
 
 permissions:
   contents: read
