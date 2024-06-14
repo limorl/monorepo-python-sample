@@ -1,6 +1,5 @@
-# We're creating all types of deployments on all environments 
-
-resource "aws_appconfig_deployment_strategy" "appconfig_deployment_strategy_dev" {
+resource "aws_appconfig_deployment_strategy" "dev_deployment_strategy" {
+  count                          = var.stage == "dev" ? 1 : 0
   name                           = "dev-deployment-strategy"
   deployment_duration_in_minutes = 0
   final_bake_time_in_minutes     = 0
@@ -9,11 +8,13 @@ resource "aws_appconfig_deployment_strategy" "appconfig_deployment_strategy_dev"
   replicate_to                   = "NONE"
 
   tags = {
-    Stage = "dev"
+    Terraform   = "true"
+    Stage       = "dev"
   }
 }
 
-resource "aws_appconfig_deployment_strategy" "appconfig_deployment_strategy_staging" {
+resource "aws_appconfig_deployment_strategy" "staging_deployment_strategy" {
+  count                          = var.stage == "staging" ? 1 : 0
   name                           = "staging-deployment-strategy"
   deployment_duration_in_minutes = 0
   final_bake_time_in_minutes     = 0
@@ -22,11 +23,13 @@ resource "aws_appconfig_deployment_strategy" "appconfig_deployment_strategy_stag
   replicate_to                   = "NONE"
 
   tags = {
-    Stage = "staging"
+    Terraform   = "true"
+    Stage       = "staging"
   }
 }
 
-resource "aws_appconfig_deployment_strategy" "appconfig_deployment_strategy_prod" {
+resource "aws_appconfig_deployment_strategy" "prod_deployment_strategy" {
+  count                          = var.stage == "prod" ? 1 : 0
   name                           = "prod-deployment-strategy"
   deployment_duration_in_minutes = 10
   final_bake_time_in_minutes     = 2
@@ -35,6 +38,7 @@ resource "aws_appconfig_deployment_strategy" "appconfig_deployment_strategy_prod
   replicate_to                   = "NONE"
 
   tags = {
-    Stage = "prod"
+    Terraform   = "true"
+    Stage       = "prod"
   }
 }

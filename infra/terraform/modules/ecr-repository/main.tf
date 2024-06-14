@@ -1,6 +1,5 @@
 resource "aws_ecr_repository" "ecr_repository" {
-    for_each             = toset(var.ecr_name)
-    name                 = each.key
+    name                 = var.ecr_repository_name
     image_tag_mutability = var.image_mutability
 
     encryption_configuration {
@@ -11,5 +10,10 @@ resource "aws_ecr_repository" "ecr_repository" {
         scan_on_push = true
     }
 
-    tags = var.tags
+    tags = merge(
+        var.tags,
+        {
+            Type = "ecr_repository"
+        },
+    )
 }

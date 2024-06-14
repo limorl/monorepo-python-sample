@@ -7,12 +7,18 @@ terraform {
   }
 
   backend "s3" {
-    bucket  = "terraform-state-github-workflow"
-    region  = var.aws_region
+    # TODO (@limorl): Add state locking using DynamoDB
   }
 }
 
-
 provider "aws" {
-  region     = var.aws_region
+  region     = var.aws_primary_region
+
+  default_tags {
+   tags = {
+     Environment    = var.stage
+     Region         = var.aws_region
+     Deployment     = "terraform-github-workflow"
+   }
+ }
 }

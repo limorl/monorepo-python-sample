@@ -1,4 +1,4 @@
-name: Terraform Deployment - Primary Region
+name: Terraform Deployment - To Primary Region of Environment (Stage)
 
 # on:
 #   push:
@@ -10,6 +10,12 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'Stage [dev | staging | prod]'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -26,17 +32,17 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Create .env File
-        run: |
-          cp .devcontainer/.env.ci .devcontainer/.env
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
             role-to-assume: ${{ env.AWS_GITHUB_ACTIONS_ROLE }}
-            role-session-name: TerraformDeployment
+            role-session-name: GithubWorkflow-TerraformDeployment-Dev
             aws-region: ${{ env.AWS_PRIMARY_REGION }}
       
+      # - name: Create .env File
+      #   run: |
+      #     cp .devcontainer/.env.ci .devcontainer/.env
+
       # - name: Terraform init, validate plan
       #   uses: devcontainers/ci@v0.3
       #   with:

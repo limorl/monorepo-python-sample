@@ -4,6 +4,11 @@ variable "ecr_name" {
     default     = null
 }
 
+variable "ecr_repository_name" {
+    type        = string
+    default     = null
+}
+
 variable "image_mutability" {
     type        = string
     default     = "MUTABLE"
