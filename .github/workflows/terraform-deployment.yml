@@ -4,15 +4,12 @@ name: Terraform Deployment - To Primary Region of Environment (Stage)
 
 on:
   pull_request:
-    branches:
-      - main
-    paths:
-      - infra/terraform/**
+    branches: [ "main" ]
+    paths: [ "infra/terraform/**" ]
   push:
-    branches:
-      - main
-    paths:
-      - infra/terraform/**
+    branches: [ "main" ]
+    paths: [ "infra/terraform/**" ]
+
   # workflow_dispatch:
   #   inputs:
   #     stage:
@@ -27,8 +24,7 @@ permissions:
 jobs:
   terraform-deploy-to-dev:
     runs-on: ubuntu-latest
-    environment:
-      name: dev
+    environment: dev
     steps:
       - name: Checkout Git Repository
         uses: actions/checkout@v3.0.0
@@ -38,9 +34,9 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-            role-to-assume: ${{ env.AWS_GITHUB_ACTIONS_ROLE }}
+            role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
             role-session-name: GithubWorkflow-TerraformDeployment-Dev
-            aws-region: ${{ env.AWS_PRIMARY_REGION }}
+            aws-region: ${{ vars.AWS_PRIMARY_REGION }}
       
       # - name: Create .env File
       #   run: |
