@@ -38,7 +38,7 @@ jobs:
             aws-region: ${{ vars.AWS_PRIMARY_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v4
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform-version: 1.7.5
 
