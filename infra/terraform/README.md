@@ -30,7 +30,11 @@ However, we are using a **resource naming convention that assumes a multi-region
 | prod | us-east-2 | Main region, should be optimized for the location of the majority of customers |
 
 
-## Terraform Deployment
+## Terraform Deployment using Github Actions
+We have two Github Workflows which runs upon a change in files under `infra/terraform`:
+* `terraform-plan.yml` - Runs on pull requests and executes `terraform plan`
+* `terraform-apply.yml` - Runc on push to merge and executes `terraform apply`
+
 Terraform deployment is done by github workflow `terraform-deployment.yml`.
 To enable that, an IAM Role was created with [Open ID Connect identity provider (OIDC)](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
 

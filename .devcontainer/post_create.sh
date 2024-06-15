@@ -20,6 +20,7 @@ python run_script.py build-all
 
 # Install pre-commit and pre-push hooks
 poetry run pre-commit install
+poetry run pre-commit install-hooks
 poetry run pre-commit install --hook-type pre-push
 
 # Localstack - Validation

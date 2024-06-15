@@ -1,4 +1,5 @@
 repos:
+    # Detect Secrets
     - repo: https://github.com/Yelp/detect-secrets
       rev: v1.4.0
       hooks:
@@ -6,6 +7,7 @@ repos:
           args: ["--exclude-lines", "SECRET_PREFIX = 'secret:'|.*secretsmanager:GetSecretValue.*", "--exclude-secrets", ".*fake-secret.*|.*fake-password.*|.*FAKE_SECRET.*"]
           stages: [commit]
     
+    # Python Linting using Ruff & Flake8
     - repo: https://github.com/astral-sh/ruff-pre-commit
       rev: v0.4.7
       hooks:
@@ -22,7 +24,28 @@ repos:
       hooks:
         - id: flake8
           stages: [push]
-    
+
+    # Terrafmor Linting using Tflint
+    # - repo: https://github.com/terraform-docs/terraform-docs
+    #   rev: v0.18.0
+    #   hooks:
+    #     - id: terraform-docs-go
+    #       args: ["markdown", "table", "--output-file", "README.md", "./"]
+    #       stages: [commit]
+
+    # - repo: https://github.com/antonbabenko/pre-commit-terraform
+    #   rev: "v1.74.1"
+    #   hooks:
+    #     - id: terraform_fmt
+    #       stages: [commit]
+    #     - id: terraform_tflint
+    #       stages: [commit]
+    #     - id: terraform_validate
+    #       stages: [commit]
+    #     - id: terraform_tfsec
+    #       stages: [commit]
+
+    # Spell Checking
     - repo: https://github.com/codespell-project/codespell
       rev: v2.2.4
       hooks:
