@@ -21,9 +21,10 @@ jobs:
       run: |
         cp .devcontainer/.env.ci .devcontainer/.env
 
-    - name: Run pre-commit hooks & unit tests
+    - name: Run pre-commit and pre-push hooks & unit tests
       uses: devcontainers/ci@v0.3
       with:
         runCmd: |
           pre-commit run --all-files
+          pre-commit run --all-files --hook-stage push
           pytest -m  "not integration and not e2e"
