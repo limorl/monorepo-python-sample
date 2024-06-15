@@ -8,8 +8,8 @@ resource "aws_appconfig_deployment_strategy" "dev_deployment_strategy" {
   replicate_to                   = "NONE"
 
   tags = {
-    Terraform   = "true"
-    Stage       = "dev"
+    Terraform = "true"
+    Stage     = "dev"
   }
 }
 
@@ -23,8 +23,8 @@ resource "aws_appconfig_deployment_strategy" "staging_deployment_strategy" {
   replicate_to                   = "NONE"
 
   tags = {
-    Terraform   = "true"
-    Stage       = "staging"
+    Terraform = "true"
+    Stage     = "staging"
   }
 }
 
@@ -38,7 +38,7 @@ resource "aws_appconfig_deployment_strategy" "prod_deployment_strategy" {
   replicate_to                   = "NONE"
 
   tags = {
-    Terraform   = "true"
-    Stage       = "prod"
+    Terraform = "true"
+    Stage     = "prod"
   }
 }

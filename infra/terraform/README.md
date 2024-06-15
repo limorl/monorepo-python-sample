@@ -1,5 +1,34 @@
 # Terraform [Work in Progress]
 
+## Terraform Deployment using Github Actions
+We have two Github Workflows which runs upon a change in files under `infra/terraform`:
+* `terraform-plan.yml` - Runs on pull requests and executes `terraform plan`
+* `terraform-apply.yml` - Runc on push to merge and executes `terraform apply`
+
+Terraform deployment is done by github workflow `terraform-deployment.yml`.
+To enable that, an IAM Role was created with [Open ID Connect identity provider (OIDC)](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
+
+To test the `terraform-deployment.yml`, a pull request to main needs to be created, and then the workflow appears on the Github Actions tab and can be triggered manually.
+
+In any case, it's recommended to add lock key management using DynamoDB.
+
+For AWS Dev:
+```shell
+terraform init -backend-config=backend.dev.tfvars
+```
+
+For AWS Staging:
+```shell
+terraform init -backend-config=backend.staging.tfvars
+```
+
+For AWS Prod:
+```shell
+terraform init -backend-config=backend.prod.tfvars
+```
+
+>>Note: A common practice when the RnD team and the project grows significantly, is manage all environments from a centralized account. Therefore we are storing the backend state in a file with `stage` suffix.
+
 ## Environments (env per stage)
 
 We use the following environments :
@@ -29,32 +58,42 @@ However, we are using a **resource naming convention that assumes a multi-region
 | staging | us-east-2  | Preferably similar to prod |
 | prod | us-east-2 | Main region, should be optimized for the location of the majority of customers |
 
+<!-- BEGIN_TF_DOCS -->
+## Requirements
 
-## Terraform Deployment using Github Actions
-We have two Github Workflows which runs upon a change in files under `infra/terraform`:
-* `terraform-plan.yml` - Runs on pull requests and executes `terraform plan`
-* `terraform-apply.yml` - Runc on push to merge and executes `terraform apply`
+| Name | Version |
+|------|---------|
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.0 |
 
-Terraform deployment is done by github workflow `terraform-deployment.yml`.
-To enable that, an IAM Role was created with [Open ID Connect identity provider (OIDC)](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
+## Providers
 
-To test the `terraform-deployment.yml`, a pull request to main needs to be created, and then the workflow appears on the Github Actions tab and can be triggered manually.
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.54.1 |
 
-In any case, it's recommended to add lock key management using DynamoDB.
+## Modules
 
-For AWS Dev:
-```shell
-terraform init -backend-config=backend.dev.tfvars
-```
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_services"></a> [services](#module\_services) | ./modules/service | n/a |
 
-For AWS Staging:
-```shell
-terraform init -backend-config=backend.staging.tfvars
-```
+## Resources
 
-For AWS Prod:
-```shell
-terraform init -backend-config=backend.prod.tfvars
-```
+| Name | Type |
+|------|------|
+| [aws_appconfig_deployment_strategy.dev_deployment_strategy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appconfig_deployment_strategy) | resource |
+| [aws_appconfig_deployment_strategy.prod_deployment_strategy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appconfig_deployment_strategy) | resource |
+| [aws_appconfig_deployment_strategy.staging_deployment_strategy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appconfig_deployment_strategy) | resource |
 
->>Note: A common practice when the RnD team and the project grows significantly, is manage all environments from a centralized account. Therefore we are storing the backend state in a file with `stage` suffix.
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_aws_primary_region"></a> [aws\_primary\_region](#input\_aws\_primary\_region) | Primary Region - for ECR, AppConfig, SecretsManager | `string` | `null` | no |
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | Region to deploy to | `string` | `null` | no |
+| <a name="input_stage"></a> [stage](#input\_stage) | n/a | `string` | `null` | no |
+
+## Outputs
+
+No outputs.
+<!-- END_TF_DOCS -->
