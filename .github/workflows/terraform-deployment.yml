@@ -45,7 +45,7 @@ jobs:
       - name: Terraform Init
         id: terraform-init
         working-directory: ./infra/terraform
-        run: terraform init
+        run: terraform init -backend-config=backend.dev.tfvars
 
       - name: Terraform Format
         id: terraform-fmt
@@ -61,7 +61,7 @@ jobs:
       - name: Terraform Plan
         id: terraform-plan
         working-directory: ./infra/terraform
-        run: terraform plan -backend-config=backend.dev.tfvars
+        run: terraform plan
   
   # deploy-dev:
   #   name: Terraform Deploy - Dev
