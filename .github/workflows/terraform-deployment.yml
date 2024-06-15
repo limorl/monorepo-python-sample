@@ -1,14 +1,12 @@
-name: Terraform Deployment - To Primary Region of Environment (Stage)
-
-# on:
+name: Terraform Deployment - Primary Region Environment
 
 on:
   pull_request:
-    branches: [ "main" ]
-    paths: [ "infra/terraform/**" ]
+    branches: [main]
+    paths: ["infra/terraform/**"]
   push:
-    branches: [ "main" ]
-    paths: [ "infra/terraform/**" ]
+    branches: [main]
+    paths: ["infra/terraform/**"]
 
   # workflow_dispatch:
   #   inputs:
@@ -22,7 +20,7 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
-  terraform-plan-dev:
+  plan-dev:
     name: Terraform Plan - Dev
     runs-on: ubuntu-latest
     environment: dev
@@ -44,40 +42,48 @@ jobs:
         with:
           terraform-version: 1.7.5
 
-      - name: Terraform fmt
+      - name: Terraform Init
+        id: terraform-init
         run: |
           cd infra/terraform
-          terraform fmt
+          terraform init -backend-config=backend.dev.tfvars
 
-      - name: Terraform init
-        run: terraform init -backend-config=backend.dev.tfvars
+      - name: Terraform Format
+        id: terraform-fmt
+        run: |
+          terraform fmt
 
       - name: Terraform Validate
+        id: terraform-validate
         run: terraform validate
+      
+      - name: Terraform Plan
+        id: terraform-plan
+        run: terraform plan
   
-  terraform-deploy-dev:
-    name: Terraform Deploy - Dev
-    needs: terraform-plan-dev
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14.x
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
-          role-session-name: GithubWorkflow-TerraformDeployment-Dev
-          aws-region: ${{ vars.AWS_PRIMARY_REGION }}
-      - name: Initialise project and deploy terraform
-        run: |
-          cd infra/terraform
-          terraform fmt
-          terraform init
-          terraform apply -backend-config=backend.dev.tfvars
+  # deploy-dev:
+  #   name: Terraform Deploy - Dev
+  #   needs: [plan-dev]
+  #   if: github.ref == 'refs/heads/main'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Use Node.js 14.x
+  #       uses: actions/setup-node@v1
+  #       with:
+  #         node-version: 14.x
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
+  #         role-session-name: GithubWorkflow-TerraformDeployment-Dev
+  #         aws-region: ${{ vars.AWS_PRIMARY_REGION }}
+  #     - name: Initialise project and deploy terraform
+  #       run: |
+  #         cd infra/terraform
+  #         terraform fmt
+  #         terraform init
+  #         terraform apply -backend-config=backend.dev.tfvars
       
       
       # - name: Create .env File

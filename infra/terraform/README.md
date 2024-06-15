@@ -1,10 +1,11 @@
 # Terraform [Work in Progress]
+Here, we are using 'vanila' terrafirm with S3 bucket backend.
+
+## Pre-requisite
+* Manually create S3 Bucket on AWS Dev, Staging and PRod Environment as explained [here](https://developer.hashicorp.com/terraform/language/settings/backends/s3).
+* Manually create OIDC IAM Role on each environment to allow Github Actions to provision resources on AWS (see below for more details).
 
 ## Terraform Deployment using Github Actions
-We have two Github Workflows which runs upon a change in files under `infra/terraform`:
-* `terraform-plan.yml` - Runs on pull requests and executes `terraform plan`
-* `terraform-apply.yml` - Runc on push to merge and executes `terraform apply`
-
 Terraform deployment is done by github workflow `terraform-deployment.yml`.
 To enable that, an IAM Role was created with [Open ID Connect identity provider (OIDC)](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
 
