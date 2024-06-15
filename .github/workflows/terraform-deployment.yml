@@ -45,7 +45,7 @@ jobs:
       - name: Terraform Init
         id: terraform-init
         working-directory: ./infra/terraform
-        run: terraform init -backend-config=backend.dev.tfvars
+        run: terraform init
 
       - name: Terraform Format
         id: terraform-fmt
