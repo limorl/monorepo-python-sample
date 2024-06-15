@@ -25,6 +25,8 @@ jobs:
       uses: devcontainers/ci@v0.3
       with:
         runCmd: |
-          pre-commit run --all-files
-          pre-commit run --all-files --hook-stage push
-          pytest -m  "not integration and not e2e"
+          echo ">>>>>>>>>>> PATH:"
+          echo $PATH
+          poetry run pre-commit run --all-files
+          poetry run pre-commit run --all-files --hook-stage push
+          poetry run pytest -m "not integration and not e2e"
