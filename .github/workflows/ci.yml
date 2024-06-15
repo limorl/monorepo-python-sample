@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Check-out Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set-up PWD Environment Variable
       run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
