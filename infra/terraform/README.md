@@ -92,7 +92,7 @@ However, we are using a **resource naming convention that assumes a multi-region
 |------|-------------|------|---------|:--------:|
 | <a name="input_aws_primary_region"></a> [aws\_primary\_region](#input\_aws\_primary\_region) | Primary Region - for ECR, AppConfig, SecretsManager | `string` | `null` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | Region to deploy to | `string` | `null` | no |
-| <a name="input_stage"></a> [stage](#input\_stage) | n/a | `string` | `null` | no |
+| <a name="input_stage"></a> [stage](#input\_stage) | General | `string` | `null` | no |
 
 ## Outputs
 
