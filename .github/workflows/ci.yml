@@ -12,15 +12,7 @@ jobs:
 
     steps:
     - name: Check-out Code
-      uses: actions/checkout@v3
-    
-    # - name: Set-up Python Environment
-    #   uses: actions/setup-python@v4
-    #   with:
-    #     python-version: "3.12"
-
-    # - name: Lint (flake8)
-    #   uses: py-actions/flake8@v2
+      uses: actions/checkout@v4
 
     - name: Set-up PWD Environment Variable
       run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
@@ -29,9 +21,10 @@ jobs:
       run: |
         cp .devcontainer/.env.ci .devcontainer/.env
 
-    - name: Run Pre-commit hooks & Tests
+    - name: Run pre-commit and pre-push hooks & unit tests
       uses: devcontainers/ci@v0.3
       with:
         runCmd: |
-          pre-commit run --all-files
-          pytest -m  "not integration and not e2e"
+          poetry run pre-commit run --all-files
+          poetry run pre-commit run --all-files --hook-stage push
+          poetry run pytest -m "not integration and not e2e"
