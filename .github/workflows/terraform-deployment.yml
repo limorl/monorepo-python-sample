@@ -19,7 +19,7 @@ jobs:
     if: github.event_name == 'pull_request'
     strategy:
       matrix:
-        environment: [dev]  # [dev, staging, prod] TODO (@limorl): Enable all three envs and require approval for prod only
+        environment: [dev]  # [dev, staging, prod] TODO (@limorl): Enable all three envs
     uses: ./.github/workflows/terraform-deployment-reusable.yml
     with:
       environment: ${{ matrix.environment }}
@@ -49,107 +49,3 @@ jobs:
     with:
       environment: prod
       plan_only: false
-
-
-# on:
-#   pull_request:
-#     branches: [main]
-#     paths: ["infra/terraform/**"]
-#   push:
-#     branches: [main]
-#     paths: ["infra/terraform/**"]
-
-# permissions:
-#   id-token: write # This is required for requesting the JWT
-#   contents: read  # This is required for actions/checkout
-
-# jobs:
-#   plan-dev:
-#     name: Terraform Plan - Dev
-#     runs-on: ubuntu-latest
-#     environment: dev
-#     steps:
-#       - name: Checkout Git Repository
-#         uses: actions/checkout@v4
-#         with:
-#           fetch-depth: 0
-
-#       - name: Configure AWS credentials
-#         uses: aws-actions/configure-aws-credentials@v4
-#         with:
-#             role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
-#             role-session-name: GithubWorkflow-TerraformPlan-Dev
-#             aws-region: ${{ vars.AWS_PRIMARY_REGION }}
-
-#       - name: Setup Terraform
-#         uses: hashicorp/setup-terraform@v3
-#         with:
-#           terraform-version: 1.7.5
-
-#       - name: Terraform Init
-#         id: terraform-init
-#         working-directory: ./infra/terraform
-#         run: terraform init -backend-config=backend.dev.tfvars
-
-#       - name: Terraform Format
-#         id: terraform-fmt
-#         working-directory: ./infra/terraform
-#         run: |
-#           terraform fmt
-
-#       - name: Terraform Validate
-#         id: terraform-validate
-#         working-directory: ./infra/terraform
-#         run: terraform validate
-      
-#       - name: Terraform Plan
-#         id: terraform-plan
-#         working-directory: ./infra/terraform
-#         run: terraform plan -var-file='dev.tfvars' -out=dev.tfplan
-
-#       - name: Upload Terraform Plan
-#         uses: actions/upload-artifact@v3
-#         with:
-#           name: dev.tfplan
-#           path: ./infra/terraform/dev.tfplan
-
-#   apply-dev:
-#     name: Terraform Apply - Dev
-#     needs: plan-dev
-#     runs-on: ubuntu-latest
-#     environment:
-#       name: dev
-#       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    
-#     steps:
-#       - name: Checkout Git Repository
-#         uses: actions/checkout@v4
-
-#       - name: Configure AWS credentials
-#         uses: aws-actions/configure-aws-credentials@v4
-#         with:
-#           role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
-#           role-session-name: GithubWorkflow-TerraformDeployment-Dev
-#           aws-region: ${{ vars.AWS_PRIMARY_REGION }}
-
-#       - name: Setup Terraform
-#         uses: hashicorp/setup-terraform@v3
-#         with:
-#           terraform-version: 1.7.5
-
-#       - name: Download Terraform Plan
-#         uses: actions/download-artifact@v3
-#         with:
-#           name: dev.tfplan
-#           path: ./infra/terraform
-
-#       - name: Terraform Init
-#         working-directory: ./infra/terraform
-#         run: terraform init -backend-config=backend.dev.tfvars
-
-#       - name: Terraform Apply
-#         working-directory: ./infra/terraform
-#         run: terraform apply -auto-approve dev.tfplan
-
-  
-#   # TODO (@limorl) Add support in staging and request approval before deploying to prod

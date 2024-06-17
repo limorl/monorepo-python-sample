@@ -1,5 +1,5 @@
 resource "aws_appconfig_application" "app" {
-  name        = "service-${var.service_name}"
+  name        = "${var.service_name}-service"
   description = "AppConfig Application"
 
   tags = {
