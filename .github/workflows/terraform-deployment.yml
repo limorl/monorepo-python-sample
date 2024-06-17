@@ -18,7 +18,7 @@ jobs:
     if: github.event_name == 'pull_request'
     strategy:
       matrix:
-        environment: [dev, staging, prod]
+        environment: [dev]  # [dev, staging, prod] TODO (@limorl): Enable all three envs and require approval for prod only
     uses: ./.github/workflows/terraform-deployment-reusable.yml
     with:
       environment: ${{ matrix.environment }}
@@ -29,7 +29,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     strategy:
       matrix:
-        environment: [dev, staging, prod]
+        environment: [dev]  # [dev, staging, prod] TODO (@limorl): Enable all three envs and require approval for prod only
     uses: ./.github/workflows/terraform-deployment-reusable.yml
     with:
       environment: ${{ matrix.environment }}
