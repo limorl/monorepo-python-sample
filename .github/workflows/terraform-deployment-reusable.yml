@@ -79,7 +79,7 @@ jobs:
     if: inputs.plan_only != true
     environment:
       name: ${{ inputs.environment }}
-      url: ${{ inputs.environment == 'prod' &&  https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }} || '' }}
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     
     steps:
       - name: Checkout Git Repository
