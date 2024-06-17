@@ -36,7 +36,7 @@ jobs:
     with:
       environment: ${{ matrix.environment }}
       plan_only: false
-  
+
   apply-prod:
     name: Terraform Apply - prod
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -49,6 +49,7 @@ jobs:
     with:
       environment: prod
       plan_only: false
+
 
 # on:
 #   pull_request:

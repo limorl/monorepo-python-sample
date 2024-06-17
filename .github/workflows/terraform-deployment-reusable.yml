@@ -19,7 +19,7 @@ jobs:
   plan:
     name: Terraform Plan - ${{ inputs.environment }}
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: Checkout Git Repository
         uses: actions/checkout@v4
@@ -29,9 +29,9 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-            role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
-            role-session-name: GithubWorkflow-TerraformPlan-Dev
-            aws-region: ${{ vars.AWS_PRIMARY_REGION }}
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
+          role-session-name: GithubWorkflow-TerraformPlan-${{ inputs.environment }}
+          aws-region: ${{ vars.AWS_PRIMARY_REGION }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -46,8 +46,7 @@ jobs:
       - name: Terraform Format
         id: terraform-fmt
         working-directory: ./infra/terraform
-        run: |
-          terraform fmt
+        run: terraform fmt
 
       - name: Terraform Validate
         id: terraform-validate
@@ -67,13 +66,8 @@ jobs:
 
   apply:
     name: Terraform Apply - ${{ inputs.environment }}
-    needs: plan
     runs-on: ubuntu-latest
-    if: inputs.plan_only != true
-    environment:
-      name: ${{ inputs.environment }}
-      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    
+    if: ${{ inputs.plan_only != true }}
     steps:
       - name: Checkout Git Repository
         uses: actions/checkout@v4
@@ -82,7 +76,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
-          role-session-name: GithubWorkflow-TerraformDeployment-Dev
+          role-session-name: GithubWorkflow-TerraformDeployment-${{ inputs.environment }}
           aws-region: ${{ vars.AWS_PRIMARY_REGION }}
 
       - name: Setup Terraform
@@ -103,6 +97,3 @@ jobs:
       - name: Terraform Apply
         working-directory: ./infra/terraform
         run: terraform apply -auto-approve ${{ inputs.environment }}.tfplan
-
-  
-  # TODO (@limorl) Add support in staging and request approval before deploying to prod
