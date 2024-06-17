@@ -8,6 +8,10 @@ on:
     branches: [main]
     paths: ["infra/terraform/**"]
 
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
 jobs:
   plan:
     name: Terraform Plan - ${{ matrix.environment }}
