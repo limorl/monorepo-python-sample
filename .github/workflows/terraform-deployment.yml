@@ -11,6 +11,7 @@ on:
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
+  pull-requests: write  # This allows the workflow to comment on PRs
 
 jobs:
   plan:
@@ -27,12 +28,26 @@ jobs:
   apply:
     name: Terraform Apply - ${{ matrix.environment }}
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [plan]
     strategy:
       matrix:
-        environment: [dev]  # [dev, staging, prod] TODO (@limorl): Enable all three envs and require approval for prod only
+        environment: [dev]  # [dev, staging] TODO (@limorl): Enable on dev and staging
     uses: ./.github/workflows/terraform-deployment-reusable.yml
     with:
       environment: ${{ matrix.environment }}
+      plan_only: false
+  
+  apply-prod:
+    name: Terraform Apply - prod
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [plan]
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    uses: ./.github/workflows/terraform-deployment-reusable.yml
+    with:
+      environment: prod
       plan_only: false
 
 # on:

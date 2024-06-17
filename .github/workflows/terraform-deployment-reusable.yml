@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   plan:
-    name: Terraform Plan
+    name: Terraform Plan - ${{ inputs.environment }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
@@ -36,7 +36,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform-version: 1.7.5
+          terraform_version: 1.7.5
 
       - name: Terraform Init
         id: terraform-init
@@ -64,16 +64,9 @@ jobs:
         with:
           name: ${{ inputs.environment }}.tfplan
           path: ./infra/terraform/${{ inputs.environment }}.tfplan
-      
-      - name: Show Plan
-        if: inputs.plan_only
-        run: |
-          echo "Terraform Plan for environment ${{ inputs.environment }}:"
-          terraform show -no-color ${{ inputs.environment }}.tfplan
-        working-directory: ./infra/terraform
 
   apply:
-    name: Terraform Apply
+    name: Terraform Apply - ${{ inputs.environment }}
     needs: plan
     runs-on: ubuntu-latest
     if: inputs.plan_only != true
@@ -95,7 +88,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform-version: 1.7.5
+          terraform_version: 1.7.5
 
       - name: Download Terraform Plan
         uses: actions/download-artifact@v3
