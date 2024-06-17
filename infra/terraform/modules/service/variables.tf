@@ -1,14 +1,14 @@
 variable "stage" {
-    type        = string
-    default     = null
+  type    = string
+  default = null
 }
 
 variable "service_name" {
-    type        = string
-    default     = null
+  type    = string
+  default = null
 }
 
 variable "tags" {
-    type        = map(string)
-    default     = {}
+  type    = map(string)
+  default = {}
 }
