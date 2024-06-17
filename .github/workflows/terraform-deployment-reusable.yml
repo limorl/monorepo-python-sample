@@ -1,0 +1,115 @@
+name: Terraform Deployment (Primary Region) - Reusable Across Environments
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      plan_only:
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+            role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
+            role-session-name: GithubWorkflow-TerraformPlan-Dev
+            aws-region: ${{ vars.AWS_PRIMARY_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform-version: 1.7.5
+
+      - name: Terraform Init
+        id: terraform-init
+        working-directory: ./infra/terraform
+        run: terraform init -backend-config=backend.${{ inputs.environment }}.tfvars
+
+      - name: Terraform Format
+        id: terraform-fmt
+        working-directory: ./infra/terraform
+        run: |
+          terraform fmt
+
+      - name: Terraform Validate
+        id: terraform-validate
+        working-directory: ./infra/terraform
+        run: terraform validate
+      
+      - name: Terraform Plan
+        id: terraform-plan
+        working-directory: ./infra/terraform
+        run: terraform plan -var-file=${{ inputs.environment }}.tfvars -out=${{ inputs.environment }}.tfplan
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.environment }}.tfplan
+          path: ./infra/terraform/${{ inputs.environment }}.tfplan
+      
+      - name: Show Plan
+        if: inputs.plan_only
+        run: |
+          echo "Terraform Plan for environment ${{ inputs.environment }}:"
+          terraform show -no-color ${{ inputs.environment }}.tfplan
+        working-directory: ./infra/terraform
+
+  apply:
+    name: Terraform Apply
+    needs: plan
+    runs-on: ubuntu-latest
+    if: inputs.plan_only != true
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ inputs.environment == 'prod' &&  https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }} || '' }}
+    
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
+          role-session-name: GithubWorkflow-TerraformDeployment-Dev
+          aws-region: ${{ vars.AWS_PRIMARY_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform-version: 1.7.5
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.environment }}.tfplan
+          path: ./infra/terraform
+
+      - name: Terraform Init
+        working-directory: ./infra/terraform
+        run: terraform init -backend-config=backend.${{ inputs.environment }}.tfvars
+
+      - name: Terraform Apply
+        working-directory: ./infra/terraform
+        run: terraform apply -auto-approve ${{ inputs.environment }}.tfplan
+
+  
+  # TODO (@limorl) Add support in staging and request approval before deploying to prod
