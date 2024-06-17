@@ -20,6 +20,7 @@ jobs:
     name: Terraform Plan - ${{ inputs.environment }}
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
+    environment: ${{ inputs.environment }}
     steps:
       - name: Checkout Git Repository
         uses: actions/checkout@v4
@@ -68,6 +69,7 @@ jobs:
     name: Terraform Apply - ${{ inputs.environment }}
     runs-on: ubuntu-latest
     if: ${{ inputs.plan_only != true }}
+    environment: ${{ inputs.environment }}
     steps:
       - name: Checkout Git Repository
         uses: actions/checkout@v4
