@@ -1,1 +1,0 @@
-{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"appconfig","Source":"registry.terraform.io/terraform-aws-modules/appconfig/aws","Version":"2.0.0","Dir":".terraform/modules/appconfig"},{"Key":"services","Source":"./modules/service","Dir":"modules/service"}]}

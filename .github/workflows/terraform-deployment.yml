@@ -1,4 +1,4 @@
-name: Terraform Deployment (Primary Region)
+name: Terraform Deployment
 
 on:
   pull_request:

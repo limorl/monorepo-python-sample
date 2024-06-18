@@ -2,9 +2,12 @@ resource "aws_appconfig_application" "app" {
   name        = "${var.service_name}-service"
   description = "AppConfig Application"
 
-  tags = {
-    Type = "appconfig_application"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Type = "aws_appconfig_application"
+    },
+  )
 }
 
 resource "aws_appconfig_environment" "appconfig_environment" {
@@ -20,7 +23,7 @@ resource "aws_appconfig_environment" "appconfig_environment" {
   tags = merge(
     var.tags,
     {
-      Type = "appconfig_application"
+      Type = "appconfig_environment"
     },
   )
 }

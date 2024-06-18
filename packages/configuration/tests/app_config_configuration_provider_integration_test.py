@@ -66,7 +66,7 @@ def app_configuration_provider(service_env):
 
 """ This test assumes the following resources exists in Dev/Test env:
 
-    Test.Linear.AllatOnce configuration deployment strategy (all at once with duration 0 and bake time 0)
+    dev-deployment-strategy configuration deployment strategy (all at once with duration 0 and bake time 0)
 
     Two secrets are stored on Secretes Manager:
     - Plain text secret: 'test/app/fake-secret-plain' = fake-secret-val
@@ -75,7 +75,7 @@ def app_configuration_provider(service_env):
                 'Password': 'fake-password'
             }
 
-    TODO (@limorl): Test can be imprived to deploy a newly created configuration and then deleted after test test
+    TODO (@limorl): Test can be improved to deploy a newly created configuration and then deleted after test test
 """
 
 

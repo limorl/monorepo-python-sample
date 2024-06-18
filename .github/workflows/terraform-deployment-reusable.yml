@@ -1,4 +1,4 @@
-name: Terraform Deployment (Primary Region) - Reusable Across Environments
+name: Terraform Deployment - Reusable Across Environments
 
 on:
   workflow_call:
@@ -42,7 +42,7 @@ jobs:
       - name: Terraform Init
         id: terraform-init
         working-directory: ./infra/terraform
-        run: terraform init -backend-config=backend.${{ inputs.environment }}.tfvars
+        run: terraform init
 
       - name: Terraform Format
         id: terraform-fmt
@@ -57,7 +57,7 @@ jobs:
       - name: Terraform Plan
         id: terraform-plan
         working-directory: ./infra/terraform
-        run: terraform plan -var-file=${{ inputs.environment }}.tfvars -out=${{ inputs.environment }}.tfplan
+        run: terraform plan -var-file=environments/${{ inputs.environment }}/env.tfvars -out=${{ inputs.environment }}.tfplan
 
       - name: Upload Terraform Plan
         uses: actions/upload-artifact@v3
@@ -94,7 +94,7 @@ jobs:
 
       - name: Terraform Init
         working-directory: ./infra/terraform
-        run: terraform init -backend-config=backend.${{ inputs.environment }}.tfvars
+        run: terraform init
 
       - name: Terraform Apply
         working-directory: ./infra/terraform

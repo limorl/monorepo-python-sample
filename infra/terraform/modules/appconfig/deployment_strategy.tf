@@ -7,10 +7,12 @@ resource "aws_appconfig_deployment_strategy" "dev_deployment_strategy" {
   growth_type                    = "LINEAR"
   replicate_to                   = "NONE"
 
-  tags = {
-    Terraform = "true"
-    Stage     = "dev"
-  }
+  tags = merge(
+        var.tags,
+        {
+            Type = "appconfig_deployment_strategy"
+        },
+    )
 }
 
 resource "aws_appconfig_deployment_strategy" "staging_deployment_strategy" {
@@ -22,10 +24,12 @@ resource "aws_appconfig_deployment_strategy" "staging_deployment_strategy" {
   growth_type                    = "LINEAR"
   replicate_to                   = "NONE"
 
-  tags = {
-    Terraform = "true"
-    Stage     = "staging"
-  }
+  tags = merge(
+        var.tags,
+        {
+            Type = "appconfig_deployment_strategy"
+        },
+    )
 }
 
 resource "aws_appconfig_deployment_strategy" "prod_deployment_strategy" {
@@ -37,8 +41,10 @@ resource "aws_appconfig_deployment_strategy" "prod_deployment_strategy" {
   growth_type                    = "LINEAR"
   replicate_to                   = "NONE"
 
-  tags = {
-    Terraform = "true"
-    Stage     = "prod"
-  }
+  tags = merge(
+        var.tags,
+        {
+            Type = "appconfig_deployment_strategy"
+        },
+    )
 }
