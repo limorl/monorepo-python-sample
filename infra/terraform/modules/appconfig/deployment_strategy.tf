@@ -8,11 +8,11 @@ resource "aws_appconfig_deployment_strategy" "dev_deployment_strategy" {
   replicate_to                   = "NONE"
 
   tags = merge(
-        var.tags,
-        {
-            Type = "appconfig_deployment_strategy"
-        },
-    )
+    var.tags,
+    {
+      Type = "appconfig_deployment_strategy"
+    },
+  )
 }
 
 resource "aws_appconfig_deployment_strategy" "staging_deployment_strategy" {
@@ -25,11 +25,11 @@ resource "aws_appconfig_deployment_strategy" "staging_deployment_strategy" {
   replicate_to                   = "NONE"
 
   tags = merge(
-        var.tags,
-        {
-            Type = "appconfig_deployment_strategy"
-        },
-    )
+    var.tags,
+    {
+      Type = "appconfig_deployment_strategy"
+    },
+  )
 }
 
 resource "aws_appconfig_deployment_strategy" "prod_deployment_strategy" {
@@ -42,9 +42,9 @@ resource "aws_appconfig_deployment_strategy" "prod_deployment_strategy" {
   replicate_to                   = "NONE"
 
   tags = merge(
-        var.tags,
-        {
-            Type = "appconfig_deployment_strategy"
-        },
-    )
+    var.tags,
+    {
+      Type = "appconfig_deployment_strategy"
+    },
+  )
 }

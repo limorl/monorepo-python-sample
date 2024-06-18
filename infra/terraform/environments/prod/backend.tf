@@ -10,6 +10,6 @@ terraform {
     # TODO (@limorl): Add state locking using DynamoDB
     bucket = "terraform-backend-561z6"
     key    = "prod/terraform.tfstate"
-    region = "us-east-1"    # Primary Region (prod)
+    region = "us-east-1" # Primary Region (prod)
   }
 }
