@@ -32,6 +32,12 @@ repos:
         - id: terraform-docs-go
           args: ["markdown", "table", "--output-file", "README.md", "./infra/terraform/environments/dev"]
           stages: [commit]
+        - id: terraform-docs-go
+          args: ["markdown", "table", "--output-file", "README.md", "./infra/terraform/environments/staging"]
+          stages: [commit]
+        - id: terraform-docs-go
+          args: ["markdown", "table", "--output-file", "README.md", "./infra/terraform/environments/prod"]
+          stages: [commit]
           
     - repo: https://github.com/antonbabenko/pre-commit-terraform
       rev: v1.91.0

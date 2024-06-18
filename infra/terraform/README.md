@@ -56,32 +56,3 @@ In this example we are using multi-regions (primary and secondary) for prod and 
 | dev |  us-east-1 | N\A | Should be close to dev teams |
 | staging | eu-west-1 | eu-west-2 | Preferably similar to prod* |
 | prod | us-west-1 | us-west-2 | Main region, should be optimized for the location of the majority of customers |
-
-<!-- BEGIN_TF_DOCS -->
-## Requirements
-
-No requirements.
-
-## Providers
-
-No providers.
-
-## Modules
-
-No modules.
-
-## Resources
-
-No resources.
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_aws_primary_region"></a> [aws\_primary\_region](#input\_aws\_primary\_region) | Primary Region - for ECR, AppConfig, SecretsManager | `string` | `null` | no |
-| <a name="input_stage"></a> [stage](#input\_stage) | General | `string` | `null` | no |
-
-## Outputs
-
-No outputs.
-<!-- END_TF_DOCS -->
