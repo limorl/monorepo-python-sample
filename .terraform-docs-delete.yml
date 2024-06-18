@@ -1,4 +1,4 @@
-formatter: "" # this is required
+formatter: markdown table
 
 version: ""
 
@@ -6,9 +6,9 @@ header-from: main.tf
 footer-from: ""
 
 recursive:
-  enabled: false
-  path: modules
-  include-main: true
+  enabled: true
+  path: "./infra/terraform/environments"
+  include-main: false
 
 sections:
   hide: []

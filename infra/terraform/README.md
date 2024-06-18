@@ -14,21 +14,6 @@ To test the `terraform-deployment.yml`, a pull request to main needs to be creat
 
 In any case, it's recommended to add lock key management using DynamoDB.
 
-For AWS Dev:
-```shell
-terraform init -backend-config=backend.dev.tfvars
-```
-
-For AWS Staging:
-```shell
-terraform init -backend-config=backend.staging.tfvars
-```
-
-For AWS Prod:
-```shell
-terraform init -backend-config=backend.prod.tfvars
-```
-
 >>Note: A common practice when the RnD team and the project grows significantly, is manage all environments from a centralized account.
 
 

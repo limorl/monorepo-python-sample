@@ -29,14 +29,9 @@ repos:
     - repo: https://github.com/terraform-docs/terraform-docs
       rev: v0.18.0
       hooks:
-        # - id: terraform-docs-go
-        #   args: ["markdown", "table", "--output-file", "README.md", "./infra/terraform/environments/dev"]
-        #   stages: [commit]
         - id: terraform-docs-go
-          args: ["markdown", "table", "--output-file", "README.md", "./infra/terraform/environments/staging"]
-          stages: [commit]
-        - id: terraform-docs-go
-          args: ["markdown", "table", "--output-file", "README.md", "./infra/terraform/environments/prod"]
+          # args: ["markdown", "table", "--recursive", "true", "--recursive-include-main", "false", "output-file", "README.md", "./infra/terraform/environments/prod"]
+          args: ["markdown", "table", "--recursive", "--recursive-include-main=false", "--output-file", "README.md", "./infra/terraform"]
           stages: [commit]
           
     - repo: https://github.com/antonbabenko/pre-commit-terraform
