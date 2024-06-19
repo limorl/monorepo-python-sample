@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 
 # Update regions according to your setup
 AWS_PRIMARY_REGION_DEV = 'us-east-1'
-AWS_PRIMARY_REGION_STAGING = 'us-east-1'
-AWS_PRIMARY_REGION_PROD = 'us-east-1'
+AWS_PRIMARY_REGION_STAGING = 'eu-west-1'
+AWS_PRIMARY_REGION_PROD = 'us-west-1'
 
 
 class Platform(Enum):

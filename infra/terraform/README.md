@@ -4,12 +4,13 @@ Github Actions are used to deploy infrastructure using terraform.
 
 ## Terraform Deployment using Github Actions
 ### Pre-requisite
-* Manually create S3 Bucket on AWS Dev, Staging and PRod Environment as explained [here](https://developer.hashicorp.com/terraform/language/settings/backends/s3).
-* Manually create OIDC IAM Role on each environment to allow Github Actions to provision resources on AWS (see below for more details).
+* Manually create S3 Bucket on primary region (on dev, staging and prod), as explained [here](https://developer.hashicorp.com/terraform/language/settings/backends/s3).
+* Manually create DynamoDB tableon primary region (for dev, staging, prod), to store state lock keys, as explained [here](https://developer.hashicorp.com/terraform/language/settings/backends/s3).
+* Manually create OIDC IAM Role on primary region (for dev, staging and prod) to allow Github Actions to provision resources on AWS (see below for more details).
+Follow guidelines here: [Open ID Connect identity provider (OIDC)](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
+
 
 Terraform deployment is done by github workflow `terraform-deployment.yml`.
-To enable that, an IAM Role was created with [Open ID Connect identity provider (OIDC)](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
-
 To test the `terraform-deployment.yml`, a pull request to main needs to be created, and then the workflow appears on the Github Actions tab and can be triggered manually.
 
 In any case, it's recommended to add lock key management using DynamoDB.
@@ -31,10 +32,10 @@ In the code we use the combination of `Platform` (local,AWS) and `Stage` (dev, s
 In this example we are using multi-regions (primary and secondary) for prod and staging and a single region for dev.
 
 - Every environment has has a primary region `AWS_PRIMARY_REGION`
-- In `AWS_PRIMARY_REGION` we manage centrally the shared resources for the environment:  ECR, AppConfig, SecretsManager
+- In `AWS_PRIMARY_REGION` we manage centrally the shared resources for the environment:  ECR, AppConfig, SecretsManager, Terraform S3 BAckend, DynamoDB lock table for terraform state
 - `AWS_REGION` is the region where the resource is actually deployed
 
->> Note: In general it's better to have staging and prod environment as similar as possible and preferably on the same regions. In this example we used other regions for the sake of the example.
+>> Note: In general it's better to have staging and prod environment as similar as possible and preferably on the same regions. In this example we used other regions as the different environments are simulated on the same account.
 
 | Env | Primary Region | Secondary Region | Notes |
 | --- | --- | --- | --- |
