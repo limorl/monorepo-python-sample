@@ -1,5 +1,5 @@
 provider "aws" {
-  alias  = "primary"
+  alias  = "dev-primary"
   region = var.aws_primary_region
 
   default_tags {

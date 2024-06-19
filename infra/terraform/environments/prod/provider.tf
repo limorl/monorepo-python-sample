@@ -1,5 +1,5 @@
 provider "aws" {
-  alias  = "primary"
+  alias  = "prod-primary"
   region = "us-west-1"
 
   default_tags {
@@ -11,7 +11,7 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias  = "secondary"
+  alias  = "prod-secondary"
   region = "us-west-2"
 
   default_tags {
