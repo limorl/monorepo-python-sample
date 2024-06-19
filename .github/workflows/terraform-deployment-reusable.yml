@@ -60,7 +60,7 @@ jobs:
         run: terraform plan -var-file=environments/${{ inputs.environment }}/terraform.tfvars -out=${{ inputs.environment }}.tfplan
 
       - name: Upload Terraform Plan
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.environment }}.tfplan
           path: ./infra/terraform/${{ inputs.environment }}.tfplan

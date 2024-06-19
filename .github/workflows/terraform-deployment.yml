@@ -19,7 +19,7 @@ jobs:
     if: github.event_name == 'pull_request'
     strategy:
       matrix:
-        environment: [dev]  # [dev, staging, prod] TODO (@limorl): Enable all three envs
+        environment: [dev, staging, prod]
     uses: ./.github/workflows/terraform-deployment-reusable.yml
     with:
       environment: ${{ matrix.environment }}
@@ -31,7 +31,7 @@ jobs:
     needs: [plan]
     strategy:
       matrix:
-        environment: [dev]  # [dev, staging] TODO (@limorl): Enable on dev and staging
+        environment: [dev, staging]
     uses: ./.github/workflows/terraform-deployment-reusable.yml
     with:
       environment: ${{ matrix.environment }}
