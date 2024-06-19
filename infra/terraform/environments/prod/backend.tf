@@ -8,7 +8,7 @@ terraform {
 
   backend "s3" {
     # TODO (@limorl): Add state locking using DynamoDB
-    bucket = "terraform-backend-561z6"
+    bucket = "terraform-backend-450y5"
     key    = "prod/terraform.tfstate"
     region = "us-east-1" # Primary Region (prod)
   }
