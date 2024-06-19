@@ -9,7 +9,7 @@ terraform {
   backend "s3" {
     bucket         = "terraform-backend-staging-450y5"
     key            = "staging/terraform.tfstate"
-    region         = "eu-west-1"            # Primary Region (staging)
+    region         = "eu-west-1" # Primary Region (staging)
     dynamodb_table = "terraform-state-lock"
   }
 }
