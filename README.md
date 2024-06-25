@@ -286,7 +286,8 @@ output.txt
 
 ### Building and Deploying Greeting lambda container
 
-Build the container (note that in samconfig.toml the --use-container is set to true, hence no need to explicitly specify it here:). Use the greeting package version as DockerTag when deployng to AWS.
+Build the container (note that in samconfig.toml the --use-container is set to true, hence no need to explicitly specify it here:).
+Use the greeting package version as DockerTag when deployng to AWS.
 
 ```shell
 cd services/greeting
@@ -304,7 +305,7 @@ Now, deploy to localstack using sam deploy (open a new bash window):
 Use `prod` or `dev` as config env. For `prod`, det `DockerTag` to be the recent greeting package version.
 
 ```shell
-sam deploy --config-env <prod|dev> --parameter-override 'DockerTage=<package-version>'
+sam deploy --config-env <prod|dev> --parameter-overrides 'DockerTage=<package-version>'
 ```
 
 You can list the functions and see that the newly deployed lambda appears in the list:

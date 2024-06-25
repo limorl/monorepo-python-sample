@@ -150,7 +150,7 @@ def app_config_deploy_service_configuration(
     config_name = get_config_name(platform, stage, region)
 
     monorepo_root = pathlib.Path(__file__).parent.parent.parent.parent.resolve()
-    config_dir = config_dir or os.path.join(monorepo_root, 'services', 'service_name', 'config')
+    config_dir = config_dir or os.path.join(monorepo_root, 'services', service_name, 'config')
     config_file = os.path.join(config_dir, f'{config_name}.json')
 
     if not os.path.exists(config_file):
