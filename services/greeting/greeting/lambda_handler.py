@@ -12,6 +12,7 @@ from greeting.lambda_logging import get_lambda_logger
 
 logger = get_lambda_logger()
 
+
 def handler(event: dict, context: dict) -> Any:
     app = create_app(configuration_provider, Greeting(configuration_provider))
     return handle_request(app, event, context)
@@ -33,5 +34,6 @@ def create_and_init_configuration_provider() -> IConfigurationProvider:
 
     config_provider.init_configuration()
     return config_provider
+
 
 configuration_provider = create_and_init_configuration_provider()
