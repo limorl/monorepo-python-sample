@@ -28,9 +28,9 @@ jobs:
         id: check
         run: |
           if git diff --name-only HEAD~1 HEAD | grep -q '^infra/terraform/'; then
-            echo "terraform_changed=true" >> $GITHUB_ENV
+            echo "terraform_changed=true" >> $GITHUB_OUTPUT
           else
-            echo "terraform_changed=false" >> $GITHUB_ENV
+            echo "terraform_changed=false" >> $GITHUB_OUTPUT
 
   terraform-apply:
     name: Terraform Apply - ${{ matrix.environment }}
