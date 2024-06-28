@@ -31,6 +31,10 @@ jobs:
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
           else
             echo "terraform_changed=false" >> $GITHUB_OUTPUT
+      
+      - name: Display terraform_changed output
+        run: |
+          echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
 
   terraform-apply:
     name: Terraform Apply - ${{ matrix.environment }}
