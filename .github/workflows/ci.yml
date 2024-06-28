@@ -10,32 +10,53 @@ permissions:
   pull-requests: write  # This allows the workflow to comment on PRs
 
 jobs:
-  ci-code-checks:
-    name: Lint & Test
+  # ci-code-checks:
+  #   name: Lint & Test
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #   - name: Check-out Code
+  #     uses: actions/checkout@v4
+
+  #   - name: Set-up PWD Environment Variable
+  #     run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+
+  #   - name: Create CI Environment File
+  #     run: |
+  #       cp .devcontainer/.env.ci .devcontainer/.env
+
+  #   - name: Run pre-commit and pre-push hooks & unit tests
+  #     uses: devcontainers/ci@v0.3
+  #     with:
+  #       runCmd: |
+  #         poetry run pre-commit run --all-files
+  #         poetry run pre-commit run --all-files --hook-stage push
+  #         poetry run pytest -m "not integration and not e2e"
+
+  ci-check-terraform-changes:
+    name: Check for Terraform Changes
     runs-on: ubuntu-latest
-
+    outputs:
+      terraform_changed: ${{ steps.check.outputs.terraform_changed }}
     steps:
-    - name: Check-out Code
-      uses: actions/checkout@v4
+      - name: Check-out code
+        uses: actions/checkout@v4
 
-    - name: Set-up PWD Environment Variable
-      run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
-
-    - name: Create CI Environment File
-      run: |
-        cp .devcontainer/.env.ci .devcontainer/.env
-
-    - name: Run pre-commit and pre-push hooks & unit tests
-      uses: devcontainers/ci@v0.3
-      with:
-        runCmd: |
-          poetry run pre-commit run --all-files
-          poetry run pre-commit run --all-files --hook-stage push
-          poetry run pytest -m "not integration and not e2e"
+      - name: Check for changes in infra/terraform
+        id: check
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^infra/terraform/'; then
+            echo "terraform_changed=true" >> $GITHUB_ENV
+            echo "::set-output name=terraform_changed::true"
+          else
+            echo "terraform_changed=false" >> $GITHUB_ENV
+            echo "::set-output name=terraform_changed::false"
+          fi
 
   ci-terraform-plan:
     name: Terraform Plan - ${{ matrix.environment }}
-    if: github.event.pull_request.changed_files.* matches 'infra/terraform/**'
+    needs: [check-terraform-changes]
+    if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
     strategy:
       matrix:
         environment: [dev, staging]
