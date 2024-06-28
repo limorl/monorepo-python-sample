@@ -33,7 +33,7 @@ jobs:
           poetry run pre-commit run --all-files --hook-stage push
           poetry run pytest -m "not integration and not e2e"
           chmod +x .github/scripts/ci-sam-buid.sh
-          .github/scripts/ci-sam-buid.sh
+          .github/scripts/ci-sam-build.sh
 
   check-terraform-changes:
     name: Check for Terraform Changes
