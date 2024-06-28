@@ -10,28 +10,30 @@ permissions:
   pull-requests: write  # This allows the workflow to comment on PRs
 
 jobs:
-  # code-checks:
-  #   name: Lint & Test
-  #   runs-on: ubuntu-latest
+  code-checks:
+    name: Lint & Test
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #   - name: Check-out Code
-  #     uses: actions/checkout@v4
+    steps:
+    - name: Check-out Code
+      uses: actions/checkout@v4
 
-  #   - name: Set-up PWD Environment Variable
-  #     run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+    - name: Set-up PWD Environment Variable
+      run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
 
-  #   - name: Create CI Environment File
-  #     run: |
-  #       cp .devcontainer/.env.ci .devcontainer/.env
+    - name: Create CI Environment File
+      run: |
+        cp .devcontainer/.env.ci .devcontainer/.env
 
-  #   - name: Run pre-commit and pre-push hooks & unit tests
-  #     uses: devcontainers/ci@v0.3
-  #     with:
-  #       runCmd: |
-  #         poetry run pre-commit run --all-files
-  #         poetry run pre-commit run --all-files --hook-stage push
-  #         poetry run pytest -m "not integration and not e2e"
+    - name: Run pre-commit and pre-push hooks & unit tests
+      uses: devcontainers/ci@v0.3
+      with:
+        runCmd: |
+          poetry run pre-commit run --all-files
+          poetry run pre-commit run --all-files --hook-stage push
+          poetry run pytest -m "not integration and not e2e"
+          chmod +x .github/scripts/ci-sam-buid.sh
+          .github/scripts/ci-sam-buid.sh
 
   check-terraform-changes:
     name: Check for Terraform Changes
@@ -57,9 +59,8 @@ jobs:
         run: |
           echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
 
-
   terraform-plan:
-    name: Reuse  # The job name of the reusable workflow will be appended automatically 
+    name: Run  # The job name of the reusable workflow will be appended automatically 
     needs: [check-terraform-changes]
     if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
     strategy:
