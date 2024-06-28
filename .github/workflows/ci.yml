@@ -10,7 +10,7 @@ permissions:
   pull-requests: write  # This allows the workflow to comment on PRs
 
 jobs:
-  # ci-code-checks:
+  # code-checks:
   #   name: Lint & Test
   #   runs-on: ubuntu-latest
 
@@ -33,7 +33,7 @@ jobs:
   #         poetry run pre-commit run --all-files --hook-stage push
   #         poetry run pytest -m "not integration and not e2e"
 
-  ci-check-terraform-changes:
+  check-terraform-changes:
     name: Check for Terraform Changes
     runs-on: ubuntu-latest
     outputs:
@@ -53,7 +53,7 @@ jobs:
             echo "::set-output name=terraform_changed::false"
           fi
 
-  ci-terraform-plan:
+  terraform-plan:
     name: Terraform Plan - ${{ matrix.environment }}
     needs: [check-terraform-changes]
     if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
