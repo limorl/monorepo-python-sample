@@ -68,7 +68,7 @@ jobs:
 
 
   terraform-plan:
-    # name: Terraform Plan - ${{ matrix.environment }}
+    name: Run  # The job name of the reusable workflow will be appended automatically 
     needs: [check-terraform-changes]
     if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
     strategy:
