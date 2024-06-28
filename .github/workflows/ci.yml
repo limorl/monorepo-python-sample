@@ -43,11 +43,21 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Ensure full checkout
+      
+      - name: Debug Git Diff
+        run: |
+          echo "Comparing base branch with current branch:"
+          echo "Base branch: ${{ github.event.pull_request.base.ref }}"
+          echo "Current branch: ${{ github.head_ref }}"
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.sha }}
+
 
       - name: Check for terraform changes
         id: check
         run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^infra/terraform/'; then
+          if git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.sha }} | grep -q '^infra/terraform/'; then
+
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
           else
             echo "terraform_changed=false" >> $GITHUB_OUTPUT
