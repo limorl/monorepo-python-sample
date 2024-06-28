@@ -19,8 +19,10 @@ jobs:
     outputs:
       terraform_changed: ${{ steps.check.outputs.terraform_changed }}
     steps:
-      - name: Checkout code
+      - name: Check-out code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full checkout
 
       - name: Check for changes in infra/terraform
         id: check

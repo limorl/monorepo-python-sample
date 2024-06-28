@@ -41,6 +41,8 @@ jobs:
     steps:
       - name: Check-out code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full checkout
 
       - name: Check for terraform changes
         id: check
