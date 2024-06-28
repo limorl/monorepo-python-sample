@@ -39,7 +39,7 @@ jobs:
     strategy:
       matrix:
         environment: [dev, staging]
-    uses: ./.github/workflows/terraform-deployment-reusable.yml
+    uses: ./.github/workflows/terraform-plan-reusable.yml
     with:
       environment: ${{ matrix.environment }}
 
