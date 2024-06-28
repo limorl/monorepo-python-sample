@@ -44,14 +44,13 @@ jobs:
         with:
           fetch-depth: 0  # Ensure full checkout
       
-      - name: Debug Git Diff
-        run: |
-          echo "Comparing base branch with current branch:"
-          echo "Base branch: ${{ github.event.pull_request.base.ref }}"
-          echo "Current branch: ${{ github.head_ref }}"
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.sha }}
-
+      # - name: Debug Git Diff
+      #   run: |
+      #     echo "Comparing base branch with current branch:"
+      #     echo "Base branch: ${{ github.event.pull_request.base.ref }}"
+      #     echo "Current branch: ${{ github.head_ref }}"
+      #     git fetch origin ${{ github.event.pull_request.base.ref }}
+      #     git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.sha }}
 
       - name: Check for terraform changes
         id: check
@@ -69,7 +68,7 @@ jobs:
 
 
   terraform-plan:
-    name: Terraform Plan - ${{ matrix.environment }}
+    # name: Terraform Plan - ${{ matrix.environment }}
     needs: [check-terraform-changes]
     if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
     strategy:
