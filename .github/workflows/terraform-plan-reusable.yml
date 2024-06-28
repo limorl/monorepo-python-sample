@@ -1,4 +1,4 @@
-name: Terraform Deployment - Reusable Across Environments
+name: Terraform Plan - Reusable Across Environments
 
 on:
   workflow_call:
@@ -6,10 +6,6 @@ on:
       environment:
         required: true
         type: string
-      plan_only:
-        required: false
-        type: boolean
-        default: false
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -19,7 +15,6 @@ jobs:
   plan:
     name: Terraform Plan - ${{ inputs.environment }}
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
     environment: ${{ inputs.environment }}
     steps:
       - name: Checkout Git Repository
@@ -65,37 +60,10 @@ jobs:
           name: ${{ inputs.environment }}.tfplan
           path: ./infra/terraform/${{ inputs.environment }}.tfplan
 
-  apply:
-    name: Terraform Apply - ${{ inputs.environment }}
-    runs-on: ubuntu-latest
-    if: ${{ inputs.plan_only != true }}
-    environment: ${{ inputs.environment }}
-    steps:
-      - name: Checkout Git Repository
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
-          role-session-name: GithubWorkflow-TerraformDeployment-${{ inputs.environment }}
-          aws-region: ${{ vars.AWS_PRIMARY_REGION }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.5
-
-      - name: Download Terraform Plan
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ inputs.environment }}.tfplan
-          path: ./infra/terraform
-
-      - name: Terraform Init
-        working-directory: ./infra/terraform
-        run: terraform init
-
-      - name: Terraform Apply
-        working-directory: ./infra/terraform
-        run: terraform apply -auto-approve ${{ inputs.environment }}.tfplan
+      - name: Notify success
+        if: success() 
+        run: |
+          curl -X POST -H "Accept: application/vnd.github.v3+json" \
+          -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+          https://api.github.com/repos/${{ github.repository }}/dispatches \
+          -d '{"event_type":"terraform-plan-${{ inputs.environment }}-success", "client_payload": {"environment": "${{ github.event.inputs.environment }}"} }'

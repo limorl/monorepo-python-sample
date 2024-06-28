@@ -2,14 +2,16 @@ name: CI
 
 on:
   pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - 'infra/**'
+    branches: [main]
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+  pull-requests: write  # This allows the workflow to comment on PRs
 
 jobs:
-  ci-checks:
-    name: Run CI Checks
+  ci-code-checks:
+    name: Lint & Test
     runs-on: ubuntu-latest
 
     steps:
@@ -30,3 +32,16 @@ jobs:
           poetry run pre-commit run --all-files
           poetry run pre-commit run --all-files --hook-stage push
           poetry run pytest -m "not integration and not e2e"
+
+  ci-terraform-plan:
+    name: Terraform Plan - ${{ matrix.environment }}
+    if: github.event.pull_request.changed_files.* matches 'infra/terraform/**'
+    strategy:
+      matrix:
+        environment: [dev, staging]
+    uses: ./.github/workflows/terraform-deployment-reusable.yml
+    with:
+      environment: ${{ matrix.environment }}
+
+# TODO: Add Build Services
+
