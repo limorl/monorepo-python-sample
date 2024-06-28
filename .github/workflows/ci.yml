@@ -47,10 +47,8 @@ jobs:
         run: |
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^infra/terraform/'; then
             echo "terraform_changed=true" >> $GITHUB_ENV
-            echo "terraform_changed=true"
           else
             echo "terraform_changed=false" >> $GITHUB_ENV
-            echo "terraform_changed=false"
           fi
 
   terraform-plan:
