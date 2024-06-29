@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   code-checks:
-    name: Lint, Test & Build
+    name: CI Code Checks
     runs-on: ubuntu-latest
 
     steps:
