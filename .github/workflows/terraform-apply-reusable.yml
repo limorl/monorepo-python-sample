@@ -1,0 +1,47 @@
+name: Terraform Apply - Reusable Across Environments
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
+          role-session-name: GithubWorkflow-TerraformDeployment-${{ inputs.environment }}
+          aws-region: ${{ vars.AWS_PRIMARY_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.environment }}.tfplan
+          path: ./infra/terraform
+
+      - name: Terraform Init
+        working-directory: ./infra/terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: ./infra/terraform
+        run: terraform apply -auto-approve ${{ inputs.environment }}.tfplan

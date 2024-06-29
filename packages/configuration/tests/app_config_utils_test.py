@@ -8,6 +8,9 @@ def test_get_app_name():
 
 
 def test_get_config_name():
+    assert get_config_name(Platform.LOCAL, Stage.DEV, 'us-east-1') == 'local.dev'
+    assert get_config_name(Platform.AWS, Stage.DEV, 'us-west-2') == 'aws.dev.us-west-2'
+    assert get_config_name(Platform.AWS, Stage.STAGING, 'us-west-1') == 'aws.staging.us-west-1'
     assert get_config_name(Platform.AWS, Stage.PROD, 'us-east-1') == 'aws.prod.us-east-1'
 
 
@@ -67,7 +70,7 @@ def test_app_config_get_environment_id_env_exists_env_does_not_exist_create(mock
     assert env_id == mock_create_environment_reponse['Id']
 
 
-def test_pp_config_get_deployment_strategy_id_stratey_exists(mock_appconfig, mock_list_deployment_strategies_response):
+def test_app_config_get_deployment_strategy_id_exists(mock_appconfig, mock_list_deployment_strategies_response):
     mock_appconfig.list_deployment_strategies.return_value = mock_list_deployment_strategies_response
 
     strategy_name = mock_list_deployment_strategies_response['Items'][0]['Name']

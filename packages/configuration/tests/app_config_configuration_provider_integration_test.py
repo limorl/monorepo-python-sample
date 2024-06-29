@@ -48,7 +48,7 @@ def service_env():
     os.environ['PLATFORM'] = 'AWS'
     os.environ['STAGE'] = 'dev'
     os.environ['REGION'] = 'us-west-2'
-    os.environ['SERVICE_NAME'] = 'test'
+    os.environ['SERVICE_NAME'] = 'test-appconfig'
 
     config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
     os.environ['LOCAL_CONFIGURATION_FOLDER'] = config_folder
@@ -66,7 +66,7 @@ def app_configuration_provider(service_env):
 
 """ This test assumes the following resources exists in Dev/Test env:
 
-    Test.Linear.AllatOnce configuration deployment strategy (all at once with duration 0 and bake time 0)
+    dev-deployment-strategy configuration deployment strategy (all at once with duration 0 and bake time 0)
 
     Two secrets are stored on Secretes Manager:
     - Plain text secret: 'test/app/fake-secret-plain' = fake-secret-val
@@ -75,7 +75,7 @@ def app_configuration_provider(service_env):
                 'Password': 'fake-password'
             }
 
-    TODO (@limorl): Test can be imprived to deploy a newly created configuration and then deleted after test test
+    TODO (@limorl): Test can be improved to deploy a newly created configuration and then deleted after test test
 """
 
 

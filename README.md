@@ -21,6 +21,7 @@ The repo is great for ramping up on the following concepts:
 The monorepo will be extendedt to support:
 * When running in AWS mode,  Start Lambda with AppConfigConfigurationProvider when runs on AWS + Define IAM role to access AppConfig and SecretsManager
 * Logging using [aws-powertools] (https://github.com/aws-powertools/powertools-lambda-python)
+* Add Config Schema validators under each `/config` folder and deploy it in terraform
 * Use Lambda Extensions to better handle calls to AppConfig and SSM
 * Semantic release using [changeset](https://github.com/changesets/changesets) - blogpost [here](https://lirantal.com/blog/introducing-changesets-simplify-project-versioning-with-semantic-releases/)
 * Terraform to deploy infra on localstack and on AWS

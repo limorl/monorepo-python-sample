@@ -1,4 +1,5 @@
 repos:
+    # Detect Secrets
     - repo: https://github.com/Yelp/detect-secrets
       rev: v1.4.0
       hooks:
@@ -6,6 +7,7 @@ repos:
           args: ["--exclude-lines", "SECRET_PREFIX = 'secret:'|.*secretsmanager:GetSecretValue.*", "--exclude-secrets", ".*fake-secret.*|.*fake-password.*|.*FAKE_SECRET.*"]
           stages: [commit]
     
+    # Python Linting using Ruff & Flake8
     - repo: https://github.com/astral-sh/ruff-pre-commit
       rev: v0.4.7
       hooks:
@@ -22,7 +24,40 @@ repos:
       hooks:
         - id: flake8
           stages: [push]
-    
+
+    # Terrafmorm
+    - repo: https://github.com/terraform-docs/terraform-docs
+      rev: v0.18.0
+      hooks:
+        - id: terraform-docs-go
+          # args: ["markdown", "table", "--recursive", "true", "--recursive-include-main", "false", "output-file", "README.md", "./infra/terraform/environments/prod"]
+          args: ["markdown", "table", "--recursive", "--recursive-include-main=false", "--output-file", "README.md", "./infra/terraform"]
+          stages: [commit]
+          
+    - repo: https://github.com/antonbabenko/pre-commit-terraform
+      rev: v1.91.0
+      hooks:
+        - id: terraform_fmt
+          stages: [push]
+        #- id: terraform_tflint  TODO (@limorl): Install TFLint in docker and enable this hook
+        #  stages: [push]
+        - id: terraform_validate
+          args:
+            - --tf-init-args=-backend=false
+           # - --chdir=infra/terraform
+          stages: [push]
+        #- id: terraform_docs     TODO (@limorl): Install TFLint in docker and enable this hook omstead of terraform-docs-go
+        #  stages: [push]
+
+    # - repo: local
+    #   hooks:
+    #     - id: terraform-validate-all
+    #       name: terraform-validate-all
+    #       entry: bash .github/scripts/terraform-validate-all.sh
+    #       language: system
+    #       stages: [push]
+
+    # Spell Checking
     - repo: https://github.com/codespell-project/codespell
       rev: v2.2.4
       hooks:

@@ -15,9 +15,9 @@ from .configuration import ConfigurationSection
 logger = logging.getLogger()
 
 # This assumes these service deployment strategy was created using Terraform. For now it was created manually.
-DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_DEV = 'Test.Linear.AllatOnce'
-DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_STAGING = 'Test.Linear.AllatOnce'
-DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_PROD = 'ServiceDefault.Linear'
+DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_DEV = 'dev-deployment-strategy'
+DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_STAGING = 'staging-deployment-strategy'
+DEFAULT_CONFIGURATION_DEPLOYMENT_STRATEGY_PROD = 'prod-deployment-strategy'
 
 
 class DeploymentError(Exception):
@@ -38,6 +38,8 @@ def get_app_name(service_name: str) -> str:
 
 
 def get_config_name(platform: Platform, stage: Stage, region: str) -> str:
+    if platform and platform == Platform.LOCAL:
+        return f'{platform.value.lower()}.{stage.value}'
     return f'{platform.value.lower()}.{stage.value}.{region}'
 
 

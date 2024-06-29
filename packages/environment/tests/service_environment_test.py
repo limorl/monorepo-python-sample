@@ -40,7 +40,7 @@ def test_init_environment_variables_prod_env(reset_env, default_local_config_fol
 
     assert env.platform == Platform.AWS
     assert env.region == 'us-east-1'
-    assert env.primary_region == 'us-east-1'
+    assert env.primary_region == 'us-west-1'
     assert env.service_name == 'hello'
     assert env.stage == Stage.PROD
     assert env.local_configuration_folder == default_local_config_folder
@@ -75,7 +75,7 @@ def test_init_environment_variables_prod_dotenv_path(reset_env, test_data_dir, d
 
     assert env.platform == Platform.AWS
     assert env.region == 'us-east-1'
-    assert env.primary_region == 'us-east-1'
+    assert env.primary_region == 'us-west-1'
     assert env.service_name == 'hello'
     assert env.stage == Stage.PROD
     assert env.local_configuration_folder == default_local_config_folder
