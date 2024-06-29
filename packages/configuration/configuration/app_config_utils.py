@@ -34,10 +34,12 @@ class DeploymentState(Enum):
 
 
 def get_app_name(service_name: str) -> str:
-    return f'service-{service_name}'
+    return f'{service_name}-service'
 
 
 def get_config_name(platform: Platform, stage: Stage, region: str) -> str:
+    if platform and platform == Platform.LOCAL:
+        return f'{platform.value.lower()}.{stage.value}'
     return f'{platform.value.lower()}.{stage.value}.{region}'
 
 
