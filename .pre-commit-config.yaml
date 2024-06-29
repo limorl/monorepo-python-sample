@@ -53,10 +53,18 @@ repos:
         - id: terraform_validate
           args:
             - --tf-init-args=-backend=false
-            - --chdir=-infra/terraform
+           # - --chdir=infra/terraform
           stages: [push]
         #- id: terraform_docs     TODO (@limorl): Install TFLint in docker and enable this hook omstead of terraform-docs-go
         #  stages: [push]
+
+    - repo: local
+      hooks:
+        - id: terraform-validate-all
+          name: terraform-validate-all
+          entry: bash .github/scripts/terraform-validate-all.sh
+          language: system
+          stages: [push]
 
     # Spell Checking
     - repo: https://github.com/codespell-project/codespell
