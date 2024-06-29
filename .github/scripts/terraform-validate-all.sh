@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo "Cleaning up existing Terraform initialization..."
-find infra/terraform -type d -name ".terraform" -exec rm -rf {} +
-find infra/terraform -type f -name ".terraform.lock.hcl" -exec rm -f {} +
+#echo "Cleaning up existing Terraform initialization..."
+#find infra/terraform -type d -name ".terraform" -exec rm -rf {} +
+#find infra/terraform -type f -name ".terraform.lock.hcl" -exec rm -f {} +
 
 echo "Initializing and validating main Terraform configuration..."
 terraform -chdir=infra/terraform init -backend=false -upgrade
