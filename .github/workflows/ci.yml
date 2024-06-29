@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   code-checks:
-    name: Lint & Test
+    name: Lint, Test & Build
     runs-on: ubuntu-latest
 
     steps:
@@ -27,10 +27,13 @@ jobs:
 
     - name: Run pre-commit and pre-push hooks & unit tests
       uses: devcontainers/ci@v0.3
-      with:
+      with:  # Run all code related hooks and skip the terraform ones, they are handled by the terraform-plan action
         runCmd: |
           poetry run pre-commit run --all-files
-          poetry run pre-commit run --all-files --hook-stage push
+          poetry run pre-commit run ruff --all-files --hook-stage push
+          poetry run pre-commit run flake8 --all-files --hook-stage push
+          poetry run pre-commit run codespell --all-files --hook-stage push
+          poetry run pre-commit run unit-tests --all-files --hook-stage push
           poetry run pytest -m "not integration and not e2e"
           chmod +x .github/scripts/sam-build-updated-services.sh
           .github/scripts/sam-build-updated-services.sh

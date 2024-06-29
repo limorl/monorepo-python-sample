@@ -26,15 +26,6 @@ repos:
           stages: [push]
 
     # Terrafmorm
-    # - repo: local
-    #   hooks:
-    #     - id: terraform-init-no-backend  # Needed for terraform validate
-    #       name: terraform-init-without-backend
-    #       # entry: bash -c ' && terraform init -backend=false && cd ../staging && terraform init -backend=false && cd ../prod && terraform init -backend=false'
-    #       entry: bash -c 'terraform -chdir=environments/dev validate && terraform -chdir=infra/terraform/environments/staging validate && terraform -chdir=infra/terraform/environments/prod validate '
-    #       language: system
-    #       stages: [push]
-
     - repo: https://github.com/terraform-docs/terraform-docs
       rev: v0.18.0
       hooks:
