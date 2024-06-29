@@ -4,7 +4,7 @@
 
 # Ensure an environment argument is provided
 if [ -z "$1" ]; then
-  echo "No environment provided. Usage: ./ci-sam-build.sh <environment>"
+  echo "No environment provided. Usage: ./sam-build-updated-services.sh <environment>"
   exit 1
 fi
 
