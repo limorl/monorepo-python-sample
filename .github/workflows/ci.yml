@@ -10,6 +10,24 @@ permissions:
   pull-requests: write  # This allows the workflow to comment on PRs
 
 jobs:
+  pr-title-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+
+      - name: Install commitlint
+        run: npm install @commitlint/config-conventional @commitlint/cli
+
+      - name: Run commitlint on PR title
+        run: echo "${{ github.event.pull_request.title }}" | npx commitlint --verbose --config commitlint.config.js
+
   code-checks:
     name: CI Code Checks
     runs-on: ubuntu-latest
