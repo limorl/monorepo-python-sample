@@ -35,7 +35,7 @@ jobs:
         with:
           route: GET /repos/${{ github.repository }}/pulls/${{ github.event.number }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run commitlint on PR title
         run: echo "${{ steps.fetch-pr.outputs.data.title }}" | npx commitlint --verbose --config ./.commitlintrc.js
