@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   pr-title-check:
+    name: PR Title Check
     runs-on: ubuntu-latest
 
     steps:
