@@ -1,8 +1,13 @@
 ## Pull Request Title Format
 
-Please ensure your pull request title adheres to the following format to comply with semantic versioning conventions:
+Pull request title and description should be: should be:
 <type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
 
+The body or footer can begin with `BREAKING CHANGE:` followed by a short description to create a `major` release.
 
 Where `<type>` can be one of the following:
 - `feat`: A new feature

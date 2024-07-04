@@ -21,13 +21,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 14.x
+          node-version: 16
 
       - name: Install commitlint
         run: npm install @commitlint/config-conventional @commitlint/cli
 
       - name: Run commitlint on PR title
-        run: echo "${{ github.event.pull_request.title }}" | npx commitlint --verbose --config commitlint.config.js
+        run: echo "${{ github.event.pull_request.title }}" | npx commitlint --verbose --config ./.commitlintrc.js
 
   code-checks:
     name: CI Code Checks
