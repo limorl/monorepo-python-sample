@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  hello-world
+
+  Sample SAM Template for hello-world
+
+Globals:
+  Function:
+    Timeout: 5
+
+Parameters:
+  Stage:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Deployment stage of the application
+
+  Platform:
+    Type: String
+    Default: AWS
+    AllowedValues:
+      - AWS
+      - local
+    Description: Platform where the Lambda function is deployed
+
+Resources:
+  HelloWorldLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: "hello-world"
+      PackageType: Image
+      ImageUri: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/greeting:${DockerTag}'
+      CodeUri: .
+      Handler: hello_world.app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          PLATFORM: !Ref Platform
+          STAGE: !Ref Stage
+          SERVICE_NAME: hello-world
+    Metadata:
+      Dockerfile: ./services/greeting/Dockerfile
+      DockerContext: ../../       # Set docker context to monorepo root to include local packages
+      DockerTag: !Ref DockerTag   # Set DockerTage to package version when deploying to AWS  
+
+Outputs:
+  HelloWorldFunction:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt Function.Arn
+  HelloWorldFunctionIamRole:
+    Description: "Implicit IAM Role created for function"
+    Value: !GetAtt FunctionRole.Arn
