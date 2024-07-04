@@ -26,19 +26,8 @@ jobs:
       - name: Install commitlint
         run: npm install @commitlint/config-conventional @commitlint/cli
 
-      #- name: Run commitlint on PR title
-      #  run: echo "${{ github.event.pull_request.title }}" | npx commitlint --verbose --config ./.commitlintrc.js
-      
-      - name: Fetch PR details
-        id: fetch-pr
-        uses: octokit/request-action@v2.x
-        with:
-          route: GET /repos/${{ github.repository }}/pulls/${{ github.event.number }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Run commitlint on PR title
-        run: echo "${{ steps.fetch-pr.outputs.data.title }}" | npx commitlint --verbose --config ./.commitlintrc.js
+        run: echo "${{ github.event.pull_request.title }}" | npx commitlint --verbose --config ./.commitlintrc.js
 
   code-checks:
     name: CI Code Checks
