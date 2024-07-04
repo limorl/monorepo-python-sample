@@ -20,7 +20,7 @@ Where `<type>` can be one of the following:
 Examples:
 - breaking(greeting-service): updated greeting API
 - feat(login): add new login button
-- docs(authenitcation): add authentication documentation
+- docs(authentication): add authentication documentation
 - feat(authentication): add jwt support
 - fix(database): resolve connection leak
 - style(greeting-service): correct typo messages
