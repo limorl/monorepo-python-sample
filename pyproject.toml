@@ -54,6 +54,23 @@ commit_parser = "angular"
 commit_subject = "{{type}}({{scope}}): {{subject}}"
 commit_message = "{{type}}({{scope}}): {{subject}}\n\n{{body}}"
 changelog_file = "CHANGELOG.md"
+patch_without_tag = "true"
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = [
+    "build",
+    "chore",
+    "ci",
+    "docs",
+    "feat",
+    "fix",
+    "perf",
+    "style",
+    "refactor",
+    "test",
+]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf",]
 
 [tool.semantic_release.release_rules]
 breaking = "major"
@@ -62,3 +79,4 @@ fix = "patch"
 docs = "patch"
 style = "patch"
 chore = "patch"
+test = "path"
