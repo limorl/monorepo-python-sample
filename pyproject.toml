@@ -24,7 +24,9 @@ pyright = "1.1.296"
 pre-commit = "3.6.2"
 debugpy = "1.8.1"
 localstack = "3.3.0"
+toml = "^0.10.2"
 scripts = { path = "packages/scripts", develop = false }
+
 
 [tool.poetry.plugins."poetry.application.plugin"]
 export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
