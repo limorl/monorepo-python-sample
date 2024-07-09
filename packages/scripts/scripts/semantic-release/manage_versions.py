@@ -1,7 +1,7 @@
 """
 Basic implementation of version management.
 Based on the commit message (conventional), the version of all updated packages should be bumped.
-At this point, no distinction between actual chage type per package.
+At this point, no distinction between actual change type per package.
 
 The version bump is managed by semantic_release as follows:
 PATCH version bump: when the type is fix, refactor, style, or test
@@ -24,7 +24,7 @@ def get_changed_packages() -> list[str]:
 
     changed_packages = set()
     for file in changed_files:
-        # changed files may include files which have been deleted in the commited change
+        # changed files may include files which have been deleted in the committed change
         if os.path.exists(file) and file.startswith(('packages/', 'services/')):
             package = '/'.join(file.split('/')[:2])
             changed_packages.add(package)

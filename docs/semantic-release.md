@@ -6,7 +6,7 @@ A simple versioning approach is taken to manage package versioning using [python
 
 ## Package Versioning
 * Each package has it's own version in this monorepo
-* Package version is incremented following the [Semantic Versioning Convention](https://semver.org/) - This requires conventional commit messages as described bellow
+* Package version is incremented following the [Semantic Versioning Convention](https://semver.org/) - This requires conventional commit messages as described below
 * The configuration of `python-semantic-release` this will be centralized in the root's `pyproject.toml` file.
 * The monorepo root is not considered a package, but its version is managed and incremented whenever one of the packages is incremented
 * Since the branch policy uses squash and merge - all commit messages are squashed into a single one which is assumed to be of the [conventional commit message format](https://python-semantic-release.readthedocs.io/en/latest/commit-parsing.html) (more details below)
@@ -25,7 +25,7 @@ In each pull request, all updated packages, including the monorepo root, will be
 Even if one package requires a PATCH version bump and another package requires a MINOR package bump, they will both be incremented in a MINOR patch**
 
 ### Commit Messages Format
-To allow automatic versioning, we'll need to follw a [conventional commit message format](https://python-semantic-release.readthedocs.io/en/latest/commit-parsing.html):
+To allow automatic versioning, we'll need to follow a [conventional commit message format](https://python-semantic-release.readthedocs.io/en/latest/commit-parsing.html):
 ```
 <type>(<scope>): <subject>
 <BLANK LINE>
@@ -34,7 +34,7 @@ To allow automatic versioning, we'll need to follw a [conventional commit messag
 <footer(optional)>
 ```
 
->> Note: When commiting to your local feature brach, running `git commit` will open an editor with the above format.
+>> Note: When committing to your local feature branch, running `git commit` will open an editor with the above format.
 You can edit it and close it to complete the commit.
 >> Note: Once your feature branch is ready to be `squashed and merged` into `main`, you can use all messages or create a new one in the above format
 >> Note: When packages are not released to a registry, your local development environment is always using the latest code regardless of the actual version. The version is used to indicate what is deployed to production and whether it requires an update
