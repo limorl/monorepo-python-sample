@@ -33,7 +33,7 @@ def get_changed_packages() -> list[str]:
 
 
 def determine_bump_type() -> str:
-    # def determine_bump_type(package: str) -> str: 
+    # def determine_bump_type(package: str) -> str:
     # os.chdir(package)
     current_version = Version(current=True)
     next_version = Version(current=True, next=True)
