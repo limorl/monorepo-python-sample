@@ -6,7 +6,7 @@ At this point, no distinction between actual change type per package.
 The version bump is managed by semantic_release as follows:
 PATCH version bump: when the type is fix, refactor, style, or test
 MINOR version bump: when the type is feat
-MAJOR version bump: when there's a BREAKING CHANGE: footer, or the type is BREAKING CHANGE (regardless 
+MAJOR version bump: when there's a BREAKING CHANGE: footer, or the type is BREAKING CHANGE (regardless
 of the commit type)
 """
 
@@ -33,7 +33,7 @@ def get_changed_packages() -> list[str]:
 
 
 def determine_bump_type() -> str:
-# def determine_bump_type(package: str) -> str:
+    # def determine_bump_type(package: str) -> str: 
     # os.chdir(package)
     current_version = Version(current=True)
     next_version = Version(current=True, next=True)
