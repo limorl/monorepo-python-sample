@@ -6,7 +6,8 @@ At this point, no distinction between actual change type per package.
 The version bump is managed by semantic_release as follows:
 PATCH version bump: when the type is fix, refactor, style, or test
 MINOR version bump: when the type is feat
-MAJOR version bump: when there's a BREAKING CHANGE: footer, or the type is BREAKING CHANGE (regardless of the commit type)
+MAJOR version bump: when there's a BREAKING CHANGE: footer, or the type is BREAKING CHANGE (regardless 
+of the commit type)
 """
 
 import os
@@ -31,11 +32,12 @@ def get_changed_packages() -> list[str]:
     return list(changed_packages)
 
 
-def determine_bump_type(package: str) -> str:
-    #os.chdir(package)
+def determine_bump_type() -> str:
+# def determine_bump_type(package: str) -> str:
+    # os.chdir(package)
     current_version = Version(current=True)
     next_version = Version(current=True, next=True)
-    #os.chdir('../..')
+    # os.chdir('../..')
 
     if next_version.major > current_version.major:
         return 'major'
@@ -55,7 +57,9 @@ def bump_package_version(package: str) -> None:
     changelog_file = config['tool']['semantic_release']['changelog_file']
 
     bump_type = determine_bump_type(package)
-    semantic_release_cli(['version', f'--{bump_type}', f'--version-variable={version_variable}', f'--changelog-file={changelog_file}'])
+    semantic_release_cli(
+        ['version', f'--{bump_type}', f'--version-variable={version_variable}', f'--changelog-file={changelog_file}']
+    )
 
     os.chdir('../..')
 
