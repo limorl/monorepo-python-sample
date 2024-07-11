@@ -24,7 +24,9 @@ pyright = "1.1.296"
 pre-commit = "3.6.2"
 debugpy = "1.8.1"
 localstack = "3.3.0"
+toml = "^0.10.2"
 scripts = { path = "packages/scripts", develop = false }
+
 
 [tool.poetry.plugins."poetry.application.plugin"]
 export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
@@ -54,6 +56,23 @@ commit_parser = "angular"
 commit_subject = "{{type}}({{scope}}): {{subject}}"
 commit_message = "{{type}}({{scope}}): {{subject}}\n\n{{body}}"
 changelog_file = "CHANGELOG.md"
+patch_without_tag = "true"
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = [
+    "build",
+    "chore",
+    "ci",
+    "docs",
+    "feat",
+    "fix",
+    "perf",
+    "style",
+    "refactor",
+    "test",
+]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf",]
 
 [tool.semantic_release.release_rules]
 breaking = "major"
@@ -62,3 +81,4 @@ fix = "patch"
 docs = "patch"
 style = "patch"
 chore = "patch"
+test = "path"

@@ -5,6 +5,10 @@ description = "Configuration Provider based on configuration file"
 authors = ["Limor Lahiani"]
 readme = "README.md"
 
+[tool.semantic_release]
+version_variable = "pyproject.toml:tool.poetry.version"
+changelog_file = "CHANGELOG.md"
+
 [tool.poetry.dependencies]
 python = "^3.12"
 python-dotenv="1.0.1"

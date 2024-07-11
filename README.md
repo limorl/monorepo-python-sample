@@ -74,52 +74,12 @@ For example:
 my_local_package = { path = "../packages/my_local_package", develop = false } 
 ```
 
-#### Package versioning
-We will use [python-semantic-release](https://python-semantic-release.readthedocs.io/en/latest/) to automatically manage package versioning per package.
+#### Package Versioning
+For now, this repo uses local dev packages without publising them to a package registry.
+Also, this sample repo uses [python-semantic-release](https://python-semantic-release.readthedocs.io/en/latest/) to manage package versioning.
 The configuration of `python-semantic-release` this will be centralized in the root's `pyproject.toml` file.
 
-There are several approaches to bumping versions:
-1. **Manual Bumping** - Manually bumping version in the `pyproject.toml` file
-2. **Selective Release Rules** - Use python-semantic-release configuration options for selective release rules.
-3. **Custom Release Script** - For more control, a custom release script using the semantic_release library.
-
-**We will start with option 2**
-This approach will help starting with a basic `release_rules` configuration.
-As the project grows, we will refine the rules to handle more complex scenarios, and consider using a custom script for intricate versioning logic if needed.
-
-Following the [Semantic Versioning Convention](https://semver.org/) this is how version is incremented:
-Given a version number MAJOR.MINOR.PATCH, increment the:
-* MAJOR version when you make incompatible API changes
-* MINOR version when you add functionality in a backward compatible manner
-* PATCH version when you make backward compatible bug fixes
-
-#### Commit Messages Format (to be enforced through Code Review):
-To allow automatic versioning, we'll need to follow commit message format.
-
-1. **Commit Message Format:** `<type>(<scope>): <short summary>`.
-  * **type**: This denotes the kind of change the commit introduces. Common types include **feat** (new feature), **fix** (bug fix), **docs** (documentation changes), **style** (style changes that do not affect the meaning of the code), **refactor** (code change that neither fixes a bug nor adds a feature), **test** (adding missing tests or correcting existing ones), **chore** (updates to the build process, auxiliary tools, and libraries such as documentation generation).
-  * **scope**  (optional): A scope may be provided to indicate a more specific part of the codebase the change affects.
-  * **short summary**: A concise description of the changes.
-
-  * Examples:
-    feat(authentication): add jwt support
-    fix(database): resolve connection leak
-
-2. **Automated Version Management**
- python-semantic-release will analyze these commit messages from the main branch (or whichever branch is configured) to automatically determine the type of version bump required for the next release:
-  Commits with **feat** will trigger a minor version bump.
-  Commits with **fix** will trigger a patch version bump.
-  Commits that include a **BREAKING CHANGE** footer will trigger a major version bump, regardless of the commit type.
-  Custom rules in the [tool.semantic_release.release_rules] section can further refine how other types of commits (like docs, style, or chore) influence the version bump.
-
-3. **Release Process**
-Upon merging changes into the release branch (e.g., main), the CI pipeline should include a step that runs python-semantic-release. This tool will:
-- Analyze commits since the last release.
-- Determine the next version number based on the commit messages.
-- Update the version in pyproject.toml and any other configured version_variable files.
-- Generate or update the CHANGELOG.md.
-- Tag the release in the VCS (Version Control System, e.g., Git).
-- Optionally, upload the package to PyPI or another package repository if configured.
+more details on [semantic release](./docs/semantic-release.md).
 
 ### Local Dev environment
 We're using VS Code DevContainer to run our dockerized development environment.

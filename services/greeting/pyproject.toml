@@ -5,6 +5,10 @@ description = "Greeting Service"
 authors = ["Limor Lahiani"]
 readme = "README.md"
 
+[tool.semantic_release]
+version_variable = "pyproject.toml:tool.poetry.version"
+changelog_file = "CHANGELOG.md"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
