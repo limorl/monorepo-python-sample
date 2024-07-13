@@ -31,6 +31,7 @@ jobs:
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
           else
             echo "terraform_changed=false" >> $GITHUB_OUTPUT
+          fi
       
       - name: Display terraform_changed output
         run: |
