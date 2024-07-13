@@ -3,8 +3,6 @@ name: CI
 on:
   pull_request:
     branches: [main]
-    paths-ignore:
-      - '.github/**'
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -55,7 +53,6 @@ jobs:
       - name: Check for terraform changes
         id: check
         run: |
-          echo "GITHUB_OUTPUT $GITHUB_OUTPUT"
           if git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.sha }} | grep -q '^infra/terraform/'; then
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
           else
