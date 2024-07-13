@@ -1,7 +1,7 @@
 # Infrastructure Scripts
 
 ## Terraform Setup
-[terraform-setup.sh](terraform-setup.sh) scripts creates the resources nessary to manage terraform backend on AWS S3 using Github Actions:
+[terraform-setup.sh](terraform-setup.sh) scripts creates the resources necessary to manage terraform backend on AWS S3 using Github Actions:
 1. S3 bucket - to store bacend state
 2. DynamoDB table - to store lock keys
 3. Open ID Provider for Github Actions - to allow secured access from Github Actions
