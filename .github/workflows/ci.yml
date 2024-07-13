@@ -62,16 +62,24 @@ jobs:
       - name: Display terraform_changed output
         run: |
           echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
-
+  
   terraform-plan:
-    name: Run  # The job name of the reusable workflow will be appended automatically 
+    name: Terraform Plan
     needs: [check-terraform-changes]
-    if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         environment: [dev, staging]
-    uses: ./.github/workflows/terraform-plan-reusable.yml
-    with:
-      environment: ${{ matrix.environment }}
+    steps:
+      - name: Run Terraform Plan
+        if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
+        uses: ./.github/workflows/terraform-plan-reusable.yml
+        with:
+          environment: ${{ matrix.environment }}
+      
+      - name: Skip Terraform Plan
+        if: needs.check-terraform-changes.outputs.terraform_changed != 'true'
+        run: echo "No Terraform changes detected. Skipping Terraform plan."
+
 
 # TODO: Add Build Services
