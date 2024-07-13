@@ -23,8 +23,8 @@ resource "aws_appconfig_deployment_strategy" "deployment_strategy_primary" {
 }
 
 module "test_resources_primary" {
-  source    = "../../modules/tests"
-  stage     =  var.stage
+  source = "../../modules/tests"
+  stage  = var.stage
 
   providers = {
     aws = aws.staging-primary
