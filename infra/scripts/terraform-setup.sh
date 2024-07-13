@@ -31,11 +31,18 @@ create_s3_bucket() {
         echo "Bucket $TERRAFORM_BACKEND_BUCKET_NAME already exists. Skipping creation."
     else
         echo "Creating bucket $TERRAFORM_BACKEND_BUCKET_NAME"
+        if [ "$AWS_PRIMARY_REGION" = "us-east-1" ]; then
         aws s3api create-bucket \
             --bucket "$TERRAFORM_BACKEND_BUCKET_NAME" \
             --region "$AWS_PRIMARY_REGION" \
-            --create-bucket-configuration LocationConstraint="$AWS_PRIMARY_REGION" \
             --profile "$ENVIRONMENT" || { echo "Failed to create S3 bucket"; exit 1; }
+        else
+            aws s3api create-bucket \
+                --bucket "$TERRAFORM_BACKEND_BUCKET_NAME" \
+                --region "$AWS_PRIMARY_REGION" \
+                --create-bucket-configuration LocationConstraint="$AWS_PRIMARY_REGION" \
+                --profile "$ENVIRONMENT" || { echo "Failed to create S3 bucket"; exit 1; }
+        fi
     fi
 
     aws s3api put-bucket-versioning \
@@ -219,7 +226,7 @@ if [ $# -eq 0 ]; then
 fi
 
 readonly ENVIRONMENT=$1
-readonly TERRAFORM_BACKEND_BUCKET_NAME="terraform-backend-450y5"
+readonly TERRAFORM_BACKEND_BUCKET_NAME="terraform-backend-$ENVIRONMENT-450y5"
 readonly GITHUB_OIDC_THUMBPRINT="1b511abead59c6ce207077c0bf0e0043b1382612"
 
 check_env_vars
