@@ -39,9 +39,9 @@ parameter_overrides = [
 
 [dev.deploy.parameters]
 stack_name = 'greeting-service'
-region = 'us-east-1'    # Set to primary/default region and override when to deploying to other regions
+region = 'eu-west-1'    # Set to primary/default region and override when to deploying to other regions
 capabilities = 'CAPABILITY_IAM'
-image_repository = '__ACCOUNT_ID__.dkr.ecr.us-east-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
+image_repository = '__ACCOUNT_ID__.dkr.ecr.eu-west-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
 parameter_overrides = [
     'Platform=AWS',
     'Stage=dev',
@@ -50,7 +50,7 @@ parameter_overrides = [
 
 [staging.deploy.parameters]
 stack_name = 'greeting-service'
-region = 'eu-west-1'    # Set to primary/default region and override when to deploying to other regions
+region = 'us-east-1'    # Set to primary/default region and override when to deploying to other regions
 capabilities = 'CAPABILITY_IAM'
 image_repository = '__ACCOUNT_ID__.dkr.ecr.us-east-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
 parameter_overrides = [

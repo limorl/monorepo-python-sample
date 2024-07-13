@@ -47,4 +47,12 @@ jobs:
     with:
       environment: ${{ matrix.environment }}
 
-# TODO: Add Build & Deploy Services to Dev and Staging encvironments
+  # deploy-services:
+  #   name: Deploy Services
+  #   needs: [terraform-apply]
+  #   strategy:
+  #     matrix:
+  #       environment: [dev, staging]
+  #   uses: ./.github/workflows/deploy-services-reusable.yml
+  #   with:
+  #     environment: ${{ matrix.environment }}

@@ -1,3 +1,13 @@
+# For now, we're deploying in a single region. To support a secondary region, duplicate the resources,
+# replace the siffix -primary with -secondary and use aws.dev-secondary provider
+
+module "services_primary" {
+  source = "../../modules/services"
+  providers = {
+    aws = aws.dev-primary
+  }
+}
+
 resource "aws_appconfig_deployment_strategy" "deployment_strategy_primary" {
   name                           = "dev-deployment-strategy"
   provider                       = aws.dev-primary
@@ -12,8 +22,10 @@ resource "aws_appconfig_deployment_strategy" "deployment_strategy_primary" {
   }
 }
 
-module "services_primary" {
-  source = "../../modules/services"
+module "test_resources_primary" {
+  source = "../../modules/tests"
+  stage  = var.stage
+
   providers = {
     aws = aws.dev-primary
   }

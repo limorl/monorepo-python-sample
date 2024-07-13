@@ -10,6 +10,6 @@ terraform {
     bucket         = "terraform-backend-dev-450y5"
     key            = "dev/terraform.tfstate"
     region         = "us-east-1" # Primary Region (dev)
-    dynamodb_table = "terraform-state-lock"
+    dynamodb_table = "tfstate-lock-dev"
   }
 }

@@ -1,6 +1,12 @@
 # Terraform [Work in Progress]
-Here, we are using 'vanila' terrafirm with S3 bucket backend.
-Github Actions are used to deploy infrastructure using terraform.
+To manage our infrastructure, we're using:
+* 'Vanila terrafirm` with S3 bucket backend.
+* Github Actions are used to deploy infrastructure using terraform.
+
+In larger organizations, a good practice is to use an `infrastructure` account to manage infrastructure on all environments/accounts.
+
+>> **Note:** In this sample repo, for simplicity, we will a terraform backend per each environment (dev, staging or prod) in their respective primary region. Supporting a centralized infrastructure account will require a few changes such as a single bucket for all backends, using IAM assumed roles for cross accounts access.
+The backend bucket keys and dynamodb lock tables are already created with unique names per environment.
 
 ## Terraform Deployment using Github Actions
 ### Pre-requisite

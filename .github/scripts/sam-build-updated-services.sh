@@ -1,5 +1,6 @@
 #!/bin/bash
-# This files runs in the context of Github Actions inside dev container 
+
+# This file runs in the context of Github Actions inside dev container 
 # It runs sam build for lambdas which have changed in recent pull request
 
 # Ensure an environment argument is provided
@@ -18,11 +19,18 @@ echo "Changed files: $changed_files"
 impacted_lambdas=$(echo "$changed_files" | grep -E '^services/[^/]+/' | cut -d'/' -f1,2 | sort | uniq)
 echo "Impacted Lambda services: $impacted_lambdas"
 
+# Clear the file before writing new content
+> changed_lambdas.txt
+
 # Build impacted Lambda services
 for lambda in $impacted_lambdas; do
   echo "Building $lambda for environment $ENVIRONMENT"
   cd $lambda
   package_version=$(poetry version --short)
   sam build --config-env $ENVIRONMENT --parameter-overrides "DockerTag=$package_version"
+  
+  # Output lambda path and version to the file
+  echo "$lambda:$package_version" >> ../changed_lambdas.txt
+  
   cd -
 done
