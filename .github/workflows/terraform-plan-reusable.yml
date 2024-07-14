@@ -22,8 +22,8 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Check for Terraform Changes 2
-        id: tf-changes-2
+      - name: Check for Terraform Changes
+        id: tf-changes
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "Processing Pull Request"
@@ -39,10 +39,12 @@ jobs:
           
           ALL_CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
           echo "All changed files:"
+          echo "------------------"
           echo "$ALL_CHANGED_FILES"
           
           FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^infra/terraform/' || true)
           echo "Filtered files:"
+          echo "---------------"
           echo "$FILTERED_FILES"
           
           if [ -n "$FILTERED_FILES" ]; then
@@ -51,17 +53,6 @@ jobs:
           else
             echo "terraform_changed=false" >> $GITHUB_OUTPUT
             echo "No matching files found"
-          fi
-
-      - name: Check for Terraform Changes
-        id: tf-changes
-        run: |
-          echo "Changed files:"
-          echo  "git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -q '^infra/terraform/'"
-          if git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -q '^infra/terraform/'; then
-            echo "terraform_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "terraform_changed=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Configure AWS credentials

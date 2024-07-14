@@ -20,8 +20,8 @@ jobs:
       with:
         fetch-depth: 0
     
-    - name: Check for Code Changes 2
-      id: code-changes-2
+    - name: Check for Code Changes
+      id: code-changes
       run: |
         if [[ "${{ github.event_name }}" == "pull_request" ]]; then
           echo "Processing Pull Request"
@@ -37,10 +37,12 @@ jobs:
         
         ALL_CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
         echo "All changed files:"
+        echo "------------------"
         echo "$ALL_CHANGED_FILES"
         
         FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^(packages/|services/|[^/]+\.py)$' || true)
         echo "Filtered files:"
+        echo "---------------"
         echo "$FILTERED_FILES"
         
         if [ -n "$FILTERED_FILES" ]; then
@@ -51,17 +53,6 @@ jobs:
           echo "No matching files found"
         fi
     
-    - name: Check for Code Changes
-      id: code-changes
-      run: |
-        echo "Changed files:"
-        echo "git diff --name-only -r HEAD^1 HEAD"
-        if git diff --name-only -r HEAD^1 HEAD | grep -E '^(packages/|services/|.*\.py$)'; then
-          echo "code_changed=true" >> $GITHUB_OUTPUT
-        else
-          echo "code_changed=false" >> $GITHUB_OUTPUT
-        fi
-
     - name: Display code_changed Output
       run: |
         echo "Code changed: ${{ steps.code-changes.outputs.code_changed }}"
