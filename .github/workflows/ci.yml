@@ -64,7 +64,7 @@ jobs:
   #         echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
   
   terraform-plan:
-    name: Run  # The job name of the reusable workflow will be appended automatically 
+    name: Terraform Plan  # The job name of the reusable workflow will be appended automatically 
   #  needs: [check-terraform-changes]
   #  if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
     strategy:
