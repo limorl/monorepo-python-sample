@@ -11,7 +11,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_appconfig_app"></a> [appconfig\_app](#module\_appconfig\_app) | ../appconfig_app | n/a |
+| <a name="module_appconfig_app"></a> [appconfig\_app](#module\_appconfig\_app) | ../appconfig-app | n/a |
 | <a name="module_ecr_repository"></a> [ecr\_repository](#module\_ecr\_repository) | ../ecr-repository | n/a |
 
 ## Resources
