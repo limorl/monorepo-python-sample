@@ -71,6 +71,11 @@ jobs:
       matrix:
         environment: [dev, staging]
     steps:
+      - name: Check-out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full checkout
+          
       - name: Run Terraform Plan
         if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
         uses: ./.github/workflows/terraform-plan-reusable.yml
