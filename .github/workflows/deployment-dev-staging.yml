@@ -1,10 +1,6 @@
 name: Deploy to Dev & Staging
 
 on:
-  # workflow_run:
-  #   workflows: ["CI"]
-  #   types:
-  #     - completed
   push:
     branches: [main]
 
@@ -40,20 +36,13 @@ jobs:
   terraform-apply:
     name: Terraform Apply
     needs: [check-terraform-changes]
-    runs-on: ubuntu-latest
+    if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
     strategy:
       matrix:
         environment: [dev, staging]
-    steps:
-      - name: Run Terraform Apply
-        if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
-        uses: ./.github/workflows/terraform-apply-reusable.yml
-        with:
-          environment: ${{ matrix.environment }}
-      
-      - name: Skip Terraform Apply
-        if: needs.check-terraform-changes.outputs.terraform_changed != 'true'
-        run: echo "No Terraform changes detected. Skipping Terraform Apply."
+    uses: ./.github/workflows/terraform-apply-reusable.yml
+    with:
+      environment: ${{ matrix.environment }}
 
   # deploy-services:
   #   name: Deploy Services

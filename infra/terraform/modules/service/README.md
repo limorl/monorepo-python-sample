@@ -5,20 +5,18 @@ No requirements.
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.56.1 |
+No providers.
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_appconfig_app"></a> [appconfig\_app](#module\_appconfig\_app) | ../appconfig_app | n/a |
+| <a name="module_ecr_repository"></a> [ecr\_repository](#module\_ecr\_repository) | ../ecr-repository | n/a |
 
 ## Resources
 
-| Name | Type |
-|------|------|
-| [aws_appconfig_application.app](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appconfig_application) | resource |
-| [aws_appconfig_environment.appconfig_environment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appconfig_environment) | resource |
+No resources.
 
 ## Inputs
 
