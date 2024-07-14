@@ -15,7 +15,7 @@ jobs:
     outputs:
       terraform_changed: ${{ steps.check.outputs.terraform_changed }}
     steps:
-      - name: Check-out code
+      - name: Check-out Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Ensure full checkout
@@ -29,7 +29,7 @@ jobs:
             echo "terraform_changed=false" >> $GITHUB_OUTPUT
           fi
       
-      - name: Display terraform_changed output
+      - name: Display terraform_changed Output
         run: |
           echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
   
