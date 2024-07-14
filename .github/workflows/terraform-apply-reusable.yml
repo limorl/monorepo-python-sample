@@ -23,7 +23,7 @@ jobs:
       - name: Download Terraform Plan created in CI Workflow
         uses: dawidd6/action-download-artifact@v2
         with:
-          workflow: ci.yml
+          workflow: CI
           name: ${{ inputs.environment }}.tfplan
           path: ./infra/terraform
           workflow_conclusion: success
