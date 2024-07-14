@@ -17,52 +17,18 @@ jobs:
     steps:
     - name: Check-out Code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
     
-    - name: Fetch main branch
-      run: |
-        git fetch origin main:main
-        git fetch origin ${{ github.base_ref }}
-
-    - name: Debug Git Info
-      run: |
-        echo "Current branch: $(git rev-parse --abbrev-ref HEAD)"
-        echo "Base ref: ${{ github.base_ref }}"
-        echo "GitHub ref: ${{ github.ref }}"
-        git branch -a
-        git log --oneline -n 5
-
     - name: Check for Code Changes
       id: code-changes
       run: |
-        BASE_BRANCH="${{ github.base_ref }}"
-        echo "Comparing changes with $BASE_BRANCH"
-        
-        CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '^(packages/|services/|[^/]+\.py)$' || true)
-        
-        echo "Changed files:"
-        echo "$CHANGED_FILES"
-        
-        if [ -n "$CHANGED_FILES" ]; then
+        echo "git diff --name-only -r HEAD^1 HEAD | grep -E '^(packages/|services/|.*\.py$)'"
+        if git diff --name-only -r HEAD^1 HEAD | grep -E '^(packages/|services/|.*\.py$)'; then
           echo "code_changed=true" >> $GITHUB_OUTPUT
-          echo "Matching files found"
         else
           echo "code_changed=false" >> $GITHUB_OUTPUT
-          echo "No matching files found"
         fi
-
-    - name: Display code_changed output
-      run: |
-        echo "Code changed: ${{ steps.code-changes.outputs.code_changed }}"
-
-    # - name: Check for Code Changes
-    #   id: code-changes
-    #   run: |
-    #     echo "git diff --name-only origin/main...HEAD| grep -E '^(packages/|services/|.*\.py$)'"
-    #     if git diff --name-only origin/main...HEAD | grep -E '^(packages/|services/|.*\.py$)'; then
-    #       echo "code_changed=true" >> $GITHUB_OUTPUT
-    #     else
-    #       echo "code_changed=false" >> $GITHUB_OUTPUT
-    #     fi
 
     - name: Display code_changed Output
       run: |
