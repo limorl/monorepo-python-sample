@@ -18,14 +18,30 @@ jobs:
     - name: Check-out Code
       uses: actions/checkout@v4
 
+    - name: Check for Code Changes
+      id: code-changes
+      run: |
+        if git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '^(packages/|services/|.*\.py$)'; then
+          echo "code_changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "code_changed=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Display code_changed Output
+      run: |
+        echo "Code changed: ${{ steps.code-changes.outputs.python_changed }}"
+
     - name: Set-up PWD Environment Variable
+      if: steps.code-changes.outputs.code_changed == 'true'
       run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
 
     - name: Create CI Environment File
+      if: steps.code-changes.outputs.code_changed == 'true'
       run: |
         cp .devcontainer/.env.ci .devcontainer/.env
 
     - name: Run pre-commit and pre-push hooks & unit tests
+      if: steps.code-changes.outputs.code_changed == 'true'
       uses: devcontainers/ci@v0.3
       with:  # Run all code related hooks and skip the terraform ones, they are handled by the terraform-plan action
         runCmd: |
@@ -38,6 +54,10 @@ jobs:
     #     To enable build, samconfig files should include aws account ids (only in private repos)
     #     chmod +x .github/scripts/sam-build-updated-services.sh
     #     .github/scripts/sam-build-updated-services.sh dev
+
+    - name: Skip Code Checks
+      if: steps.code-changes.outputs.code_changed != 'true'
+      run: echo "No code changes detected. Skipping code checks."
   
   # The reusable workflow checks if terraform file has changed or not, since this is a required status check in the CI
   terraform-plan:
