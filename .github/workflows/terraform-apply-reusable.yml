@@ -19,17 +19,6 @@ jobs:
     steps:
       - name: Checkout Git Repository
         uses: actions/checkout@v4
-      
-      - name: Download Terraform Plan created in CI Workflow
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          workflow: CI
-          name: ${{ inputs.environment }}.tfplan
-          path: ./infra/terraform
-          workflow_conclusion: success
-          branch: main
-          event: pull_request
-          if_no_artifact_found: fail
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -46,6 +35,12 @@ jobs:
       - name: Terraform Init
         working-directory: ./infra/terraform
         run: terraform init
+
+      - name: Terraform Plan
+        id: terraform-plan
+        working-directory: ./infra/terraform
+        run: terraform plan -var-file=environments/${{ inputs.environment }}/terraform.tfvars -out=${{ inputs.environment }}.tfplan
+
 
       - name: Terraform Apply
         working-directory: ./infra/terraform
