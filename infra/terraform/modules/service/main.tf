@@ -1,5 +1,5 @@
 module "appconfig_app" {
-  source   = "../appconfig_app"
+  source   = "../appconfig-app"
   app_name = "${var.service_name}-service"
   env_name = var.stage
   tags     = var.tags
