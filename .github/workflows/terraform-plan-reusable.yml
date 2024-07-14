@@ -75,7 +75,7 @@ permissions:
 
 jobs:
   plan:
-    name: Terraform Plan
+    name: Plan
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
