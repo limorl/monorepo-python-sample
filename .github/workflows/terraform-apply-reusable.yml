@@ -12,13 +12,24 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
-  apply:
+  terraform-apply:
     name: Terraform Apply
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
       - name: Checkout Git Repository
         uses: actions/checkout@v4
+      
+      - name: Download Terraform Plan created in CI Workflow
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: ci.yml
+          name: ${{ inputs.environment }}.tfplan
+          path: ./infra/terraform
+          workflow_conclusion: success
+          branch: main
+          event: pull_request
+          if_no_artifact_found: fail
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -32,11 +43,11 @@ jobs:
         with:
           terraform_version: 1.7.5
 
-      - name: Download Terraform Plan
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ inputs.environment }}.tfplan
-          path: ./infra/terraform
+      # - name: Download Terraform Plan
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: ${{ inputs.environment }}.tfplan
+      #     path: ./infra/terraform
 
       - name: Terraform Init
         working-directory: ./infra/terraform
