@@ -40,7 +40,7 @@ jobs:
         echo "------------------"
         echo "$ALL_CHANGED_FILES"
         
-        FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^(packages/|services/|[^/]+\.py)$' || true)
+        FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^(packages/|services/|[^/]+\.py)' || true)
         echo "Filtered files:"
         echo "---------------"
         echo "$FILTERED_FILES"
