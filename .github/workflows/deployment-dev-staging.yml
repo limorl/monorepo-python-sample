@@ -10,31 +10,33 @@ permissions:
   pull-requests: write  # This allows the workflow to comment on PRs
 
 jobs:
-  # check-terraform-changes:
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     terraform_changed: ${{ steps.check.outputs.terraform_changed }}
-  #   steps:
-  #     - name: Check-out code
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0  # Ensure full checkout
+  check-terraform-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      terraform_changed: ${{ steps.check.outputs.terraform_changed }}
+    steps:
+      - name: Check-out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full checkout
 
-  #     - name: Check for changes in infra/terraform
-  #       id: check
-  #       run: |
-  #         if git diff --name-only HEAD~1 HEAD | grep -q '^infra/terraform/'; then
-  #           echo "terraform_changed=true" >> $GITHUB_OUTPUT
-  #         else
-  #           echo "terraform_changed=false" >> $GITHUB_OUTPUT
-  #         fi
+      - name: Check for changes in infra/terraform
+        id: check
+        run: |
+          if git diff --name-only HEAD~1 HEAD | grep -q '^infra/terraform/'; then
+            echo "terraform_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "terraform_changed=false" >> $GITHUB_OUTPUT
+          fi
       
-  #     - name: Display terraform_changed output
-  #       run: |
-  #         echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
+      - name: Display terraform_changed output
+        run: |
+          echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
   
   terraform-apply:
     name: Terraform Apply
+    needs: [check-terraform-changes]
+    if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
     strategy:
       matrix:
         environment: [dev, staging]

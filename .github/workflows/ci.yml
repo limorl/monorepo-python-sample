@@ -38,31 +38,8 @@ jobs:
     #     To enable build, samconfig files should include aws account ids (only in private repos)
     #     chmod +x .github/scripts/sam-build-updated-services.sh
     #     .github/scripts/sam-build-updated-services.sh dev
-
-  # check-terraform-changes:
-  #   name: Check for Terraform Changes
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     terraform_changed: ${{ steps.check.outputs.terraform_changed }}
-  #   steps:
-  #     - name: Check-out code
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0  # Ensure full checkout
-      
-  #     - name: Check for terraform changes
-  #       id: check
-  #       run: |
-  #         if git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.sha }} | grep -q '^infra/terraform/'; then
-  #           echo "terraform_changed=true" >> $GITHUB_OUTPUT
-  #         else
-  #           echo "terraform_changed=false" >> $GITHUB_OUTPUT
-  #         fi
-      
-  #     - name: Display terraform_changed output
-  #       run: |
-  #         echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
   
+  # The reusable workflow checks if terraform file has changed or not, since this is a required status check in the CI
   terraform-plan:
     name: Terraform Plan  
     strategy:
@@ -71,6 +48,3 @@ jobs:
     uses: ./.github/workflows/terraform-plan-reusable.yml
     with:
       environment: ${{ matrix.environment }}
-
-
-# TODO: Add Build Services
