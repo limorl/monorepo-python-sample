@@ -32,16 +32,16 @@ jobs:
         echo "Code changed: ${{ steps.code-changes.outputs.python_changed }}"
 
     - name: Set-up PWD Environment Variable
-      if: steps.code-changes.outputs.python_changed == 'true'
+      if: steps.code-changes.outputs.code_changed == 'true'
       run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
 
     - name: Create CI Environment File
-      if: steps.code-changes.outputs.python_changed == 'true'
+      if: steps.code-changes.outputs.code_changed == 'true'
       run: |
         cp .devcontainer/.env.ci .devcontainer/.env
 
     - name: Run pre-commit and pre-push hooks & unit tests
-      if: steps.code-changes.outputs.python_changed == 'true'
+      if: steps.code-changes.outputs.code_changed == 'true'
       uses: devcontainers/ci@v0.3
       with:  # Run all code related hooks and skip the terraform ones, they are handled by the terraform-plan action
         runCmd: |
