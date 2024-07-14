@@ -39,52 +39,40 @@ jobs:
     #     chmod +x .github/scripts/sam-build-updated-services.sh
     #     .github/scripts/sam-build-updated-services.sh dev
 
-  check-terraform-changes:
-    name: Check for Terraform Changes
-    runs-on: ubuntu-latest
-    outputs:
-      terraform_changed: ${{ steps.check.outputs.terraform_changed }}
-    steps:
-      - name: Check-out code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Ensure full checkout
+  # check-terraform-changes:
+  #   name: Check for Terraform Changes
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     terraform_changed: ${{ steps.check.outputs.terraform_changed }}
+  #   steps:
+  #     - name: Check-out code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0  # Ensure full checkout
       
-      - name: Check for terraform changes
-        id: check
-        run: |
-          if git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.sha }} | grep -q '^infra/terraform/'; then
-            echo "terraform_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "terraform_changed=false" >> $GITHUB_OUTPUT
-          fi
+  #     - name: Check for terraform changes
+  #       id: check
+  #       run: |
+  #         if git diff --name-only origin/${{ github.event.pull_request.base.ref }} ${{ github.sha }} | grep -q '^infra/terraform/'; then
+  #           echo "terraform_changed=true" >> $GITHUB_OUTPUT
+  #         else
+  #           echo "terraform_changed=false" >> $GITHUB_OUTPUT
+  #         fi
       
-      - name: Display terraform_changed output
-        run: |
-          echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
+  #     - name: Display terraform_changed output
+  #       run: |
+  #         echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
   
   terraform-plan:
-    name: Terraform Plan
-    needs: [check-terraform-changes]
-    runs-on: ubuntu-latest
+    name: Run  # The job name of the reusable workflow will be appended automatically 
+  #  needs: [check-terraform-changes]
+  #  if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
     strategy:
       matrix:
         environment: [dev, staging]
-    steps:
-      - name: Check-out code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Ensure full checkout
-          
-      - name: Run Terraform Plan
-        if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
-        uses: ./.github/workflows/terraform-plan-reusable.yml
-        with:
-          environment: ${{ matrix.environment }}
-      
-      - name: Skip Terraform Plan
-        if: needs.check-terraform-changes.outputs.terraform_changed != 'true'
-        run: echo "No Terraform changes detected. Skipping Terraform plan."
+    uses: ./.github/workflows/terraform-plan-reusable.yml
+    with:
+      environment: ${{ matrix.environment }}
 
 
 # TODO: Add Build Services
