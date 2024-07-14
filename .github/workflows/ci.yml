@@ -29,7 +29,7 @@ jobs:
 
     - name: Display code_changed Output
       run: |
-        echo "Code changed: ${{ steps.code-changes.outputs.python_changed }}"
+        echo "Code changed: ${{ steps.code-changes.outputs.code_changed }}"
 
     - name: Set-up PWD Environment Variable
       if: steps.code-changes.outputs.code_changed == 'true'
