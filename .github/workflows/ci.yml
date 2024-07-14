@@ -21,15 +21,19 @@ jobs:
     - name: Check for Code Changes
       id: code-changes
       run: |
-        if git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '^(packages/|services/|.*\.py$)'; then
-          echo "code_changed=true" >> $GITHUB_OUTPUT
-        else
-          echo "code_changed=false" >> $GITHUB_OUTPUT
-        fi
+          matched_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '^(packages/|services/|[^/]+\.py)$')
+          if [ -n "$matched_files" ]; then
+            echo "code_changed=true" >> $GITHUB_OUTPUT
+            echo "Matched files:"
+            echo "$matched_files"
+          else
+            echo "code_changed=false" >> $GITHUB_OUTPUT
+            echo "No matching files found"
+          fi
 
     - name: Display code_changed Output
       run: |
-        echo "Code changed: ${{ steps.code-changes.outputs.python_changed }}"
+        echo "Code changed: ${{ steps.code-changes.outputs.code_changed }}"
 
     - name: Set-up PWD Environment Variable
       if: steps.code-changes.outputs.code_changed == 'true'
