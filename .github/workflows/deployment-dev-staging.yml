@@ -13,7 +13,7 @@ jobs:
   check-terraform-changes:
     runs-on: ubuntu-latest
     outputs:
-      terraform_changed: ${{ steps.check.outputs.terraform_changed }}
+      terraform_changed: ${{ steps.tf-changes.outputs.terraform_changed }}
     steps:
       - name: Check-out Code
         uses: actions/checkout@v4
@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0  # Ensure full checkout
 
       - name: Check for Terraform Changes
-        id: terraform-changes
+        id: tf-changes
         run: |
           echo "Processing Push Event"
           BASE_SHA=${{ github.event.before }}
@@ -49,7 +49,7 @@ jobs:
       
       - name: Display terraform_changed Output
         run: |
-          echo "Terraform changed: ${{ steps.terraform-changes.outputs.terraform_changed }}"
+          echo "Terraform changed: ${{ steps.tf-changes.outputs.terraform_changed }}"
   
   terraform-apply:
     name: Terraform Apply
