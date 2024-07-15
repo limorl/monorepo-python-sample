@@ -24,7 +24,7 @@ When pull request is merged to main, the github workflow `deployment-dev-staging
 ## Environments
 In this sample repo we use 3 environment, one environment on each account per the three stages: dev, staging and prod.
 In addition, we use local dev environment for local development and testing.
-In the code we use the combination of `Platform` (local,AWS) and `Stage` (dev, staging, prod) enums to indicate these environments.
+In the code we use the combination of `Platform` (local,AWS) and `Stage` (dev, staging, prod) enums to indicate the above environments.
 
 - **Local Dev** - Code developed and tested by developers working on changes, leveraging dev container and local stack to run and test services. Code is not yet merged to man. Testing locally and in CI.
 - **AWS Dev** - Sandbox for developers with the latest code. Once PR has been merged to main, the code is deployed to Dev.
