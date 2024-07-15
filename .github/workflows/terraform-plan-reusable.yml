@@ -93,6 +93,12 @@ jobs:
         working-directory: ./infra/terraform
         run: terraform plan -var-file=environments/${{ inputs.environment }}/terraform.tfvars -out=${{ inputs.environment }}.tfplan
 
+      - name: Debug Terraform Plan
+        if: steps.tf-changes.outputs.terraform_changed == 'true'
+        id: terraform-plan-env
+        working-directory: ./infra/terraform/environments/${{ inputs.environment }}
+        run: terraform plan -var-file=terraform.tfvars -out=${{ inputs.environment }}.tfplan
+
       - name: Upload Terraform Plan
         if: steps.tf-changes.outputs.terraform_changed == 'true'
         uses: actions/upload-artifact@v4
