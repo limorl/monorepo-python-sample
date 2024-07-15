@@ -18,7 +18,7 @@ Follow guidelines here: [Open ID Connect identity provider (OIDC)](https://docs.
 
 When pull request is merged to main, the github workflow `deployment-dev-staging.yml` runs `terraform apply` if terraform changes were made.
 
->>Note: A common practice when the RnD team and the project grows significantly, is manage all environments from a centralized account. Here for simplicity we manage terraform seprataely with backend on each account.
+>>**Note**: A common practice when the RnD team and the project grows significantly, is manage all environments from a centralized account. Here for simplicity we manage terraform seprataely with backend on each account.
 
 
 ## Environments

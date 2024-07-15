@@ -72,30 +72,24 @@ jobs:
       - name: Terraform Init
         if: steps.tf-changes.outputs.terraform_changed == 'true'
         id: terraform-init
-        working-directory: ./infra/terraform
+        working-directory: ./infra/terraform/environments/${{ inputs.environment }}
         run: terraform init
 
       - name: Terraform Format
         if: steps.tf-changes.outputs.terraform_changed == 'true'
         id: terraform-fmt
-        working-directory: ./infra/terraform
+        working-directory: ./infra/terraform/environments/${{ inputs.environment }}
         run: terraform fmt
 
       - name: Terraform Validate
         if: steps.tf-changes.outputs.terraform_changed == 'true'
         id: terraform-validate
-        working-directory: ./infra/terraform
+        working-directory: ./infra/terraform/environments/${{ inputs.environment }}
         run: terraform validate
       
       - name: Terraform Plan
         if: steps.tf-changes.outputs.terraform_changed == 'true'
         id: terraform-plan
-        working-directory: ./infra/terraform
-        run: terraform plan -var-file=environments/${{ inputs.environment }}/terraform.tfvars -out=${{ inputs.environment }}.tfplan
-
-      - name: Debug Terraform Plan
-        if: steps.tf-changes.outputs.terraform_changed == 'true'
-        id: terraform-plan-env
         working-directory: ./infra/terraform/environments/${{ inputs.environment }}
         run: terraform plan -var-file=terraform.tfvars -out=${{ inputs.environment }}.tfplan
 
@@ -104,7 +98,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.environment }}.tfplan
-          path: ./infra/terraform/${{ inputs.environment }}.tfplan
+          path: ./infra/terraform/environments/${{ inputs.environment }}/${{ inputs.environment }}.tfplan
 
       - name: Report No Changes
         if: steps.tf-changes.outputs.terraform_changed != 'true'
