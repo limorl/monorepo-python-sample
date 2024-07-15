@@ -16,10 +16,7 @@ The backend bucket keys and dynamodb lock tables are already created with unique
 Follow guidelines here: [Open ID Connect identity provider (OIDC)](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
 
 
-Terraform deployment is done by github workflow `terraform-deployment.yml`.
-To test the `terraform-deployment.yml`, a pull request to main needs to be created, and then the workflow appears on the Github Actions tab and can be triggered manually.
-
-In any case, it's recommended to add lock key management using DynamoDB.
+When pull request is merged to main, the github workflow `deployment-dev-staging.yml` runs `terraform apply` if terraform changes were made.
 
 >>Note: A common practice when the RnD team and the project grows significantly, is manage all environments from a centralized account. Here for simplicity we manage terraform seprataely with backend on each account.
 
