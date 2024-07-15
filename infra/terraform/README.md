@@ -45,6 +45,6 @@ In this example we are using multi-regions (primary and secondary) for prod and 
 
 | Env | Primary Region | Secondary Region | Notes |
 | --- | --- | --- | --- |
-| dev |  us-east-1 | N\A | Should be close to dev teams |
-| staging | eu-west-1 | eu-west-2 | Preferably similar to prod* |
-| prod | us-west-1 | us-west-2 | Main region, should be optimized for the location of the majority of customers |
+| dev |  eu-west-1 | N\A | Should be close to dev teams |
+| staging | us-east-1 | us-west-1 | Preferably similar to prod* |
+| prod | us-east-1 | us-west-2 | Main region, should be optimized for the location of the majority of customers |

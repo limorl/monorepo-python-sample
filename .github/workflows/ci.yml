@@ -17,19 +17,45 @@ jobs:
     steps:
     - name: Check-out Code
       uses: actions/checkout@v4
-
+      with:
+        fetch-depth: 0
+    
     - name: Check for Code Changes
       id: code-changes
       run: |
-        if git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E '^(packages/|services/|.*\.py$)'; then
-          echo "code_changed=true" >> $GITHUB_OUTPUT
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          echo "Processing Pull Request"
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          HEAD_SHA=${{ github.event.pull_request.head.sha }}
         else
-          echo "code_changed=false" >> $GITHUB_OUTPUT
+          echo "Processing Push Event"
+          BASE_SHA=${{ github.event.before }}
+          HEAD_SHA=${{ github.event.after }}
         fi
 
+        echo "Comparing $BASE_SHA...$HEAD_SHA"
+        
+        ALL_CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
+        echo "All changed files:"
+        echo "------------------"
+        echo "$ALL_CHANGED_FILES"
+        
+        FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^(packages/|services/|[^/]+\.py)' || true)
+        echo "Filtered files:"
+        echo "---------------"
+        echo "$FILTERED_FILES"
+        
+        if [ -n "$FILTERED_FILES" ]; then
+          echo "code_changed=true" >> $GITHUB_OUTPUT
+          echo "Matching files found"
+        else
+          echo "code_changed=false" >> $GITHUB_OUTPUT
+          echo "No matching files found"
+        fi
+    
     - name: Display code_changed Output
       run: |
-        echo "Code changed: ${{ steps.code-changes.outputs.python_changed }}"
+        echo "Code changed: ${{ steps.code-changes.outputs.code_changed }}"
 
     - name: Set-up PWD Environment Variable
       if: steps.code-changes.outputs.code_changed == 'true'

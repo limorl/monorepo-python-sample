@@ -20,13 +20,37 @@ jobs:
         with:
           fetch-depth: 0  # Ensure full checkout
 
-      - name: Check for changes in infra/terraform
-        id: check
+      - name: Check for Terraform Changes
+        id: terraform-changes
         run: |
-          if git diff --name-only HEAD~1 HEAD | grep -q '^infra/terraform/'; then
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          echo "Processing Pull Request"
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          HEAD_SHA=${{ github.event.pull_request.head.sha }}
+          else
+            echo "Processing Push Event"
+            BASE_SHA=${{ github.event.before }}
+            HEAD_SHA=${{ github.event.after }}
+          fi
+
+          echo "Comparing $BASE_SHA...$HEAD_SHA"
+          
+          ALL_CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
+          echo "All changed files:"
+          echo "------------------"
+          echo "$ALL_CHANGED_FILES"
+          
+          FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^infra/terraform/' || true)
+          echo "Filtered files:"
+          echo "---------------"
+          echo "$FILTERED_FILES"
+          
+          if [ -n "$FILTERED_FILES" ]; then
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
+            echo "Matching files found"
           else
             echo "terraform_changed=false" >> $GITHUB_OUTPUT
+            echo "No matching files found"
           fi
       
       - name: Display terraform_changed Output
