@@ -9,7 +9,7 @@ In larger organizations, a good practice is to use an `infrastructure` account t
 The backend bucket keys and dynamodb lock tables are already created with unique names per environment.
 
 ## Terraform Deployment using Github Actions
-### Pre-requisite
+### Pre-requisites
 * Manually create S3 Bucket on primary region (on dev, staging and prod), as explained [here](https://developer.hashicorp.com/terraform/language/settings/backends/s3).
 * Manually create DynamoDB tableon primary region (for dev, staging, prod), to store state lock keys, as explained [here](https://developer.hashicorp.com/terraform/language/settings/backends/s3).
 * Manually create OIDC IAM Role on primary region (for dev, staging and prod) to allow Github Actions to provision resources on AWS (see below for more details).
