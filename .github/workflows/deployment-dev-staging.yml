@@ -55,7 +55,7 @@ jobs:
       
       - name: Display terraform_changed Output
         run: |
-          echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
+          echo "Terraform changed: ${{ steps.terraform-changes.outputs.terraform_changed }}"
   
   terraform-apply:
     name: Terraform Apply
