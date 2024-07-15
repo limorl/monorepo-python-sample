@@ -9,7 +9,7 @@ In larger organizations, a good practice is to use an `infrastructure` account t
 The backend bucket keys and dynamodb lock tables are already created with unique names per environment.
 
 ## Terraform Deployment using Github Actions
-### Pre-requisite
+### Pre-requisites
 * Manually create S3 Bucket on primary region (on dev, staging and prod), as explained [here](https://developer.hashicorp.com/terraform/language/settings/backends/s3).
 * Manually create DynamoDB tableon primary region (for dev, staging, prod), to store state lock keys, as explained [here](https://developer.hashicorp.com/terraform/language/settings/backends/s3).
 * Manually create OIDC IAM Role on primary region (for dev, staging and prod) to allow Github Actions to provision resources on AWS (see below for more details).
@@ -18,13 +18,13 @@ Follow guidelines here: [Open ID Connect identity provider (OIDC)](https://docs.
 
 When pull request is merged to main, the github workflow `deployment-dev-staging.yml` runs `terraform apply` if terraform changes were made.
 
->>Note: A common practice when the RnD team and the project grows significantly, is manage all environments from a centralized account. Here for simplicity we manage terraform seprataely with backend on each account.
+>>**Note**: A common practice when the RnD team and the project grows significantly, is manage all environments from a centralized account. Here for simplicity we manage terraform seprataely with backend on each account.
 
 
 ## Environments
 In this sample repo we use 3 environment, one environment on each account per the three stages: dev, staging and prod.
 In addition, we use local dev environment for local development and testing.
-In the code we use the combination of `Platform` (local,AWS) and `Stage` (dev, staging, prod) enums to indicate these environments.
+In the code we use the combination of `Platform` (local,AWS) and `Stage` (dev, staging, prod) enums to indicate the above environments.
 
 - **Local Dev** - Code developed and tested by developers working on changes, leveraging dev container and local stack to run and test services. Code is not yet merged to man. Testing locally and in CI.
 - **AWS Dev** - Sandbox for developers with the latest code. Once PR has been merged to main, the code is deployed to Dev.
