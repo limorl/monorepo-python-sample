@@ -1,5 +1,5 @@
 resource "aws_secretsmanager_secret" "fake_secret_plain" {
-  name        = "test/fake-secret-plain"
+  name        = "test/fake-secret-plain-${random_id.suffix.hex}"
   description = "Fake secret used in integration tests"
 
   tags = merge(
@@ -16,7 +16,7 @@ resource "aws_secretsmanager_secret_version" "fake_secret_plain_value" {
 }
 
 resource "aws_secretsmanager_secret" "fake_secret_pair" {
-  name        = "test/fake-secret-pair"
+  name        = "test/fake-secret-pair-${random_id.suffix.hex}"
   description = "Fake secret used in integration tests"
 
   tags = merge(
