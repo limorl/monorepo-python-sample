@@ -1,3 +1,7 @@
+resource "random_id" "suffix" {
+  byte_length = 8
+}
+
 resource "aws_secretsmanager_secret" "fake_secret_plain" {
   name        = "test/fake-secret-plain-${random_id.suffix.hex}"
   description = "Fake secret used in integration tests"
