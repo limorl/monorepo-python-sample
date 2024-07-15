@@ -9,7 +9,7 @@ terraform {
   backend "s3" {
     bucket         = "terraform-backend-dev-450y5"
     key            = "dev/terraform.tfstate"
-    region         = "us-east-1" # Primary Region (dev)
+    region         = "eu-west-1" # Primary Region (dev)
     dynamodb_table = "tfstate-lock-dev"
   }
 }
