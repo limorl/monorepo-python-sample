@@ -23,15 +23,9 @@ jobs:
       - name: Check for Terraform Changes
         id: terraform-changes
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-          echo "Processing Pull Request"
-          BASE_SHA=${{ github.event.pull_request.base.sha }}
-          HEAD_SHA=${{ github.event.pull_request.head.sha }}
-          else
-            echo "Processing Push Event"
-            BASE_SHA=${{ github.event.before }}
-            HEAD_SHA=${{ github.event.after }}
-          fi
+          echo "Processing Push Event"
+          BASE_SHA=${{ github.event.before }}
+          HEAD_SHA=${{ github.event.after }}
 
           echo "Comparing $BASE_SHA...$HEAD_SHA"
           
@@ -67,6 +61,16 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: ${{ matrix.environment }}
+
+  debug-output:
+    name: Debug Output
+    needs: [check-terraform-changes]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print terraform_changed value
+        run: |
+          echo "terraform_changed: ${{ needs.check-terraform-changes.outputs.terraform_changed }}"
+          echo "Is true?: ${{ needs.check-terraform-changes.outputs.terraform_changed == 'true' }}"
 
   # deploy-services:
   #   name: Deploy Services

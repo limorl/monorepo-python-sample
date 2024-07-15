@@ -21,7 +21,7 @@ To test the `terraform-deployment.yml`, a pull request to main needs to be creat
 
 In any case, it's recommended to add lock key management using DynamoDB.
 
->>Note: A common practice when the RnD team and the project grows significantly, is manage all environments from a centralized account.
+>>Note: A common practice when the RnD team and the project grows significantly, is manage all environments from a centralized account. Here for simplicity we manage terraform seprataely with backend on each account.
 
 
 ## Environments
