@@ -1,6 +1,6 @@
 provider "aws" {
   alias  = "prod-primary"
-  region = "us-west-1"
+  region = var.aws_primary_region
 
   default_tags {
     tags = {
@@ -12,7 +12,7 @@ provider "aws" {
 
 provider "aws" {
   alias  = "prod-secondary"
-  region = "us-west-2"
+  region = var.aws_secondary_region
 
   default_tags {
     tags = {
