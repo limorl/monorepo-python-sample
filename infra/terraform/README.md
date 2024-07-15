@@ -36,7 +36,7 @@ In this example we are using multi-regions (primary and secondary) for prod and 
 
 - Every environment has has a primary region `AWS_PRIMARY_REGION`
 - In `AWS_PRIMARY_REGION` we manage centrally the shared resources for the environment:  ECR, AppConfig, SecretsManager, Terraform S3 BAckend, DynamoDB lock table for terraform state
-- `AWS_REGION` is the region where the resource is actually deployed
+- `AWS_REGION` is the region where the resource is actually deployed (populated by AWS)
 
 >> Note: In general it's better to have staging and prod environment as similar as possible and preferably on the same regions. In this example we used other regions as the different environments are simulated on the same account.
 
