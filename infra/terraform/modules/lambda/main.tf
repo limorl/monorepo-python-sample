@@ -5,7 +5,7 @@ resource "aws_lambda_function" "function" {
 }
 
 resource "aws_iam_role" "lambda_role" {
-  name = "${var.function_name}-lambda-role"
+  name               = "${var.function_name}-lambda-role"
   assume_role_policy = file("${path.module}/assume-role-policy.json")
 }
 

@@ -9,8 +9,8 @@ variable "function_name" {
 }
 
 variable "lambda_timeout" {
-    type    = number
-    default = 10
+  type    = number
+  default = 10
 }
 
 variable "tags" {
