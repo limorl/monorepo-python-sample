@@ -14,6 +14,11 @@ variable "image_mutability" {
   default = "MUTABLE"
 }
 
+variable "scan_on_push" {
+  type    = bool
+  default = true
+}
+
 variable "encrypt_type" {
   type    = string
   default = "KMS"
