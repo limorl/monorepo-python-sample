@@ -11,7 +11,7 @@ variable "ecr_repository_url" {
 variable "docker_tag" {
   description = "The tag of the Docker image to use"
   type        = string
-  default     = "latest"    # A place holder
+  default     = "latest" # A place holder
 }
 
 variable "tags" {
