@@ -27,9 +27,12 @@ No modules.
 | <a name="input_ecr_repository_name"></a> [ecr\_repository\_name](#input\_ecr\_repository\_name) | n/a | `string` | `null` | no |
 | <a name="input_encrypt_type"></a> [encrypt\_type](#input\_encrypt\_type) | n/a | `string` | `"KMS"` | no |
 | <a name="input_image_mutability"></a> [image\_mutability](#input\_image\_mutability) | n/a | `string` | `"MUTABLE"` | no |
+| <a name="input_scan_on_push"></a> [scan\_on\_push](#input\_scan\_on\_push) | n/a | `bool` | `true` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | n/a | `map(string)` | `{}` | no |
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_ecr_repository_url"></a> [ecr\_repository\_url](#output\_ecr\_repository\_url) | The URL of the ECR repository |
 <!-- END_TF_DOCS -->

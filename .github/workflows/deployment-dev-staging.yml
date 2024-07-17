@@ -62,16 +62,6 @@ jobs:
     with:
       environment: ${{ matrix.environment }}
 
-  debug-output:
-    name: Debug Output
-    needs: [check-terraform-changes]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print terraform_changed value
-        run: |
-          echo "terraform_changed: ${{ needs.check-terraform-changes.outputs.terraform_changed }}"
-          echo "Is true?: ${{ needs.check-terraform-changes.outputs.terraform_changed == 'true' }}"
-
   # deploy-services:
   #   name: Deploy Services
   #   needs: [terraform-apply]
