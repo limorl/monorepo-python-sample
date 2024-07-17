@@ -1,7 +1,7 @@
 resource "aws_iam_role" "lambda_role" {
   name               = "${var.function_name}-lambda-role"
   assume_role_policy = file("${path.module}/assume-role-policy.json")
-  
+
   tags = merge(
     var.tags,
     {
@@ -16,8 +16,8 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
 }
 
 resource "aws_iam_role_policy" "lambda_appconfig_secretsmanager_policy" {
-  name = "${var.function_name}-lambda-appconfig-secretsmanager-policy"
-  role = aws_iam_role.lambda_role.id
+  name   = "${var.function_name}-lambda-appconfig-secretsmanager-policy"
+  role   = aws_iam_role.lambda_role.id
   policy = file("${path.module}/appconfig-secretesmanager-policy.json")
 }
 

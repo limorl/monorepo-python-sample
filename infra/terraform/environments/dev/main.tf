@@ -3,7 +3,7 @@
 
 module "services_primary" {
   source = "../../modules/services"
-  
+
   providers = {
     aws = aws.dev-primary
   }
