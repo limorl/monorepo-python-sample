@@ -17,6 +17,7 @@
           "ecr:CompleteLayerUpload",
           "ecr:TagResource",
           "ecr:DescribeRepositories",
+          "ecr:ListTagsForResource",
           "appconfig:*",
           "secretsmanager:GetSecretValue",
           "secretsmanager:PutSecretValue",
