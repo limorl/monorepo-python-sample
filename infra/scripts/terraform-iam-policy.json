@@ -6,6 +6,7 @@
         "Action": [
           "lambda:*",
           "iam:*",
+          "ecr:CreateRepository",
           "ecr:GetAuthorizationToken",
           "ecr:BatchCheckLayerAvailability",
           "ecr:GetDownloadUrlForLayer",
