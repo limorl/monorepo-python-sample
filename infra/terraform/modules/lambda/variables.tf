@@ -13,8 +13,15 @@ variable "lambda_timeout" {
   default = 10
 }
 
-variable "image_uri" {
-  type = string
+variable "ecr_repository_url" {
+  description = "The URL of the ECR repository"
+  type        = string
+}
+
+variable "image_tag" {
+  description = "The tag of the Docker image to use"
+  type        = string
+  default     = "latest"
 }
 
 variable "tags" {

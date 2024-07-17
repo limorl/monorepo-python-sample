@@ -2,7 +2,7 @@ resource "aws_lambda_function" "function" {
   function_name = var.function_name
   role          = aws_iam_role.lambda_role.arn
   package_type  = "Image"
-  image_uri     = var.image_uri
+  image_uri     = "${var.ecr_repository_url}:${var.image_tag}"
 }
 
 resource "aws_iam_role" "lambda_role" {

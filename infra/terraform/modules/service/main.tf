@@ -12,8 +12,8 @@ module "ecr_repository" {
 }
 
 module "lambda_function" {
-  source        = "../lambda"
-  function_name = var.service_name
-  image_uri     = module.ecr_repository.repository_url
-  tags          = var.tags
+  source              = "../lambda"
+  function_name       = var.service_name
+  ecr_repository_url = module.ecr_repository.ecr_repository_url
+  tags                = var.tags
 }

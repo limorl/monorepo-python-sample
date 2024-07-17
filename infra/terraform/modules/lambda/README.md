@@ -26,8 +26,9 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_ecr_repository_url"></a> [ecr\_repository\_url](#input\_ecr\_repository\_url) | The URL of the ECR repository | `string` | n/a | yes |
 | <a name="input_function_name"></a> [function\_name](#input\_function\_name) | n/a | `string` | `null` | no |
-| <a name="input_image_uri"></a> [image\_uri](#input\_image\_uri) | n/a | `string` | n/a | yes |
+| <a name="input_image_tag"></a> [image\_tag](#input\_image\_tag) | The tag of the Docker image to use | `string` | `"latest"` | no |
 | <a name="input_lambda_timeout"></a> [lambda\_timeout](#input\_lambda\_timeout) | n/a | `number` | `10` | no |
 | <a name="input_stage"></a> [stage](#input\_stage) | n/a | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | n/a | `map(string)` | `{}` | no |
