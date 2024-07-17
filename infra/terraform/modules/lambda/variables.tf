@@ -13,6 +13,10 @@ variable "lambda_timeout" {
   default = 10
 }
 
+variable "image_uri" {
+  type      = string
+}
+
 variable "tags" {
   type    = map(string)
   default = {}
