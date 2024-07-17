@@ -10,7 +10,7 @@ variable "aws_primary_region" {
   default     = null
 }
 
-variable "aws_psecondary_region" {
+variable "aws_secondary_region" {
   description = "Secondary Region"
   type        = string
   default     = null
