@@ -34,5 +34,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_ecr_repository_arn"></a> [ecr\_repository\_arn](#output\_ecr\_repository\_arn) | The ARN of the ECR repository |
 | <a name="output_ecr_repository_url"></a> [ecr\_repository\_url](#output\_ecr\_repository\_url) | The URL of the ECR repository |
 <!-- END_TF_DOCS -->
