@@ -36,6 +36,5 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_ecr_repository_url"></a> [ecr\_repository\_url](#output\_ecr\_repository\_url) | The URL of the ECR repository |
 | <a name="output_lambda_role_arn"></a> [lambda\_role\_arn](#output\_lambda\_role\_arn) | The ARN of the Lambda execution role |
 <!-- END_TF_DOCS -->

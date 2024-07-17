@@ -14,7 +14,7 @@ variable "lambda_timeout" {
 }
 
 variable "image_uri" {
-  type      = string
+  type = string
 }
 
 variable "tags" {
