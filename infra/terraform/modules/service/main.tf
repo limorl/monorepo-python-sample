@@ -11,3 +11,8 @@ module "ecr_repository" {
   tags                = var.tags
 }
 
+module "lambda_function" {
+  source        = "../lambda"
+  function_name = var.service_name
+  tags          = var.tags
+}
