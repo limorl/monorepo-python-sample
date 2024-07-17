@@ -9,3 +9,9 @@ variable "aws_primary_region" {
   type        = string
   default     = null
 }
+
+variable "aws_secondary_region" {
+  description = "Secondary Region"
+  type        = string
+  default     = null
+}

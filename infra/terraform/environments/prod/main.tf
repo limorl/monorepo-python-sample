@@ -3,6 +3,7 @@
 
 module "services_primary" {
   source    = "../../modules/services"
+  stage     = var.stage
   providers = { aws = aws.prod-primary }
 }
 
