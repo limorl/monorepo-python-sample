@@ -3,10 +3,10 @@ resource "aws_lambda_function" "function" {
   function_name = var.function_name
   role          = aws_iam_role.lambda_role.arn
   package_type  = "Image"
-  image_uri     = "${var.ecr_repository_url}:latest"  # 'latest' is a placeholder, the image tag will be set when deploying using 'sam deploy'
+  image_uri     = "${var.ecr_repository_url}:latest" # 'latest' is a placeholder, the image tag will be set when deploying using 'sam deploy'
 
   lifecycle {
-    ignore_changes = [image_uri]  # This allows SAM to update the image without Terraform interference
+    ignore_changes = [image_uri] # This allows SAM to update the image without Terraform interference
   }
 
   depends_on = [
