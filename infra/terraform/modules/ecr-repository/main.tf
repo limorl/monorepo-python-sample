@@ -18,7 +18,36 @@ resource "aws_ecr_repository" "ecr_repository" {
   )
 }
 
+# resource "aws_ecr_repository_policy" "lambda_access_policy" {
+#   repository = aws_ecr_repository.ecr_repository.name
+#   policy     = file("${path.module}/lambda-access-policy.json")
+#   lifecycle {
+#     ignore_changes = [policy]
+#   }
+# }
+
 resource "aws_ecr_repository_policy" "lambda_access_policy" {
   repository = aws_ecr_repository.ecr_repository.name
-  policy     = file("${path.module}/lambda-access-policy.json")
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "LambdaECRImageRetrievalPolicy"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+        Action = [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability"
+        ]
+      }
+    ]
+  })
+}
+
+# Debug policy file
+output "policy_content" {
+  value = file("${path.module}/lambda-access-policy.json")
 }

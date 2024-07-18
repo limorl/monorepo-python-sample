@@ -38,4 +38,5 @@ No modules.
 | <a name="output_ecr_repository_arn"></a> [ecr\_repository\_arn](#output\_ecr\_repository\_arn) | The ARN of the ECR repository |
 | <a name="output_ecr_repository_policy"></a> [ecr\_repository\_policy](#output\_ecr\_repository\_policy) | The ECR repository policy |
 | <a name="output_ecr_repository_url"></a> [ecr\_repository\_url](#output\_ecr\_repository\_url) | The URL of the ECR repository |
+| <a name="output_policy_content"></a> [policy\_content](#output\_policy\_content) | Debug policy file |
 <!-- END_TF_DOCS -->

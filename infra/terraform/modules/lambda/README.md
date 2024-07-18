@@ -8,7 +8,6 @@ No requirements.
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 5.58.0 |
-| <a name="provider_time"></a> [time](#provider\_time) | 0.12.0 |
 
 ## Modules
 
