@@ -28,6 +28,7 @@ resource "aws_ecr_repository" "ecr_repository" {
 
 resource "aws_ecr_repository_policy" "lambda_access_policy" {
   repository = aws_ecr_repository.ecr_repository.name
+  depends_on = [aws_ecr_repository.ecr_repository]
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
