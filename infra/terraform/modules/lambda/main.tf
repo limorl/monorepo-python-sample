@@ -3,7 +3,16 @@ resource "aws_lambda_function" "function" {
   function_name = var.function_name
   role          = aws_iam_role.lambda_role.arn
   package_type  = "Image"
-  image_uri     = "${var.ecr_repository_url}:${var.docker_tag}"
+  image_uri     = "${var.ecr_repository_url}:latest"  # 'latest' is a placeholder, the image tag will be set when deploying using 'sam deploy'
+
+  lifecycle {
+    ignore_changes = [image_uri]  # This allows SAM to update the image without Terraform interference
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_basic,
+    aws_iam_role_policy_attachment.lambda_ecr
+  ]
 
   tags = merge(
     var.tags,
@@ -42,9 +51,11 @@ data "aws_iam_policy_document" "ecr_access_policy_document" {
     actions = [
       "ecr:GetDownloadUrlForLayer",
       "ecr:BatchGetImage",
-      "ecr:BatchCheckLayerAvailability"
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:GetAuthorizationToken"
     ]
-    resources = [var.ecr_repository_arn]
+    # resources = [var.ecr_repository_arn]
+    resources = ["*"]
   }
 }
 
