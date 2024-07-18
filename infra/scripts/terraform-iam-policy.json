@@ -29,6 +29,7 @@
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
+          "logs:TagResource",
           "kms:Decrypt",
           "kms:GenerateDataKey",
           "cognito-idp:*",
