@@ -1,4 +1,4 @@
-# Terraform [Work in Progress]
+# Terraform [Work in Progress, super simple without networking and sgs]
 To manage our infrastructure, we're using:
 * 'Vanila terrafirm` with S3 bucket backend.
 * Github Actions are used to deploy infrastructure using terraform.

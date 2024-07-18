@@ -8,6 +8,11 @@ variable "ecr_repository_url" {
   type        = string
 }
 
+variable "ecr_repository_arn" {
+  description = "The ARN of the ECR repository"
+  type        = string
+}
+
 variable "docker_tag" {
   description = "The tag of the Docker image to use"
   type        = string
