@@ -28,7 +28,8 @@ In this sample repo we use 3 environment, one environment on each account per th
 In addition, we use local dev environment for local development and testing.
 In the code we use the combination of `Platform` (local,AWS) and `Stage` (dev, staging, prod) enums to indicate the above environments.
 
-- **Local Dev** - Code developed and tested by developers working on changes, leveraging dev container and local stack to run and test services. Code is not yet merged to man. Testing locally and in CI.
+- **Local Dev** - Code developed and tested by developers working on changes, leveraging dev container and local stack to run and test services.
+Code is not yet merged to man. Testing locally and in CI.
 - **AWS Dev** - Sandbox for developers with the latest code. Once PR has been merged to main, the code is deployed to Dev.
 - **AWS Staging** - Pre-production environment, configured similarly. Integration and E2E tests are run periodically against this environment. Promoting to production will require an approval.
 - **AWS Prod** - Production environment. At this point we
