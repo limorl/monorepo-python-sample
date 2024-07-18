@@ -38,14 +38,14 @@ repos:
       rev: v1.91.0
       hooks:
         - id: terraform_fmt
-          stages: [push]
+          stages: [commit]
         #- id: terraform_tflint  TODO (@limorl): Install TFLint in docker and enable this hook
         #  stages: [push]
         - id: terraform_validate
           args:
             - --tf-init-args=-backend=false
            # - --chdir=infra/terraform
-          stages: [push]
+          stages: [commit]
         #- id: terraform_docs     TODO (@limorl): Install TFLint in docker and enable this hook omstead of terraform-docs-go
         #  stages: [push]
 
