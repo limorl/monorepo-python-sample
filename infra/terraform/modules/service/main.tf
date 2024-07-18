@@ -12,10 +12,10 @@ module "ecr_repository" {
 }
 
 module "lambda_function" {
-  source             = "../lambda"
-  function_name      = var.service_name
-  ecr_repository_url = module.ecr_repository.ecr_repository_url
-  ecr_repository_arn = module.ecr_repository.ecr_repository_arn
+  source                = "../lambda"
+  function_name         = var.service_name
+  ecr_repository_url    = module.ecr_repository.ecr_repository_url
+  ecr_repository_arn    = module.ecr_repository.ecr_repository_arn
   ecr_repository_policy = module.ecr_repository.ecr_repository_policy
-  tags               = var.tags
+  tags                  = var.tags
 }
