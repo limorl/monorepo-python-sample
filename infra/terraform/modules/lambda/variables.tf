@@ -13,6 +13,12 @@ variable "ecr_repository_arn" {
   type        = string
 }
 
+variable "ecr_repository_policy" {
+  description = "The ECR repository policy"
+  type        = any
+  default     = null
+}
+
 variable "docker_tag" {
   description = "The tag of the Docker image to use"
   type        = string
