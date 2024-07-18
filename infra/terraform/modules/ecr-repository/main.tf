@@ -17,3 +17,8 @@ resource "aws_ecr_repository" "ecr_repository" {
     },
   )
 }
+
+resource "aws_ecr_repository_policy" "lambda_access" {
+  repository = aws_ecr_repository.ecr_repository.name
+  policy     = file("${path.module}/lambda-access-policy.json")
+}
