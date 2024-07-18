@@ -26,6 +26,8 @@ jobs:
           role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
           role-session-name: GithubWorkflow-TerraformDeployment-${{ inputs.environment }}
           aws-region: ${{ vars.AWS_PRIMARY_REGION }}
+          role-duration-seconds: 900
+          role-skip-session-tagging: true
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
