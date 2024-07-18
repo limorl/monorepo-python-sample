@@ -31,6 +31,5 @@ No resources.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_ecr_repository_arn"></a> [ecr\_repository\_arn](#output\_ecr\_repository\_arn) | The ARN of the ECR repository |
 | <a name="output_lambda_role_arn"></a> [lambda\_role\_arn](#output\_lambda\_role\_arn) | The ARN of the Lambda IAM role |
 <!-- END_TF_DOCS -->
