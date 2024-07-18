@@ -1,4 +1,9 @@
 
+resource "time_sleep" "wait_30_seconds" {
+  depends_on = [aws_iam_role_policy_attachment.lambda_ecr]
+  create_duration = "30s"
+}
+
 resource "aws_lambda_function" "function" {
   function_name = var.function_name
   role          = aws_iam_role.lambda_role.arn
@@ -11,7 +16,8 @@ resource "aws_lambda_function" "function" {
 
   depends_on = [
     aws_iam_role_policy_attachment.lambda_basic,
-    aws_iam_role_policy_attachment.lambda_ecr
+    aws_iam_role_policy_attachment.lambda_ecr,
+    time_sleep.wait_30_seconds
   ]
 
   tags = merge(
