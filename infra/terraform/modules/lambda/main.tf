@@ -1,6 +1,6 @@
 
 resource "time_sleep" "wait_30_seconds" {
-  depends_on = [aws_iam_role_policy_attachment.lambda_ecr]
+  depends_on      = [aws_iam_role_policy_attachment.lambda_ecr]
   create_duration = "30s"
 }
 
