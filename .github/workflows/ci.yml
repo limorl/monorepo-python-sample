@@ -15,21 +15,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Debug Environments
-      env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-         ACCOUNT_ID=$(gh variable get -e dev AWS_ACCOUNT_ID)
-         echo "$ACCOUNT_ID"
-         ACCOUNT_ID=$(gh variable get -e staging AWS_ACCOUNT_ID)
-         echo "$ACCOUNT_ID"
-         ACCOUNT_ID=$(gh variable get -e prod AWS_ACCOUNT_ID)
-         echo "$ACCOUNT_ID"
-  
     - name: Check-out Code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    
+    - name: Debug Environments
+      env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+          ACCOUNT_ID=$(gh variable get -e dev AWS_ACCOUNT_ID)
+          echo "$ACCOUNT_ID"
+          ACCOUNT_ID=$(gh variable get -e staging AWS_ACCOUNT_ID)
+          echo "$ACCOUNT_ID"
+          ACCOUNT_ID=$(gh variable get -e prod AWS_ACCOUNT_ID)
+          echo "$ACCOUNT_ID"
     
     - name: Check for Code Changes
       id: code-changes
