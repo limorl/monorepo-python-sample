@@ -10,58 +10,76 @@ permissions:
   pull-requests: write  # This allows the workflow to comment on PRs
 
 jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      terraform_changed: ${{ steps.check.outputs.terraform_changed }}
+      code_changed: ${{ steps.check.outputs.code_changed }}
+  
+    steps:
+      - name: Check-out Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full checkout
+
+      - name: Check for Terraform & Code Changes
+        id: check
+        run: |
+          echo "Processing Pull Request"
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          HEAD_SHA=${{ github.event.pull_request.head.sha }}
+
+          git diff --name-only $BASE_SHA $HEAD_SHA > changed_files.txt
+          
+          if grep -q "^infra/terraform/" changed_files.txt; then
+            echo "terraform_changed=true" >> $GITHUB_OUTPUT
+            echo "terraform_changed=true"
+          else
+            echo "terraform_changed=false" >> $GITHUB_OUTPUT
+            echo "terraform_changed=false"
+          fi
+          
+          if grep -qE "^services/|^packages/" changed_files.txt; then
+             echo "code_changed=true" >> $GITHUB_OUTPUT
+             echo "code_changed=true"
+          else
+             echo "code_changed=false" >> $GITHUB_OUTPUT
+             echo "code_changed=false"
+          fi
+      - name: Display check-changes Output
+        run: |
+          echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
+          echo "Code changed: ${{ steps.check.outputs.terraformcode_changed }}"
+
+  # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
   code-checks:
     name: CI Code Checks
+    needs: [check-changes]
     runs-on: ubuntu-latest
 
     steps:
     - name: Check-out Code
+      if: needs.check-changes.outputs.code_changed == 'true'
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
     
-    - name: Check for Code Changes
-      id: code-changes
-      run: |
-        echo "Processing Pull Request"
-        BASE_SHA=${{ github.event.pull_request.base.sha }}
-        HEAD_SHA=${{ github.event.pull_request.head.sha }}
-        
-        echo "Comparing $BASE_SHA...$HEAD_SHA"
-        
-        ALL_CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
-        echo "All changed files:"
-        echo "------------------"
-        echo "$ALL_CHANGED_FILES"
-        
-        FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^(packages/|services/|[^/]+\.py)' || true)
-        echo "Filtered files:"
-        echo "---------------"
-        echo "$FILTERED_FILES"
-        
-        if [ -n "$FILTERED_FILES" ]; then
-          echo "code_changed=true" >> $GITHUB_OUTPUT
-          echo "Matching files found"
-        else
-          echo "code_changed=false" >> $GITHUB_OUTPUT
-          echo "No matching files found"
-        fi
-    
     - name: Display code_changed Output
+      if: needs.check-changes.outputs.code_changed == 'true'
       run: |
         echo "Code changed: ${{ steps.code-changes.outputs.code_changed }}"
 
     - name: Set-up PWD Environment Variable
-      if: steps.code-changes.outputs.code_changed == 'true'
+      if: needs.check-changes.outputs.code_changed == 'true'
       run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
 
     - name: Create CI Environment File
-      if: steps.code-changes.outputs.code_changed == 'true'
+      if: needs.check-changes.outputs.code_changed == 'true'
       run: |
         cp .devcontainer/.env.ci .devcontainer/.env
 
     - name: Run pre-commit and pre-push hooks & unit tests
-      if: steps.code-changes.outputs.code_changed == 'true'
+      if: needs.check-changes.outputs.code_changed == 'true'
       uses: devcontainers/ci@v0.3
       with:  # Run all code related hooks and skip the terraform ones, they are handled by the terraform-plan action
         runCmd: |
@@ -71,20 +89,19 @@ jobs:
           poetry run pre-commit run codespell --all-files --hook-stage push
           poetry run pre-commit run unit-tests --all-files --hook-stage push
           poetry run pytest -m "not integration and not e2e"
-    #     To enable build, samconfig files should include aws account ids (only in private repos)
-    #     chmod +x .github/scripts/sam-build-updated-services.sh
-    #     .github/scripts/sam-build-updated-services.sh dev
 
     - name: Skip Code Checks
-      if: steps.code-changes.outputs.code_changed != 'true'
+      if: needs.check-changes.outputs.code_changed != 'true'
       run: echo "No code changes detected. Skipping code checks."
   
   # The reusable workflow checks if terraform file has changed or not, since this is a required status check in the CI
   terraform-plan:
-    name: Terraform Plan  
+    name: Terraform Plan
+    needs: [check-changes]
     strategy:
       matrix:
         environment: [dev, staging]
     uses: ./.github/workflows/terraform-plan-reusable.yml
     with:
       environment: ${{ matrix.environment }}
+      terraform_changed: needs.check-changes.outputs.terraform_changed 

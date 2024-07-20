@@ -63,7 +63,7 @@ jobs:
       terraform_changed: needs.check-changes.outputs.terraform_changed 
 
   deploy-services:
-    needs: [deploy-infra]
+    needs: [check-changes, deploy-infra]
     if: needs.check-changes.outputs.code_changed == 'true'
     runs-on: ubuntu-latest
     
