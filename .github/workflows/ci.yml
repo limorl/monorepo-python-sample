@@ -22,7 +22,7 @@ jobs:
     
     - name: Debug Environments
       env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_REPO_PAT }}
       run: |
           ACCOUNT_ID=$(gh variable get -e dev AWS_ACCOUNT_ID)
           echo "$ACCOUNT_ID"
