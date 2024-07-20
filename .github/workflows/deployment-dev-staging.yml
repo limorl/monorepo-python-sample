@@ -10,109 +10,210 @@ permissions:
   pull-requests: write  # This allows the workflow to comment on PRs
 
 jobs:
-  check-terraform-changes:
+  check-changes:
     runs-on: ubuntu-latest
     outputs:
-      terraform_changed: ${{ steps.tf-changes.outputs.terraform_changed }}
+      terraform_changed: ${{ steps.check.outputs.terraform_changed }}
+      code_changed: ${{ steps.check.outputs.code_changed }}
+  
     steps:
       - name: Check-out Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Ensure full checkout
 
-      - name: Check for Terraform Changes
-        id: tf-changes
+      - name: Check for Terraform & Code Changes
+        id: check
         run: |
           echo "Processing Push Event"
           BASE_SHA=${{ github.event.before }}
           HEAD_SHA=${{ github.event.after }}
 
-          echo "Comparing $BASE_SHA...$HEAD_SHA"
+          git diff --name-only $BASE_SHA $HEAD_SHA > changed_files.txt
           
-          ALL_CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
-          echo "All changed files:"
-          echo "------------------"
-          echo "$ALL_CHANGED_FILES"
-          
-          FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^infra/terraform/' || true)
-          echo "Filtered files:"
-          echo "---------------"
-          echo "$FILTERED_FILES"
-          
-          if [ -n "$FILTERED_FILES" ]; then
+          if grep -q "^infra/terraform/" changed_files.txt; then
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
-            echo "Matching files found"
+            echo "terraform_changed=true"
           else
             echo "terraform_changed=false" >> $GITHUB_OUTPUT
-            echo "No matching files found"
+            echo "terraform_changed=false"
           fi
-      
-      - name: Display terraform_changed Output
+          
+          if grep -qE "^services/|^packages/" changed_files.txt; then
+             echo "code_changed=true" >> $GITHUB_OUTPUT
+             echo "code_changed=true"
+          else
+             echo "code_changed=false" >> $GITHUB_OUTPUT
+             echo "code_changed=false"
+          fi
+      - name: Display check-changes Output
         run: |
-          echo "Terraform changed: ${{ steps.tf-changes.outputs.terraform_changed }}"
-  
-  terraform-apply:
-    name: Terraform Apply
-    needs: [check-terraform-changes]
-    if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
+          echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
+          echo "Code changed: ${{ steps.check.outputs.terraformcode_changed }}"
+
+  deploy-infra:
+    name: Deploy Infrastructure
+    needs: [check-changes]
     strategy:
       matrix:
         environment: [dev, staging]
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: ${{ matrix.environment }}
-  
-  check-code-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      code_changed: ${{ steps.code-changes.outputs.code_changed }}
-    steps:
-      - name: Check-out Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Ensure full checkout
+      terraform_changed: needs.check-changes.outputs.terraform_changed 
 
-      - name: Check for Code Changes
-        id: code-changes
-        run: |
-          echo "Processing Push Event"
-          BASE_SHA=${{ github.event.before }}
-          HEAD_SHA=${{ github.event.after }}
-
-          echo "Comparing $BASE_SHA...$HEAD_SHA"
-          
-          ALL_CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
-          echo "All changed files:"
-          echo "------------------"
-          echo "$ALL_CHANGED_FILES"
-          
-          FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^packages/|^services/' || true)
-          echo "Filtered files:"
-          echo "---------------"
-          echo "$FILTERED_FILES"
-          
-          if [ -n "$FILTERED_FILES" ]; then
-            echo "code_changed=true" >> $GITHUB_OUTPUT
-            echo "Matching files found"
-          else
-            echo "code_changed=false" >> $GITHUB_OUTPUT
-            echo "No matching files found"
-          fi
-      
-      - name: Display code_changed Output
-        run: |
-          echo "Code changed: ${{ steps.code-changes.outputs.code_changed }}"
-  
-  # Simple implementation to deploy all services, when code changed
-  # TODO (@limorl): Deploy only changed services, based on dervice version change
   deploy-services:
-    name: Terraform Apply
-    needs: [check-code-changes, terraform-apply]
-    if: needs.check-code-changes.outputs.code_changed == 'true'
-    strategy:
-      matrix:
-        environment: [dev, staging]
-    uses: ./.github/workflows/deployment-services-reusable.yml
-    with:
-      environment: ${{ matrix.environment }}
+    needs: [deploy-infra]
+    if: needs.check-changes.outputs.code_changed == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check-out Code
+      uses: actions/checkout@v4
+
+    - name: Set-up PWD Environment Variable
+      run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+
+    - name: Create CI Environment File
+      run: cp .devcontainer/.env.ci .devcontainer/.env
+
+    - name: Deploy Infrastructure and Services
+      uses: devcontainers/ci@v0.3
+      with:
+        runCmd: |
+          for env in dev staging; do
+            echo "Processing $env environment"
+            
+            # Use GitHub CLI to get the environment variables
+            AWS_ACCOUNT_ID=$(gh variable get -e $env AWS_ACCOUNT_ID)
+        
+            if [[ "${{ needs.check-changes.outputs.code_changed }}" == "true" ]]; then
+              echo "Deploying services for $env"
+              poetry run install-all
+              poetry run build-all
+              chmod +x .github/scripts/sam-build-and-deploy-services.sh
+              .github/scripts/sam-build-and-deploy-services.sh $env $AWS_ACCOUNT_ID
+            fi
+          done
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_REPO_PAT }}
+
+
+# name: Deploy to Dev & Staging
+
+# on:
+#   push:
+#     branches: [main]
+
+# permissions:
+#   id-token: write # This is required for requesting the JWT
+#   contents: read  # This is required for actions/checkout
+#   pull-requests: write  # This allows the workflow to comment on PRs
+
+# jobs:
+#   check-terraform-changes:
+#     runs-on: ubuntu-latest
+#     outputs:
+#       terraform_changed: ${{ steps.tf-changes.outputs.terraform_changed }}
+#     steps:
+#       - name: Check-out Code
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0  # Ensure full checkout
+
+#       - name: Check for Terraform Changes
+#         id: tf-changes
+#         run: |
+#           echo "Processing Push Event"
+#           BASE_SHA=${{ github.event.before }}
+#           HEAD_SHA=${{ github.event.after }}
+
+#           echo "Comparing $BASE_SHA...$HEAD_SHA"
+          
+#           ALL_CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
+#           echo "All changed files:"
+#           echo "------------------"
+#           echo "$ALL_CHANGED_FILES"
+          
+#           FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^infra/terraform/' || true)
+#           echo "Filtered files:"
+#           echo "---------------"
+#           echo "$FILTERED_FILES"
+          
+#           if [ -n "$FILTERED_FILES" ]; then
+#             echo "terraform_changed=true" >> $GITHUB_OUTPUT
+#             echo "Matching files found"
+#           else
+#             echo "terraform_changed=false" >> $GITHUB_OUTPUT
+#             echo "No matching files found"
+#           fi
+      
+#       - name: Display terraform_changed Output
+#         run: |
+#           echo "Terraform changed: ${{ steps.tf-changes.outputs.terraform_changed }}"
+  
+#   terraform-apply:
+#     name: Terraform Apply
+#     needs: [check-terraform-changes]
+#     if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
+#     strategy:
+#       matrix:
+#         environment: [dev, staging]
+#     uses: ./.github/workflows/terraform-apply-reusable.yml
+#     with:
+#       environment: ${{ matrix.environment }}
+  
+#   check-code-changes:
+#     runs-on: ubuntu-latest
+#     outputs:
+#       code_changed: ${{ steps.code-changes.outputs.code_changed }}
+#     steps:
+#       - name: Check-out Code
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0  # Ensure full checkout
+
+#       - name: Check for Code Changes
+#         id: code-changes
+#         run: |
+#           echo "Processing Push Event"
+#           BASE_SHA=${{ github.event.before }}
+#           HEAD_SHA=${{ github.event.after }}
+
+#           echo "Comparing $BASE_SHA...$HEAD_SHA"
+          
+#           ALL_CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
+#           echo "All changed files:"
+#           echo "------------------"
+#           echo "$ALL_CHANGED_FILES"
+          
+#           FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^packages/|^services/' || true)
+#           echo "Filtered files:"
+#           echo "---------------"
+#           echo "$FILTERED_FILES"
+          
+#           if [ -n "$FILTERED_FILES" ]; then
+#             echo "code_changed=true" >> $GITHUB_OUTPUT
+#             echo "Matching files found"
+#           else
+#             echo "code_changed=false" >> $GITHUB_OUTPUT
+#             echo "No matching files found"
+#           fi
+      
+#       - name: Display code_changed Output
+#         run: |
+#           echo "Code changed: ${{ steps.code-changes.outputs.code_changed }}"
+  
+#   # Simple implementation to deploy all services, when code changed
+#   # TODO (@limorl): Deploy only changed services, based on dervice version change
+#   deploy-services:
+#     name: Terraform Apply
+#     needs: [check-code-changes, terraform-apply]
+#     if: needs.check-code-changes.outputs.code_changed == 'true'
+#     strategy:
+#       matrix:
+#         environment: [dev, staging]
+#     uses: ./.github/workflows/deployment-services-reusable.yml
+#     with:
+#       environment: ${{ matrix.environment }}
       
