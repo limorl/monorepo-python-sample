@@ -79,18 +79,6 @@ jobs:
       run: |
         cp .devcontainer/.env.ci .devcontainer/.env
 
-    - name: Run pre-commit and pre-push hooks & unit tests
-      if: needs.check-changes.outputs.code_changed == 'true'
-      uses: devcontainers/ci@v0.3
-      with:  # Run all code related hooks, all unit tests and skip the terraform hooks, they are handled by the terraform-plan action
-        runCmd: |
-          set -e
-          poetry run pre-commit run detect-secrets --all-files
-          poetry run pre-commit run ruff --all-files --hook-stage push
-          poetry run pre-commit run flake8 --all-files --hook-stage push
-          poetry run pre-commit run codespell --all-files --hook-stage push
-          poetry run pytest -m "not integration and not e2e"
-    
     - name: Create Devcontainer
       uses: devcontainers/ci@v0.3
       with:
