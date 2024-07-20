@@ -61,13 +61,58 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: ${{ matrix.environment }}
+  
+  check-code-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code_changed: ${{ steps.code-changes.outputs.code_changed }}
+    steps:
+      - name: Check-out Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full checkout
 
-  # deploy-services:
-  #   name: Deploy Services
-  #   needs: [terraform-apply]
-  #   strategy:
-  #     matrix:
-  #       environment: [dev, staging]
-  #   uses: ./.github/workflows/deploy-services-reusable.yml
-  #   with:
-  #     environment: ${{ matrix.environment }}
+      - name: Check for Code Changes
+        id: code-changes
+        run: |
+          echo "Processing Push Event"
+          BASE_SHA=${{ github.event.before }}
+          HEAD_SHA=${{ github.event.after }}
+
+          echo "Comparing $BASE_SHA...$HEAD_SHA"
+          
+          ALL_CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
+          echo "All changed files:"
+          echo "------------------"
+          echo "$ALL_CHANGED_FILES"
+          
+          FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^packages/|^services/' || true)
+          echo "Filtered files:"
+          echo "---------------"
+          echo "$FILTERED_FILES"
+          
+          if [ -n "$FILTERED_FILES" ]; then
+            echo "code_changed=true" >> $GITHUB_OUTPUT
+            echo "Matching files found"
+          else
+            echo "code_changed=false" >> $GITHUB_OUTPUT
+            echo "No matching files found"
+          fi
+      
+      - name: Display code_changed Output
+        run: |
+          echo "Code changed: ${{ steps.code-changes.outputs.code_changed }}"
+  
+  # Simple implementation to deploy all services, when code changed
+  # TODO (@limorl): Deploy only changed services, based on dervice version change
+  deploy-services:
+    name: Terraform Apply
+    needs: [check-code-changes, terraform-apply]
+    if: needs.check-code-changes.outputs.code_changed == 'true'
+    strategy:
+      matrix:
+        environment: [dev, staging]
+    uses: ./.github/workflows/deployment-services-reusable.yml
+    with:
+      environment: ${{ matrix.environment }}
+      

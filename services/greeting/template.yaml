@@ -1,3 +1,4 @@
+# SAM Tamplate used by GithubActions
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: SAM Template for Greeting Service
@@ -29,55 +30,30 @@ Parameters:
     Type: String
     Description: Docker image tag - Use package version for cloud deployments and any value for local dev deployments
 
+  Architecture:
+    Type: String
+    Default: x86_64 # supported by Github Actions
+    AllowedValues:
+      - x86_64 
+      - amd63
+      - arm64
+    Description: Architecture 
+
 Resources:
   GreetingApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Stage
   
-  GreetingLambdaExecutionRole:  # TODO (@limorl): Remove after moving to Terraform
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service: "lambda.amazonaws.com"
-            Action: "sts:AssumeRole"
-      Policies:
-        - PolicyName: "LambdaAppConfigAndSecretsManagerAccess"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: "Allow"
-                Action:
-                  - "appconfig:listApplications"
-                  - "appconfig:listConfigurationProfiles"
-                  - "appconfig:listEnvironments"
-                  - "appconfig:listDeploymentStrategies"
-                  - "appconfig:CreateApplication"
-                  - "appconfig:CreateEnvironment"
-                  - "appconfig:CreateConfigurationProfile"                  
-                  - "appconfig:StartConfigurationSession"
-                  - "appconfig:GetLatestConfiguration"
-                Resource: "*"   # Ideally, specify the ARN of the specific secrets or path expression such as "arn:aws:appconfig:*:*:application/*"
-              - Effect: "Allow"
-                Action:
-                  - "secretsmanager:GetSecretValue"
-                Resource: "*"  # Ideally, specify the ARN of the specific secrets or path expression such as "arn:aws:secretsmanager:*:*:secret:*"
-      ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-
   GreetingLambda:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: "greeting"
       PackageType: Image
       ImageUri: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/greeting:${DockerTag}'
-      Role: !GetAtt GreetingLambdaExecutionRole.Arn
+      Role: !Sub arn:aws:iam::${AWS:AccountId}:role/greeting-lambda-role
       Architectures:
-        - arm64   # default is amd64      
+        - !Ref Architecture  
       Environment:
         Variables:
           PLATFORM: !Ref Platform
@@ -103,3 +79,10 @@ Resources:
       DockerContext: ../../       # Set docker context to monorepo root to include local packages
       DockerTag: !Ref DockerTag   # Set DockerTage to package version when deploying to AWS
 
+Outputs:
+  GreetingApi:
+    Description: "API Gateway endpoint URL for Greeting function"
+    Value: !Sub "https://${GreetingApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/"
+  GreetingFunction:
+    Description: "Greeting Lambda Function ARN"
+    Value: !GetAtt GreetingLambda.Arn

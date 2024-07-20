@@ -1,0 +1,41 @@
+name: Service Deployment - Reusable Across Environments
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  service-deployment:
+    name: Service Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check-out Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set-up PWD Environment Variable
+      run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+
+    - name: Create CI Environment File
+      run: |
+        cp .devcontainer/.env.ci .devcontainer/.env
+
+    - name: Deploy Services
+      uses: devcontainers/ci@v0.3
+      with: 
+        runCmd: |
+          poetry run install-all
+          poetry run build-all
+          chmod +x .github/scripts/sam-build-and-deploy-services.sh
+          .github/scripts/sam-build-and-deploy-services.sh ${{ inputs.environment }} ${{ vars.AWS_ACCOUNT_ID }}
+
+    # TODO (@limorl): Run integration test periodically, instead of with each merge, since we deploy to prod manually

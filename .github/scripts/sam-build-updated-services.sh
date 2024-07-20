@@ -9,7 +9,14 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+# Ensure an AWS account id argument is provided
+if [ -z "$2" ]; then
+  echo "No AWS account id provided. Usage: ./sam-build-updated-services.sh <environment> <aws-account-id>"
+  exit 1
+fi
+
 ENVIRONMENT=$1
+AWS_ACCOUNT_ID=$2
 
 # Identify impacted Lambda services
 changed_files=$(git diff --name-only origin/${GITHUB_BASE_REF} ${GITHUB_SHA})

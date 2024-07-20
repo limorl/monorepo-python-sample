@@ -6,23 +6,26 @@ use_container = true
 parameter_overrides = [
     'Platform=local',
     'Stage=dev',
+    'DockerTag=latest',
+    'Architetcure=__TARGETARCH__' # Change according to your TARGETARCH environment variable
+]
+
+[dev.build.parameters]
+use_container = true
+parameter_overrides = [
+    'Stage=dev',
     'DockerTag=latest'
 ]
 
 [dev.build.parameters]
 use_container = true
 parameter_overrides = [
-    'Platform=AWS',
-    'Stage=dev',
+    'Stage=staging',
     'DockerTag=latest'
 ]
 
 [prod.build.parameters]
 use_container = true
-parameter_overrides = [
-    'Platform=AWS',
-    'Stage=prod'
-]
 
 # Local start-api (default configured for local dev)
 
@@ -32,7 +35,8 @@ container_host = 'host.docker.internal'  # Use for Mac only, else remove
 parameter_overrides = [
     'Platform=local',
     'Stage=dev',
-    'DockerTag=latest'
+    'DockerTag=latest',
+    'Architetcure=__TARGETARCH__' # Change according to your TARGETARCH environment variable
 ]
 
 # AWS deploy
@@ -40,10 +44,8 @@ parameter_overrides = [
 [dev.deploy.parameters]
 stack_name = 'greeting-service'
 region = 'eu-west-1'    # Set to primary/default region and override when to deploying to other regions
-capabilities = 'CAPABILITY_IAM'
-image_repository = '__ACCOUNT_ID__.dkr.ecr.eu-west-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
+image_repository = '__DEV_ACCOUNT_ID__.dkr.ecr.eu-west-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
 parameter_overrides = [
-    'Platform=AWS',
     'Stage=dev',
     'DockerTag=latest'
 ]
@@ -51,10 +53,8 @@ parameter_overrides = [
 [staging.deploy.parameters]
 stack_name = 'greeting-service'
 region = 'us-east-1'    # Set to primary/default region and override when to deploying to other regions
-capabilities = 'CAPABILITY_IAM'
-image_repository = '__ACCOUNT_ID__.dkr.ecr.us-east-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
+image_repository = '__STAGING_ACCOUNT_ID__.dkr.ecr.us-east-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
 parameter_overrides = [
-    'Platform=AWS',
     'Stage=staging',
     'DockerTag=latest'
 ]
@@ -62,9 +62,4 @@ parameter_overrides = [
 [prod.deploy.parameters]
 stack_name = 'greeting-service'
 region = 'us-east-1'    # Set to primary/default region and override when to deploying to other regions
-capabilities = 'CAPABILITY_IAM'
-image_repository = '__ACCOUNT_ID__.dkr.ecr.us-east-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
-parameter_overrides = [
-    'Platform=AWS',
-    'Stage=prod'
-]
+image_repository = '__PROD_ACCOUNT_ID__.dkr.ecr.us-east-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
