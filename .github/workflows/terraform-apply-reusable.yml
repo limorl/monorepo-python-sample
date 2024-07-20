@@ -6,6 +6,9 @@ on:
       environment:
         required: true
         type: string
+      terraform_changed:
+        required: true
+        type: string
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -14,6 +17,7 @@ permissions:
 jobs:
   terraform-apply:
     name: Terraform Apply
+    if: ${{ inputs.terraform_changed }} == 'true'
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
