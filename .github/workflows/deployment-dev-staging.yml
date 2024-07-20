@@ -50,7 +50,7 @@ jobs:
       - name: Display check-changes Output
         run: |
           echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
-          echo "Code changed: ${{ steps.check.outputs.terraformcode_changed }}"
+          echo "Code changed: ${{ steps.check.outputs.code_changed }}"
 
   deploy-infra:
     name: Deploy Infrastructure
@@ -61,7 +61,7 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable.yml
     with:
       environment: ${{ matrix.environment }}
-      terraform_changed: needs.check-changes.outputs.terraform_changed 
+      terraform_changed: ${{ needs.check-changes.outputs.terraform_changed }}
 
   deploy-services:
     needs: [check-changes, deploy-infra]

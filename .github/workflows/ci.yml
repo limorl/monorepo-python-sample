@@ -105,4 +105,4 @@ jobs:
     uses: ./.github/workflows/terraform-plan-reusable.yml
     with:
       environment: ${{ matrix.environment }}
-      terraform_changed: needs.check-changes.outputs.terraform_changed 
+      terraform_changed: ${{ needs.check-changes.outputs.terraform_changed }}
