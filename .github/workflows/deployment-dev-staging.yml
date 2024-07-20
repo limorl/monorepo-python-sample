@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   check-changes:
+    name: Check Changes
     runs-on: ubuntu-latest
     outputs:
       terraform_changed: ${{ steps.check.outputs.terraform_changed }}

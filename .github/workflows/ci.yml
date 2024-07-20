@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   check-changes:
+    name: Check Changes
     runs-on: ubuntu-latest
     outputs:
       terraform_changed: ${{ steps.check.outputs.terraform_changed }}
@@ -52,8 +53,8 @@ jobs:
           echo "Code changed: ${{ steps.check.outputs.terraformcode_changed }}"
 
   # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
-  code-checks:
-    name: CI Code Checks
+  code-validation:
+    name: Validate Code
     needs: [check-changes]
     runs-on: ubuntu-latest
 
