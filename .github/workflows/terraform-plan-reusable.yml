@@ -63,11 +63,3 @@ jobs:
         with:
           name: ${{ inputs.environment }}.tfplan
           path: ./infra/terraform/environments/${{ inputs.environment }}/${{ inputs.environment }}.tfplan
-
-  report-no-changes:
-    name: No Terraform Changes
-    if: inputs.terraform_changed != 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: No Terraform Changes
-        run: echo "No changes detected in Terraform files. Skipping Terraform plan for ${{ inputs.environment }} environment."
