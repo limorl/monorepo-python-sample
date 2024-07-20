@@ -17,7 +17,7 @@ permissions:
 jobs:
   terraform-apply:
     name: Terraform Apply
-    if: ${{ inputs.terraform_changed }} == 'true'
+    if: inputs.terraform_changed == 'true'
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
