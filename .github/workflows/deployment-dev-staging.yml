@@ -91,61 +91,57 @@ jobs:
     - name: Build and Deploy to Dev & Staging
       uses: devcontainers/ci@v0.3
       env:
-        GITHUB_TOKEN: ${{ secrets.GH_REPO_PAT }}
+        GH_TOKEN: ${{ secrets.GH_REPO_PAT }}
       with:
         runCmd: |
           set -e
+          
+          # Debug information
+          echo "GitHub CLI version:"
+          gh --version
+          
+          # Use GH_TOKEN environment variable for authentication
           echo "Authenticating with GitHub..."
-          echo "$GITHUB_TOKEN" | gh auth login --with-token
-
+          gh auth status || echo "Not authenticated"
+          
+          echo "Verifying GitHub authentication..."
+          gh auth status
+          
           echo "Installing and building with Poetry..."
           poetry run install-all
           poetry run build-all
 
-          ENV=dev
-          echo "> Deploying to $ENV environment..."
-          VARS=$(gh variable list -e $ENV)
-          
-          AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
-          if [ -z "$AWS_ACCOUNT_ID" ]; then
-            echo "Failed to retrieve AWS_ACCOUNT_ID for $ENV environment"
-            exit 1
-          fi
-          
-          AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
-          if [ -z "$AWS_PRIMARY_REGION" ]; then
-            echo "Failed to retrieve AWS_PRIMARY_REGION for $ENV environment"
-            exit 1
-          fi
-          
-          echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
-          echo "AWS_PRIMARY_REGION: $AWS_PRIMARY_REGION"
-          
-          chmod +x .github/scripts/sam-build-and-deploy-services.sh
-          .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION
+          # Function to deploy to an environment
+          deploy_to_env() {
+            local ENV=$1
+            echo "> Deploying to $ENV environment..."
+            
+            echo "Listing variables for $ENV:"
+            VARS=$(gh variable list -e $ENV)
+            echo "$VARS"
+            
+            AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
+            if [ -z "$AWS_ACCOUNT_ID" ]; then
+              echo "Failed to retrieve AWS_ACCOUNT_ID for $ENV environment"
+              return 1
+            fi
+            
+            AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
+            if [ -z "$AWS_PRIMARY_REGION" ]; then
+              echo "Failed to retrieve AWS_PRIMARY_REGION for $ENV environment"
+              return 1
+            fi
+            
+            echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
+            echo "AWS_PRIMARY_REGION: $AWS_PRIMARY_REGION"
+            
+            chmod +x .github/scripts/sam-build-and-deploy-services.sh
+            .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION
+          }
 
-          ENV=staging
-          echo "> Deploying to $ENV environment..."
-          VARS=$(gh variable list -e $ENV)
-          
-          AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
-          if [ -z "$AWS_ACCOUNT_ID" ]; then
-            echo "Failed to retrieve AWS_ACCOUNT_ID for $ENV environment"
-            exit 1
-          fi
-          
-          AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
-          if [ -z "$AWS_PRIMARY_REGION" ]; then
-            echo "Failed to retrieve AWS_PRIMARY_REGION for $ENV environment"
-            exit 1
-          fi
-          
-          echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
-          echo "AWS_PRIMARY_REGION: $AWS_PRIMARY_REGION"
-          
-          chmod +x .github/scripts/sam-build-and-deploy-services.sh
-          .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION
-          
+          deploy_to_env "dev" || exit 1
+          deploy_to_env "staging" || exit 1
+
 # name: Deploy to Dev & Staging
 
 # on:
