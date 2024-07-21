@@ -24,7 +24,7 @@ jobs:
               exit 1
             fi
           
-          local ENV=dev
+          ENV=dev
           echo "> Deploying to $ENV environment..."
 
           echo "Listing variables for $ENV:"
