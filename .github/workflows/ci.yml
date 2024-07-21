@@ -75,62 +75,36 @@ jobs:
       with:
         fetch-depth: 0
     
-    - name: Display code_changed Output
+    - name: Set-up Devcontainer Environment Variables
       if: needs.check-changes.outputs.code_changed == 'true'
       run: |
-        echo "Code changed: ${{ steps.code-changes.outputs.code_changed }}"
-
-    - name: Set-up PWD Environment Variable
-      if: needs.check-changes.outputs.code_changed == 'true'
-      run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
-
-    - name: Create CI Environment File
-      if: needs.check-changes.outputs.code_changed == 'true'
-      run: |
+        echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
         cp .devcontainer/.env.ci .devcontainer/.env
-
         echo ".devcontainer/.env:"
         cat .devcontainer/.env
 
-    - name: Create Devcontainer
+    - name: Run Code Validation in Devcontainer
       if: needs.check-changes.outputs.code_changed == 'true'
       uses: devcontainers/ci@v0.3
       with:
-        runCmd: echo "Devcontainer created and ready for use"
-    
-    - name: Run detect-secrets
-      if: needs.check-changes.outputs.code_changed == 'true'
-      uses: devcontainers/ci@v0.3
-      with:
-        runCmd: poetry run pre-commit run detect-secrets --all-files
-
-    - name: Run ruff
-      if: needs.check-changes.outputs.code_changed == 'true'
-      uses: devcontainers/ci@v0.3
-      with:
-        runCmd: poetry run pre-commit run ruff --all-files --hook-stage push
-
-    - name: Run flake8
-      if: needs.check-changes.outputs.code_changed == 'true'
-      uses: devcontainers/ci@v0.3
-      with:
-        runCmd: poetry run pre-commit run flake8 --all-files --hook-stage push
-
-    - name: Run codespell
-      if: needs.check-changes.outputs.code_changed == 'true'
-      uses: devcontainers/ci@v0.3
-      with:
-        runCmd: poetry run pre-commit run codespell --all-files --hook-stage push
-
-    - name: Run pytest (unit tests)
-      if: needs.check-changes.outputs.code_changed == 'true'
-      uses: devcontainers/ci@v0.3
-      with:
-        runCmd: poetry run pytest -m "not integration and not e2e"
-
-    - name: Skip Code Checks
-      if: needs.check-changes.outputs.code_changed != 'true'
-      run: echo "No code changes detected. Skipping code checks."
+        runCmd: |
+          set -e
+          echo "Running detect-secrets..."
+          poetry run pre-commit run detect-secrets --all-files
+          
+          echo "Running ruff..."
+          poetry run pre-commit run ruff --all-files --hook-stage push
+          
+          echo "Running flake8..."
+          poetry run pre-commit run flake8 --all-files --hook-stage push
+          
+          echo "Running codespell..."
+          poetry run pre-commit run codespell --all-files --hook-stage push
+          
+          echo "Running pytest (unit tests)..."
+          poetry run pytest -m "not integration and not e2e"
+          
+          echo "All code validation checks completed!"
   
   # The reusable workflow checks if terraform file has changed or not, since this is a required status check in the CI
   terraform-plan:
