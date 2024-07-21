@@ -144,7 +144,7 @@ jobs:
           
           chmod +x .github/scripts/sam-build-and-deploy-services.sh
           .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION
-
+          
 # name: Deploy to Dev & Staging
 
 # on:
