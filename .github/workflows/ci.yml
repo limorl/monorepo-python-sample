@@ -16,7 +16,12 @@ jobs:
       contents: read
       issues: write
     steps:
-      - run: |
+      - name: Check-out Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full checkout
+      - name: Debug Git Auth
+        run: |
           echo "Verifying GitHub authentication..."
             gh auth status
             if [ $? -ne 0 ]; then
