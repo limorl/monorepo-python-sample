@@ -10,6 +10,29 @@ permissions:
   pull-requests: write  # This allows the workflow to comment on PRs
 
 jobs:
+  debug-gh-token:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - run: |
+          echo "Verifying GitHub authentication..."
+            gh auth status
+            if [ $? -ne 0 ]; then
+              echo "GitHub CLI is not authenticated"
+              exit 1
+            fi
+          
+          local ENV=dev
+          echo "> Deploying to $ENV environment..."
+
+          echo "Listing variables for $ENV:"
+          VARS=$(gh variable list -e $ENV)
+          echo "$VARS"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   check-changes:
     name: Check Changes
     runs-on: ubuntu-latest
