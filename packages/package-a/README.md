@@ -1,3 +1,3 @@
 # Package A
 
-Sample package
+Sample package.
