@@ -39,7 +39,6 @@ jobs:
           if grep -q "^infra/terraform/" changed_files.txt; then
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
             echo "terraform_changed=true"
-            echo "terraform_changed=true" >> $GITHUB_OUTPUT
             echo "Matching Terraform files:"
             grep "^infra/terraform/" changed_files.txt
           else
@@ -111,11 +110,10 @@ jobs:
       with:
         runCmd: |
           ENV=dev
-        
+          
           # Use GitHub CLI to get the environment variables
-          echo "$GITHUB_TOKEN" | gh auth login --with-token
-          AWS_ACCOUNT_ID=$(gh variable get -e $ENV AWS_ACCOUNT_ID)
-          AWS_PRIMARY_REGION=$(gh variable get -e $ENV AWS_PRIMARY_REGION)
+          AWS_ACCOUNT_ID=$(gh variable get -e $ENV AWS_ACCOUNT_ID --token "$GITHUB_TOKEN")
+          AWS_PRIMARY_REGION=$(gh variable get -e $ENV AWS_PRIMARY_REGION --token "$GITHUB_TOKEN")
           
           echo "Deploying services to $ENV"
           chmod +x .github/scripts/sam-build-and-deploy-services.sh
@@ -130,14 +128,13 @@ jobs:
           ENV=staging
 
           # Use GitHub CLI to get the environment variables
-          echo "$GITHUB_TOKEN" | gh auth login --with-token
-          AWS_ACCOUNT_ID=$(gh variable get -e $ENV AWS_ACCOUNT_ID)
-          AWS_PRIMARY_REGION=$(gh variable get -e $ENV AWS_PRIMARY_REGION)
+          AWS_ACCOUNT_ID=$(gh variable get -e $ENV AWS_ACCOUNT_ID --token "$GITHUB_TOKEN")
+          AWS_PRIMARY_REGION=$(gh variable get -e $ENV AWS_PRIMARY_REGION --token "$GITHUB_TOKEN")
           
           echo "Deploying services to $ENV"
           chmod +x .github/scripts/sam-build-and-deploy-services.sh
           .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION
-    
+
 # name: Deploy to Dev & Staging
 
 # on:
