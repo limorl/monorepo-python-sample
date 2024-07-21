@@ -50,6 +50,25 @@ RUN if [ "${TARGETARCH}" = "arm64" ]; then \
         rm -rf aws && rm awscli.zip ; \
     fi
 
+# Github CLI Default Version
+ARG GH_CLI_VERSION=2.32.1
+
+# Install Github CLI (used by Github Actions)
+RUN apt-get update && apt-get install -y \
+    curl \
+    gpg \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN case ${TARGETARCH} in \
+        "x86_64") ARCH="amd64" ;; \
+        "amd64")  ARCH="amd64" ;; \
+        "arm64")  ARCH="arm64" ;; \
+        *)        echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
+    esac \
+    && curl -fsSL https://github.com/cli/cli/releases/download/v${GH_CLI_VERSION}/gh_${GH_CLI_VERSION}_linux_${ARCH}.deb -o gh.deb \
+    && dpkg -i gh.deb \
+    && rm gh.deb
+
 # Install AWS SAM CLI
 RUN pip install aws-sam-cli
 
