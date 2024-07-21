@@ -88,6 +88,7 @@ jobs:
       uses: devcontainers/ci@v0.3
       with:
         runCmd: |
+          set -e
           echo "Running detect-secrets..."
           poetry run pre-commit run detect-secrets --all-files
           
