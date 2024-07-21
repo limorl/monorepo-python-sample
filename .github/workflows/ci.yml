@@ -31,18 +31,28 @@ jobs:
           HEAD_SHA=${{ github.event.pull_request.head.sha }}
 
           git diff --name-only $BASE_SHA $HEAD_SHA > changed_files.txt
+
+          echo "Changed files:"
+          cat changed_files.txt
           
+          echo "Checking for Terraform changes..."
           if grep -q "^infra/terraform/" changed_files.txt; then
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
             echo "terraform_changed=true"
+            echo "terraform_changed=true" >> $GITHUB_OUTPUT
+            echo "Matching Terraform files:"
+            grep "^infra/terraform/" changed_files.txt
           else
             echo "terraform_changed=false" >> $GITHUB_OUTPUT
             echo "terraform_changed=false"
           fi
           
+          echo "Checking for Code changes..."
           if grep -qE "^services/|^packages/" changed_files.txt; then
              echo "code_changed=true" >> $GITHUB_OUTPUT
              echo "code_changed=true"
+             echo "Matching Code files:"
+             grep -E "^services/|^packages/" changed_files.txt
           else
              echo "code_changed=false" >> $GITHUB_OUTPUT
              echo "code_changed=false"
