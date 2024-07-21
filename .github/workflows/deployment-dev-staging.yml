@@ -77,28 +77,51 @@ jobs:
 
     - name: Create CI Environment File
       run: cp .devcontainer/.env.ci .devcontainer/.env
+    
+    - name: Create Devcontainer
+      uses: devcontainers/ci@v0.3
+      with:
+        runCmd: echo "Devcontainer created and ready for use"
 
-    - name: Deploy Infrastructure and Services
+    - name: Poetry Install & Buils
       uses: devcontainers/ci@v0.3
       env:
         GITHUB_TOKEN: ${{ secrets.GH_REPO_PAT }}
       with:
         runCmd: |
-          for env in dev staging; do
-            echo "Processing $env environment"
-            
-            # Use GitHub CLI to get the environment variables
-            AWS_ACCOUNT_ID=$(gh variable get -e $env AWS_ACCOUNT_ID)
-        
-            if [[ "${{ needs.check-changes.outputs.code_changed }}" == "true" ]]; then
-              echo "Deploying services for $env"
-              poetry run install-all
-              poetry run build-all
-              chmod +x .github/scripts/sam-build-and-deploy-services.sh
-              .github/scripts/sam-build-and-deploy-services.sh $env $AWS_ACCOUNT_ID
-            fi
-          done
+          poetry run install-all
+          poetry run build-all
+    
+    - name: Deploy Services - Dev
+      uses: devcontainers/ci@v0.3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_REPO_PAT }}
+      with:
+        runCmd: |
+          ENV=dev
 
+          # Use GitHub CLI to get the environment variables
+          AWS_ACCOUNT_ID=$(gh variable get -e $ENV AWS_ACCOUNT_ID)
+          
+          echo "Deploying services to $ENV"
+          chmod +x .github/scripts/sam-build-and-deploy-services.sh
+          .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID
+
+    - name: Deploy Services - Staging
+      uses: devcontainers/ci@v0.3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_REPO_PAT }}
+      with:
+        runCmd: |
+          ENV=staging
+
+          # Use GitHub CLI to get the environment variables
+          AWS_ACCOUNT_ID=$(gh variable get -e $ENV AWS_ACCOUNT_ID)
+          
+          echo "Deploying services to $ENV"
+          chmod +x .github/scripts/sam-build-and-deploy-services.sh
+          .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID
+    
 # name: Deploy to Dev & Staging
 
 # on:
