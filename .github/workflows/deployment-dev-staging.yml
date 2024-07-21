@@ -97,7 +97,7 @@ jobs:
       with:
         runCmd: |
           ENV=dev
-
+        
           # Use GitHub CLI to get the environment variables
           echo "$GITHUB_TOKEN" | gh auth login --with-token
           AWS_ACCOUNT_ID=$(gh variable get -e $ENV AWS_ACCOUNT_ID)
