@@ -6,8 +6,8 @@ ARG VARIANT="-bullseye"
 
 FROM ${IMAGE}:${VERSION}${VARIANT}
 
-# Default target architecture. For another architecture, change .env file
-ARG TARGETARCH="arm64"
+ARG TARGETARCH
+RUN echo "TARGETARCH is: ${TARGETARCH}"
 
 # Install Docker CE CLI
 RUN apt-get update \
@@ -25,8 +25,16 @@ RUN export LATEST_COMPOSE_VERSION=$(curl -sSL "https://api.github.com/repos/dock
 # Install terraform
 ARG TERRAFORM_VERSION="1.7.5"
 
-# Install terraform
-RUN curl "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip" -o "terraform.zip" \
+RUN ARCH=${TARGETARCH:-$(dpkg --print-architecture)} && \
+    echo "ARCH is set to: $ARCH" && \
+    case $ARCH in \
+        "x86_64") TF_ARCH="amd64" ;; \
+        "amd64")  TF_ARCH="amd64" ;; \
+        "arm64")  TF_ARCH="arm64" ;; \
+        *)        echo "Unsupported architecture: $ARCH"; exit 1 ;; \
+    esac && \
+    echo "Installing Terraform for architecture: $TF_ARCH" && \
+    curl "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}.zip" -o "terraform.zip" \
     && unzip terraform.zip \
     && mv terraform /usr/local/bin/ \
     && rm -rf terraform.zip
@@ -36,19 +44,20 @@ RUN apt-get update && \
     apt-get install -y software-properties-common zip unzip && \
     apt-get clean
 
-RUN if [ "${TARGETARCH}" = "arm64" ]; then \
-        export AWS_CLI_ARCH="aarch64" && \
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-${AWS_CLI_ARCH}.zip" -o "awscli.zip" && \
-        unzip awscli.zip && \
-        ./aws/install && \
-        rm -rf aws && rm awscli.zip ; \
-    else \
-        export AWS_CLI_ARCH="x86_64" && \
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-${AWS_CLI_ARCH}.zip" -o "awscli.zip" && \
-        unzip awscli.zip && \
-        ./aws/install && \
-        rm -rf aws && rm awscli.zip ; \
-    fi
+# Install AWS CLI
+RUN ARCH=${TARGETARCH:-$(dpkg --print-architecture)} && \
+    echo "ARCH is set to: $ARCH" && \
+    case $ARCH in \
+        "x86_64") AWS_CLI_ARCH="x86_64" ;; \
+        "amd64")  AWS_CLI_ARCH="x86_64" ;; \
+        "arm64")  AWS_CLI_ARCH="aarch64" ;; \
+        *)        echo "Unsupported architecture: $ARCH"; exit 1 ;; \
+    esac && \
+    echo "Installing AWS CLI for architecture: $AWS_CLI_ARCH" && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-${AWS_CLI_ARCH}.zip" -o "awscli.zip" && \
+    unzip awscli.zip && \
+    ./aws/install && \
+    rm -rf aws && rm awscli.zip ;
 
 # Github CLI Default Version
 ARG GH_CLI_VERSION=2.32.1
@@ -59,15 +68,22 @@ RUN apt-get update && apt-get install -y \
     gpg \
     && rm -rf /var/lib/apt/lists/*
 
-RUN case ${TARGETARCH} in \
-        "x86_64") ARCH="amd64" ;; \
-        "amd64")  ARCH="amd64" ;; \
-        "arm64")  ARCH="arm64" ;; \
-        *)        echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
-    esac \
-    && curl -fsSL https://github.com/cli/cli/releases/download/v${GH_CLI_VERSION}/gh_${GH_CLI_VERSION}_linux_${ARCH}.deb -o gh.deb \
-    && dpkg -i gh.deb \
-    && rm gh.deb
+
+RUN ARCH=${TARGETARCH:-$(dpkg --print-architecture)} && \
+    echo "ARCH is set to: $ARCH" && \
+    if [ "$ARCH" != "arm64" ]; then \
+        case $ARCH in \
+            "x86_64") GH_ARCH="amd64" ;; \
+            "amd64")  GH_ARCH="amd64" ;; \
+            *)        echo "Unsupported architecture: $ARCH" && exit 1 ;; \
+        esac && \
+        echo "Installing GitHub CLI for architecture: $GH_ARCH" && \
+        curl -fsSL https://github.com/cli/cli/releases/download/v${GH_CLI_VERSION}/gh_${GH_CLI_VERSION}_linux_${GH_ARCH}.deb -o gh.deb && \
+        dpkg -i gh.deb && \
+        rm gh.deb; \
+    else \
+        echo "Skipping GitHub CLI installation for arm64 architecture"; \
+    fi
 
 # Install AWS SAM CLI
 RUN pip install aws-sam-cli
