@@ -1,1 +1,3 @@
 # Package B
+
+Sample package.
