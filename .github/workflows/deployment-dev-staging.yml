@@ -112,13 +112,16 @@ jobs:
           ENV=dev
           
           # Use GitHub CLI to get the environment variables
-          AWS_ACCOUNT_ID=$(gh variable list -e $ENV --json name,value | jq -r '.[] | select(.name == "AWS_ACCOUNT_ID") | .value')
+          echo "Retrieving variables for $ENV environment"
+          VARS=$(gh variable list -e $ENV)
+          
+          AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
           if [ -z "$AWS_ACCOUNT_ID" ]; then
             echo "Failed to retrieve AWS_ACCOUNT_ID for $ENV environment"
             exit 1
           fi
           
-          AWS_PRIMARY_REGION=$(gh variable list -e $ENV --json name,value | jq -r '.[] | select(.name == "AWS_PRIMARY_REGION") | .value')
+          AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
           if [ -z "$AWS_PRIMARY_REGION" ]; then
             echo "Failed to retrieve AWS_PRIMARY_REGION for $ENV environment"
             exit 1
@@ -140,13 +143,16 @@ jobs:
           ENV=staging
 
           # Use GitHub CLI to get the environment variables
-          AWS_ACCOUNT_ID=$(gh variable list -e $ENV --json name,value | jq -r '.[] | select(.name == "AWS_ACCOUNT_ID") | .value')
+          echo "Retrieving variables for $ENV environment"
+          VARS=$(gh variable list -e $ENV)
+          
+          AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
           if [ -z "$AWS_ACCOUNT_ID" ]; then
             echo "Failed to retrieve AWS_ACCOUNT_ID for $ENV environment"
             exit 1
           fi
           
-          AWS_PRIMARY_REGION=$(gh variable list -e $ENV --json name,value | jq -r '.[] | select(.name == "AWS_PRIMARY_REGION") | .value')
+          AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
           if [ -z "$AWS_PRIMARY_REGION" ]; then
             echo "Failed to retrieve AWS_PRIMARY_REGION for $ENV environment"
             exit 1
@@ -158,7 +164,7 @@ jobs:
           
           chmod +x .github/scripts/sam-build-and-deploy-services.sh
           .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION
-
+          
 # name: Deploy to Dev & Staging
 
 # on:
