@@ -1,3 +1,3 @@
 # Package B
 
-Sample package.
+Sample package with dependency

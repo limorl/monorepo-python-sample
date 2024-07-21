@@ -100,6 +100,7 @@ jobs:
             gh --version
 
             echo "Authenticating with GitHub..."
+            export GH_TOKEN=${{ secrets.GH_REPO_PAT }}
             gh auth login --with-token <<< $GH_TOKEN
             if [ $? -ne 0 ]; then
               echo "Failed to authenticate with GitHub CLI"
