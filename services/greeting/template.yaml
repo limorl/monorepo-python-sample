@@ -32,10 +32,9 @@ Parameters:
 
   Architecture:
     Type: String
-    Default: x86_64 # supported by Github Actions
+    Default: x86_64 # to go with Github Actions amd64
     AllowedValues:
       - x86_64 
-      - amd63
       - arm64
     Description: Architecture 
 
