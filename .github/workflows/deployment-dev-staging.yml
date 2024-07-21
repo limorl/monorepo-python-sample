@@ -87,6 +87,7 @@ jobs:
     - name: Create CI Environment File
       run: |
         cp .devcontainer/.env.ci .devcontainer/.env
+
         echo ".devcontainer/.env:"
         cat .devcontainer/.env
     
