@@ -86,7 +86,11 @@ jobs:
       run: echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
 
     - name: Create CI Environment File
-      run: cp .devcontainer/.env.ci .devcontainer/.env
+      run: |
+        cp .devcontainer/.env.ci .devcontainer/.env
+
+        echo ".devcontainer/.env:"
+        cat ./devcontainer/.env
     
     - name: Create Devcontainer
       uses: devcontainers/ci@v0.3
