@@ -1,37 +1,45 @@
 # See https://docs.docker.com/engine/reference/builder/#dockerignore-file
-# Files and folder to ignore and remove from devcontainer's context
+# Version control
 .git
 .gitignore
+.gitattributes
 
-Dockerfile.tmpl
-
-.bash_history
-.mypy_cache
-.pytest_cache
-
-__pycache__
-.env
-*.env
-
-docs
-!docs/requirements.txt
-
-cli/build
-cli/dist
-*.egg-info/
-
+# Build artifacts
+**/build
+**/dist
+**/*.egg-info
+**/__pycache__
+**/.mypy_cache
+**/.pytest_cache
 **/.terraform
-tfplan*
-*.log
-
-templates/workspace_services/guacamole/guacamole-server/guacamole-auth-azure/target
-
 **/node_modules
 **/.cnab
-
 ui/app/build
 site
 
+# Environment and config files
+**/.env
+**/*.env
+.bash_history
+tfplan*
+*.log
+.serverless
+serverless.yml
 
+# Documentation
+docs
+!docs/requirements.txt
 
-.serverlessserverless.yml
+# Specific exclusions
+Dockerfile.tmpl
+templates/workspace_services/guacamole/guacamole-server/guacamole-auth-azure/target
+
+# IDEs and editors
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS generated
+.DS_Store
+Thumbs.db
