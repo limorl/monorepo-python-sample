@@ -90,7 +90,7 @@ jobs:
         cp .devcontainer/.env.ci .devcontainer/.env
 
         echo ".devcontainer/.env:"
-        cat ./devcontainer/.env
+        cat .devcontainer/.env
 
     - name: Create Devcontainer
       if: needs.check-changes.outputs.code_changed == 'true'
