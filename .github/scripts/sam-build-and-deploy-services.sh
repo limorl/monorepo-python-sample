@@ -8,13 +8,14 @@ set -e
 
 
 # Ensure correct number of arguments
-if [ $# -ne 2 ]; then
-    echo "Usage: ./sam-build-and-deploy-services.sh <dev|staging|prod> <aws-account-id>"
+if [ $# -ne 3 ]; then
+    echo "Usage: ./sam-build-and-deploy-services.sh <dev|staging|prod> <aws-account-id> <aws-primary-region>"
     exit 1
 fi
 
 ENVIRONMENT=$1
 AWS_ACCOUNT_ID=$2
+AWS_PRIMARY_REGION=$3
 
 ENVIRONMENT_UPPER=$(echo "$ENVIRONMENT" | tr '[:lower:]' '[:upper:]')
 ACCOUNT_ID_PLACEHOLDER="__${ENVIRONMENT_UPPER}_ACCOUNT_ID__"
@@ -76,6 +77,9 @@ build_and_deploy_service() {
     
     echo "Building $service_name:$package_version"
     sam build --config-env "$ENVIRONMENT" --parameter-overrides "Stage=$ENVIRONMENT DockerTag=$package_version"
+
+    echo "Deploying service configuration $service_name:$package_version"
+    poetry run deploy-service-configuration --aervice-name "$service_name" --stage "$ENVIRONMENT" --region "$AWS_PRIMARY_REGION"
     
     echo "Deploying $service_name:$package_version"
     sam deploy --config-env "$ENVIRONMENT" --parameter-overrides "Stage=$ENVIRONMENT DockerTag=$package_version"
