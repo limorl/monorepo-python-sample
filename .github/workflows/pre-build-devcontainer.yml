@@ -7,6 +7,10 @@ on:
 jobs:
   pre-build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,6 +35,6 @@ jobs:
       - name: Pre-build Devcontainer
         uses: devcontainers/ci@v0.3
         with:
-          imageName: ghcr.io/${{ github.repository }}/devcontainer
-          cacheFrom: ghcr.io/${{ github.repository }}/devcontainer
+          imageName: ghcr.io/limorl/monorepo-python-sample-devcontainer
+          cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
           push: always
