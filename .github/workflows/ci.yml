@@ -5,9 +5,10 @@ on:
     branches: [main]
 
 permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
-  pull-requests: write  # This allows the workflow to comment on PRs
+  id-token: write # Required for requesting the JWT
+  contents: read  # Required for actions/checkout
+  packages: write # Rewuired for publishing packages/images to gcr
+  pull-requests: write  # Allows the workflow to comment on PRs
 
 jobs:
   check-changes:
@@ -76,9 +77,6 @@ jobs:
     name: Pre-build Devcontainer
     needs: [check-changes]
     if: needs.check-changes.outputs.devcontainer_changed == 'true'
-    permissions:
-      packages: write
-      contents: read
     uses: ./.github/workflows/pre-build-devcontainer.yml
   
    # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
