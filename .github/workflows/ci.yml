@@ -117,7 +117,7 @@ jobs:
 
               # Similarly to aws-actions/configure-aws-credentials to set up credentials
               chmod +x .github/scripts/aws-configure-credentials.sh
-              if ! aws-configure-credentials \
+              if ! aws-configure-credentials.sh \
                 --role-to-assume "$AWS_GITHUB_ACTIONS_ROLE" \
                 --role-session-name "GithubWorkflow-DeployServices-$ENV" \
                 --aws-region "$AWS_PRIMARY_REGION" \
