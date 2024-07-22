@@ -38,7 +38,7 @@ jobs:
           echo "$VARS"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_ACTIONS_PAT: ${{ secrets.GH_Actions_PAT }}
+          GH_ACTIONS_PAT: ${{ secrets.GH_ACTIONS_PAT }}
 
   check-changes:
     name: Check Changes
