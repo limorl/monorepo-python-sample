@@ -39,7 +39,6 @@ jobs:
           if grep -q "^infra/terraform/" changed_files.txt; then
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
             echo "terraform_changed=true"
-            echo "terraform_changed=true" >> $GITHUB_OUTPUT
             echo "Matching Terraform files:"
             grep "^infra/terraform/" changed_files.txt
           else
@@ -72,6 +71,7 @@ jobs:
         run: |
           echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
           echo "Code changed: ${{ steps.check.outputs.code_changed }}"
+          echo "Devcontainer changed: ${{ steps.check.outputs.devcontainer_changed }}"
   
   pre-build-devcontainer:
     name: Pre-build Devcontainer
