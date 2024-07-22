@@ -157,7 +157,6 @@ jobs:
               
               # Temporarily disable deployment
               .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION
-            }
 
             deploy_to_env "dev" || exit 1
             deploy_to_env "staging" || exit 1
