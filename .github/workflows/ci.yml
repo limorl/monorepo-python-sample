@@ -10,6 +10,48 @@ permissions:
   pull-requests: write  # This allows the workflow to comment on PRs
 
 jobs:
+  debug-gh-token:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Check-out Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full checkout
+      - name: Debug Git Auth
+        run: |
+          # Temporarily unset GITHUB_TOKEN
+          GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
+          unset GITHUB_TOKEN
+          
+          echo "Authenticating with PAT..."
+          gh auth login --with-token <<< "$GH_ACTIONS_PAT"
+          
+          echo "Verifying GitHub authentication..."
+          gh auth status
+          
+          ENV=dev
+          echo "> Attempting to access $ENV environment variables..."
+
+          echo "Listing variables for $ENV:"
+          if ! VARS=$(gh variable list -e $ENV 2>&1); then
+            echo "Failed to list variables. Error:"
+            echo "$VARS"
+            echo "Attempting to get repository details..."
+            gh api repos/$GITHUB_REPOSITORY || echo "Failed to access repo API"
+            echo "Attempting to list environments..."
+            gh api repos/$GITHUB_REPOSITORY/environments || echo "Failed to list environments"
+          else
+            echo "$VARS"
+          fi
+          
+          # Restore GITHUB_TOKEN if needed for other operations
+          export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
+        env:
+          GH_ACTIONS_PAT: ${{ secrets.GH_ACTIONS_PAT }}
+        
   check-changes:
     name: Check Changes
     runs-on: ubuntu-latest
