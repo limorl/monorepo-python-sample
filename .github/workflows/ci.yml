@@ -13,9 +13,6 @@ jobs:
   debug-gh-token:
     runs-on: ubuntu-latest
     environment: dev
-    permissions:
-      contents: read
-      issues: write
     steps:
       - name: Check-out Code
         uses: actions/checkout@v4
