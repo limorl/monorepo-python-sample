@@ -100,7 +100,7 @@ jobs:
             GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
             unset GITHUB_TOKEN
             
-            echo "Authenticating with GH_ACTIONS_PAT..."
+            echo ">> Authenticating with GH_ACTIONS_PAT..."
             gh auth login --with-token <<< "$GH_ACTIONS_PAT"
             
             echo "Verifying GitHub authentication..."
@@ -109,10 +109,6 @@ jobs:
               echo "GitHub CLI is not authenticated"
               exit 1
             fi
-            
-            echo "Installing and building with Poetry..."
-            poetry run install-all
-            poetry run build-all
 
             deploy_to_env() {
               local ENV=$1
@@ -130,21 +126,32 @@ jobs:
                 echo "$VARS"
               fi
 
-              echo ">> Deploying to $ENV environment..."
               AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
-              if [ -z "$AWS_ACCOUNT_ID" ]; then
-                echo "Failed to retrieve AWS_ACCOUNT_ID for $ENV environment"
-                return 1
-              fi
-
               AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
-              if [ -z "$AWS_PRIMARY_REGION" ]; then
-                echo "Failed to retrieve AWS_PRIMARY_REGION for $ENV environment"
+              AWS_GITHUB_ACTIONS_ROLE=$(echo "$VARS" | grep AWS_GITHUB_ACTIONS_ROLE | awk '{print $2}')
+
+              if [ -z "$AWS_ACCOUNT_ID" ] || [ -z "$AWS_PRIMARY_REGION" ] || [ -z "$AWS_GITHUB_ACTIONS_ROLE" ]; then
+                echo "Failed to retrieve necessary AWS variables for $ENV environment"
                 return 1
               fi
 
               echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
               echo "AWS_PRIMARY_REGION: $AWS_PRIMARY_REGION"
+              echo "AWS_GITHUB_ACTIONS_ROLE: $AWS_GITHUB_ACTIONS_ROLE"
+
+              echo ">> Configuring AWS credentials for $ENV..."
+              # Similarly to aws-actions/configure-aws-credentials to set up credentials
+              aws-actions-configure-aws-credentials \
+                --role-to-assume "$AWS_GITHUB_ACTIONS_ROLE" \
+                --role-session-name "GithubWorkflow-DeployServices-$ENV" \
+                --aws-region "$AWS_PRIMARY_REGION"
+
+              echo "Verifying AWS authentication for $ENV..."
+              aws sts get-caller-identity
+
+              echo ">> Deploying to $ENV environment..."
+              poetry run install-all
+              poetry run build-all
 
               chmod +x .github/scripts/sam-build-and-deploy-services.sh
               
