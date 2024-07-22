@@ -1,4 +1,4 @@
-name: Terraform Apply - Reusable Across Environments
+name: Terraform Apply to {env}
 
 on:
   workflow_call:

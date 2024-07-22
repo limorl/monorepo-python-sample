@@ -1,4 +1,4 @@
-name: Terraform Plan - Reusable Across Environments
+name: Terraform Plan to {env}
 
 on:
   workflow_call:

@@ -5,9 +5,10 @@ on:
     branches: [main]
 
 permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
-  pull-requests: write  # This allows the workflow to comment on PRs
+  id-token: write # Required for requesting the JWT
+  contents: read  # Required for actions/checkout
+  packages: write # Required for publishing packages/images to gcr
+  pull-requests: write  # Allows the workflow to comment on PRs
 
 jobs:
   check-changes:
@@ -38,7 +39,6 @@ jobs:
           if grep -q "^infra/terraform/" changed_files.txt; then
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
             echo "terraform_changed=true"
-            echo "terraform_changed=true" >> $GITHUB_OUTPUT
             echo "Matching Terraform files:"
             grep "^infra/terraform/" changed_files.txt
           else
@@ -71,6 +71,7 @@ jobs:
         run: |
           echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
           echo "Code changed: ${{ steps.check.outputs.code_changed }}"
+          echo "Devcontainer changed: ${{ steps.check.outputs.devcontainer_changed }}"
   
   pre-build-devcontainer:
     name: Pre-build Devcontainer
@@ -78,7 +79,7 @@ jobs:
     if: needs.check-changes.outputs.devcontainer_changed == 'true'
     uses: ./.github/workflows/pre-build-devcontainer.yml
   
-   # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
+  # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
   code-validation:
     name: Validate Code
     needs: [check-changes, pre-build-devcontainer]
@@ -90,7 +91,15 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+  
+    # TODO (@limorl): We can use with env in next job and retire .env and ci.env
     - name: Set-up Devcontainer Environment Variables
       if: needs.check-changes.outputs.code_changed == 'true'
       run: |
@@ -98,10 +107,14 @@ jobs:
         cp .devcontainer/.env.ci .devcontainer/.env
         echo ".devcontainer/.env:"
         cat .devcontainer/.env
+    
     - name: Run Code Validation in Devcontainer
       if: needs.check-changes.outputs.code_changed == 'true'
       uses: devcontainers/ci@v0.3
-      with:
+      with:    
+        # imageName: ghcr.io/limorl/monorepo-python-sample-devcontainer
+        cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
+        push: never
         runCmd: |
           set -e
           echo "Running detect-secrets..."
