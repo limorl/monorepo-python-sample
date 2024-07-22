@@ -69,26 +69,8 @@ jobs:
             GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
             unset GITHUB_TOKEN
 
-            echo "Debugging environment:"
-            env | grep -i github || true
-            env | grep -i gh_ || true
-            
-            echo "Authenticating with PAT..."
-            gh auth login --with-token <<< "$GH_ACTIONS_PAT"
-
             echo "Authenticating with GH_ACTIONS_PAT (Method 1)..."
             gh auth login --with-token <<< "$GH_TOKEN"
-
-            echo "Verifying GitHub authentication..."
-            if ! gh auth status; then
-              echo "Authentication failed with Method 1. Trying Method 2..."
-              echo "$GH_TOKEN" | gh auth login --with-token
-            fi
-
-            if ! gh auth status; then
-              echo "Authentication failed with Method 2. Trying Method 3..."
-              gh auth login --with-token "$GH_TOKEN"
-            fi
 
             if ! gh auth status; then
               echo "All authentication methods failed. Debug info:"
@@ -104,22 +86,60 @@ jobs:
             echo "Verifying GitHub authentication..."
             gh auth status
             
-            ENV=dev
-            echo "> Attempting to access $ENV environment variables..."
-            echo "Listing variables for $ENV:"
-            if ! VARS=$(gh variable list -e $ENV 2>&1); then
-              echo "Failed to list variables. Error:"
-              echo "$VARS"
-              echo "Attempting to get repository details..."
-              gh api repos/$GITHUB_REPOSITORY || echo "Failed to access repo API"
-              echo "Attempting to list environments..."
-              gh api repos/$GITHUB_REPOSITORY/environments || echo "Failed to list environments"
-            else
-              echo "$VARS"
-            fi
-            
-            # Restore GITHUB_TOKEN if needed for other operations
-            export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
+            deploy_to_env() {
+              local ENV=$1
+              ENV=dev
+              
+              echo ">> Getting variables for $ENV environment:"
+              if ! VARS=$(gh variable list -e $ENV 2>&1); then
+                echo "Failed to list variables. Error:"
+                echo "$VARS"
+                echo "Attempting to get repository details..."
+                gh api repos/$GITHUB_REPOSITORY || echo "Failed to access repo API"
+                echo "Attempting to list environments..."
+                gh api repos/$GITHUB_REPOSITORY/environments || echo "Failed to list environments"
+              else
+                echo "$VARS"
+              fi
+
+              AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
+              AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
+              AWS_GITHUB_ACTIONS_ROLE=$(echo "$VARS" | grep AWS_GITHUB_ACTIONS_ROLE | awk '{print $2}')
+
+              if [ -z "$AWS_ACCOUNT_ID" ] || [ -z "$AWS_PRIMARY_REGION" ] || [ -z "$AWS_GITHUB_ACTIONS_ROLE" ]; then
+                echo "Failed to retrieve necessary AWS variables for $ENV environment"
+                return 1
+              fi
+
+              echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
+              echo "AWS_PRIMARY_REGION: $AWS_PRIMARY_REGION"
+              echo "AWS_GITHUB_ACTIONS_ROLE: $AWS_GITHUB_ACTIONS_ROLE"
+
+              echo ">> Configuring AWS credentials for $ENV..."
+              # Similarly to aws-actions/configure-aws-credentials to set up credentials
+              aws-actions-configure-aws-credentials \
+                --role-to-assume "$AWS_GITHUB_ACTIONS_ROLE" \
+                --role-session-name "GithubWorkflow-DeployServices-$ENV" \
+                --aws-region "$AWS_PRIMARY_REGION"
+
+              echo "Verifying AWS authentication for $ENV..."
+              aws sts get-caller-identity
+
+              echo ">> Deploying to $ENV environment..."
+              poetry run install-all
+              poetry run build-all
+
+              chmod +x .github/scripts/sam-build-and-deploy-services.sh
+              
+              # Temporarily disable deployment
+              #.github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION
+
+              deploy_to_env "dev" || exit 1
+              deploy_to_env "staging" || exit 1
+
+              # Restore GITHUB_TOKEN if needed for other operations
+              export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
+
         
   check-changes:
     name: Check Changes
