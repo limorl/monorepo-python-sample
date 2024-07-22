@@ -9,7 +9,7 @@ Pre-requisite:
 1. Setup Terraform per each AWS environment (dev. staging and prod) using [terraform-setup.sh](../infra/scripts/terraform-setup.sh)
 2. Create 3 environments for the repo: dev, staging and prod. In each encronment devinf environment variables:
 ```
-AWS_ACCOUNT_ID = your environment acount id (12 digits)
+AWS_ACCOUNT_ID = your environment account id (12 digits)
 AWS_PRIMARY_REGION = your environment primary region (e.g. us-east1)
 AWS_GITHUB_ACTIONS_ROLE = The ARN of the GithubActions Role created in step 1 (should look like `arn:aws:iam::__AWS_ACCOUNT_ID__:role/GithubActionsRole`)
 ```
