@@ -34,7 +34,6 @@ jobs:
           
           ENV=dev
           echo "> Attempting to access $ENV environment variables..."
-
           echo "Listing variables for $ENV:"
           if ! VARS=$(gh variable list -e $ENV 2>&1); then
             echo "Failed to list variables. Error:"
@@ -51,6 +50,76 @@ jobs:
           export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
         env:
           GH_ACTIONS_PAT: ${{ secrets.GH_ACTIONS_PAT }}
+      
+      - name: Set-up Devcontainer Environment Variables
+        run: |
+          echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+          cp .devcontainer/.env.ci .devcontainer/.env
+          echo ".devcontainer/.env:"
+          cat .devcontainer/.env
+      - name: Debug Git Auth inside Devcontainer
+        uses: devcontainers/ci@v0.3
+        env:
+          GH_ACTIONS_PAT: ${{ secrets.GH_ACTIONS_PAT }}
+        with:
+          env: |
+            GH_TOKEN=${{ secrets.GH_ACTIONS_PAT }}
+          runCmd: |
+            # Temporarily unset GITHUB_TOKEN
+            GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
+            unset GITHUB_TOKEN
+
+            echo "Debugging environment:"
+            env | grep -i github || true
+            env | grep -i gh_ || true
+            
+            echo "Authenticating with PAT..."
+            gh auth login --with-token <<< "$GH_ACTIONS_PAT"
+
+            echo "Authenticating with GH_ACTIONS_PAT (Method 1)..."
+            gh auth login --with-token <<< "$GH_TOKEN"
+
+            echo "Verifying GitHub authentication..."
+            if ! gh auth status; then
+              echo "Authentication failed with Method 1. Trying Method 2..."
+              echo "$GH_TOKEN" | gh auth login --with-token
+            fi
+
+            if ! gh auth status; then
+              echo "Authentication failed with Method 2. Trying Method 3..."
+              gh auth login --with-token "$GH_TOKEN"
+            fi
+
+            if ! gh auth status; then
+              echo "All authentication methods failed. Debug info:"
+              gh auth status
+              echo "GitHub API test:"
+              gh api user || echo "Failed to access GitHub API"
+              exit 1
+            fi
+
+            echo "Successfully authenticated with GitHub"
+
+            
+            echo "Verifying GitHub authentication..."
+            gh auth status
+            
+            ENV=dev
+            echo "> Attempting to access $ENV environment variables..."
+            echo "Listing variables for $ENV:"
+            if ! VARS=$(gh variable list -e $ENV 2>&1); then
+              echo "Failed to list variables. Error:"
+              echo "$VARS"
+              echo "Attempting to get repository details..."
+              gh api repos/$GITHUB_REPOSITORY || echo "Failed to access repo API"
+              echo "Attempting to list environments..."
+              gh api repos/$GITHUB_REPOSITORY/environments || echo "Failed to list environments"
+            else
+              echo "$VARS"
+            fi
+            
+            # Restore GITHUB_TOKEN if needed for other operations
+            export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
         
   check-changes:
     name: Check Changes
@@ -71,9 +140,7 @@ jobs:
           echo "Processing Pull Request"
           BASE_SHA=${{ github.event.pull_request.base.sha }}
           HEAD_SHA=${{ github.event.pull_request.head.sha }}
-
           git diff --name-only $BASE_SHA $HEAD_SHA > changed_files.txt
-
           echo "Changed files:"
           cat changed_files.txt
           
@@ -103,7 +170,6 @@ jobs:
         run: |
           echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
           echo "Code changed: ${{ steps.check.outputs.code_changed }}"
-
   # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
   code-validation:
     name: Validate Code
@@ -124,7 +190,6 @@ jobs:
         cp .devcontainer/.env.ci .devcontainer/.env
         echo ".devcontainer/.env:"
         cat .devcontainer/.env
-
     - name: Run Code Validation in Devcontainer
       if: needs.check-changes.outputs.code_changed == 'true'
       uses: devcontainers/ci@v0.3
