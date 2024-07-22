@@ -22,6 +22,7 @@ jobs:
           fetch-depth: 0  # Ensure full checkout
       - name: Debug Git Auth
         run: |
+          gh auth login --with-token <<< $GH_ACTIONS_PAT
           echo "Verifying GitHub authentication..."
             gh auth status
             if [ $? -ne 0 ]; then
@@ -37,6 +38,7 @@ jobs:
           echo "$VARS"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_ACTIONS_PAT: ${{ secrets.GH_Actions_PAT }}
 
   check-changes:
     name: Check Changes
