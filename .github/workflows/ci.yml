@@ -79,7 +79,7 @@ jobs:
     if: needs.check-changes.outputs.devcontainer_changed == 'true'
     uses: ./.github/workflows/pre-build-devcontainer.yml
   
-   # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
+  # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
   code-validation:
     name: Validate Code
     needs: [check-changes, pre-build-devcontainer]
@@ -92,6 +92,7 @@ jobs:
       with:
         fetch-depth: 0
     
+    # TODO (@limorl): We can use with env in next job and retire .env and ci.env
     - name: Set-up Devcontainer Environment Variables
       if: needs.check-changes.outputs.code_changed == 'true'
       run: |
@@ -99,10 +100,13 @@ jobs:
         cp .devcontainer/.env.ci .devcontainer/.env
         echo ".devcontainer/.env:"
         cat .devcontainer/.env
+    
     - name: Run Code Validation in Devcontainer
       if: needs.check-changes.outputs.code_changed == 'true'
       uses: devcontainers/ci@v0.3
-      with:
+      with:    
+        cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
+        push: never
         runCmd: |
           set -e
           echo "Running detect-secrets..."
