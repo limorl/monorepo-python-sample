@@ -93,6 +93,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_ACTIONS_PAT }}
         with:
+          env: |
+            GH_TOKEN=${{ secrets.GH_ACTIONS_PAT }}
           runCmd: |
             set -e
 
