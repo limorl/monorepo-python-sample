@@ -29,4 +29,4 @@ jobs:
         with:
           imageName: ghcr.io/limorl/monorepo-python-sample-devcontainer
           cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
-          push: alway
+          push: always
