@@ -17,7 +17,7 @@ parameter_overrides = [
     'DockerTag=latest'
 ]
 
-[dev.build.parameters]
+[staging.build.parameters]
 use_container = true
 parameter_overrides = [
     'Stage=staging',
@@ -44,7 +44,11 @@ parameter_overrides = [
 [dev.deploy.parameters]
 stack_name = 'greeting-service'
 region = 'eu-west-1'    # Set to primary/default region and override when to deploying to other regions
-image_repository = '__DEV_ACCOUNT_ID__.dkr.ecr.eu-west-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
+image_repository = '058264375193.dkr.ecr.eu-west-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
+capabilities = [
+    'CAPABILITY_IAM',
+    'CAPABILITY_NAMED_IAM'
+]
 parameter_overrides = [
     'Stage=dev',
     'DockerTag=latest'
@@ -54,6 +58,10 @@ parameter_overrides = [
 stack_name = 'greeting-service'
 region = 'us-east-1'    # Set to primary/default region and override when to deploying to other regions
 image_repository = '__STAGING_ACCOUNT_ID__.dkr.ecr.us-east-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
+capabilities = [
+    'CAPABILITY_IAM',
+    'CAPABILITY_NAMED_IAM'
+]
 parameter_overrides = [
     'Stage=staging',
     'DockerTag=latest'
@@ -63,3 +71,7 @@ parameter_overrides = [
 stack_name = 'greeting-service'
 region = 'us-east-1'    # Set to primary/default region and override when to deploying to other regions
 image_repository = '__PROD_ACCOUNT_ID__.dkr.ecr.us-east-1.amazonaws.com/greeting'  # replace __ACCOUNT_ID__ with AWS dev account id
+capabilities = [
+    'CAPABILITY_IAM',
+    'CAPABILITY_NAMED_IAM'
+]

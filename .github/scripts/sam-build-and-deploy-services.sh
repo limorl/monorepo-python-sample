@@ -76,12 +76,15 @@ build_and_deploy_service() {
     fi
     
     echo "Building $service_name:$package_version"
+    echo "> sam build --config-env $ENVIRONMENT --parameter-overrides \"Stage=$ENVIRONMENT DockerTag=$package_version\""
     sam build --config-env "$ENVIRONMENT" --parameter-overrides "Stage=$ENVIRONMENT DockerTag=$package_version"
 
     echo "Deploying service configuration $service_name:$package_version"
-    poetry run deploy-service-configuration --aervice-name "$service_name" --stage "$ENVIRONMENT" --region "$AWS_PRIMARY_REGION"
+    echo "> poetry run deploy-service-configuration --service-name $service_name --stage $ENVIRONMENT --region $AWS_PRIMARY_REGION"
+    poetry run deploy-service-configuration --service-name "$service_name" --stage "$ENVIRONMENT" --region "$AWS_PRIMARY_REGION"
     
     echo "Deploying $service_name:$package_version"
+    echo "> sam deploy --config-env $ENVIRONMENT --parameter-overrides \"Stage=$ENVIRONMENT DockerTag=$package_version\""
     sam deploy --config-env "$ENVIRONMENT" --parameter-overrides "Stage=$ENVIRONMENT DockerTag=$package_version"
 }
 
