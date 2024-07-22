@@ -4,6 +4,12 @@ on:
   workflow_dispatch:  # Allows manual triggering
   workflow_call:      # Allows this workflow to be called by other workflows (e.g. CI when devcontainer has changed)
 
+
+permissions:
+  id-token: write # Required for requesting the JWT
+  contents: read  # Required for actions/checkout
+  packages: write # Required for publishing to package/container registry
+
 jobs:
   pre-build:
     runs-on: ubuntu-latest
