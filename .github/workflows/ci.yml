@@ -7,7 +7,7 @@ on:
 permissions:
   id-token: write # Required for requesting the JWT
   contents: read  # Required for actions/checkout
-  packages: write # Rewuired for publishing packages/images to gcr
+  packages: write # Required for publishing packages/images to gcr
   pull-requests: write  # Allows the workflow to comment on PRs
 
 jobs:
