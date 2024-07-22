@@ -115,12 +115,16 @@ jobs:
               echo "AWS_PRIMARY_REGION: $AWS_PRIMARY_REGION"
               echo "AWS_GITHUB_ACTIONS_ROLE: $AWS_GITHUB_ACTIONS_ROLE"
 
-              echo ">> Configuring AWS credentials for $ENV..."
               # Similarly to aws-actions/configure-aws-credentials to set up credentials
-              aws-actions-configure-aws-credentials \
+              chmod +x .github/scripts/aws-configure-credentials.sh
+              if ! aws-configure-credentials \
                 --role-to-assume "$AWS_GITHUB_ACTIONS_ROLE" \
                 --role-session-name "GithubWorkflow-DeployServices-$ENV" \
-                --aws-region "$AWS_PRIMARY_REGION"
+                --aws-region "$AWS_PRIMARY_REGION" \
+                --role-duration-seconds 3600; then
+                echo "Failed to configure AWS credentials for $ENV"
+                return 1
+              fi
 
               echo "Verifying AWS authentication for $ENV..."
               aws sts get-caller-identity
@@ -129,8 +133,14 @@ jobs:
               poetry run install-all
               poetry run build-all
 
+              echo ">> Deploying to $ENV environment..."
               chmod +x .github/scripts/sam-build-and-deploy-services.sh
-              .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION
+              if ! .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION; then
+                echo "Deployment failed for $ENV environment"
+                return 1
+              fi
+
+              echo "Deployment completed successfully for $ENV environment"
             }
               deploy_to_env "dev" || exit 1
               deploy_to_env "staging" || exit 1
