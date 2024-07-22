@@ -112,7 +112,7 @@ jobs:
       if: needs.check-changes.outputs.code_changed == 'true'
       uses: devcontainers/ci@v0.3
       with:    
-        imageName: ghcr.io/limorl/monorepo-python-sample-devcontainer:latest
+        imageName: ghcr.io/limorl/monorepo-python-sample-devcontainer
         runCmd: |
           set -e
           echo "Running detect-secrets..."
