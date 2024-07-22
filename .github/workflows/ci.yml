@@ -76,6 +76,9 @@ jobs:
     name: Pre-build Devcontainer
     needs: [check-changes]
     if: needs.check-changes.outputs.devcontainer_changed == 'true'
+    permissions:
+      packages: write
+      contents: read
     uses: ./.github/workflows/pre-build-devcontainer.yml
   
    # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
