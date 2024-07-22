@@ -1,4 +1,4 @@
-name: Service Deployment - Reusable Across Environments
+name: Service Deployment to {env}
 
 on:
   workflow_call:
