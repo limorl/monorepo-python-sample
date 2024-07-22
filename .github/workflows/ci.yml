@@ -51,6 +51,55 @@ jobs:
           export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
         env:
           GH_ACTIONS_PAT: ${{ secrets.GH_ACTIONS_PAT }}
+      
+      - name: Set-up Devcontainer Environment Variables
+        run: |
+          echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+          cp .devcontainer/.env.ci .devcontainer/.env
+          echo ".devcontainer/.env:"
+          cat .devcontainer/.env
+
+      - name: Debug Git Auth inside Devcontainer
+        uses: devcontainers/ci@v0.3
+        env:
+          GH_ACTIONS_PAT: ${{ secrets.GH_ACTIONS_PAT }}
+        with:
+          env: |
+            GH_TOKEN=${{ secrets.GH_ACTIONS_PAT }}
+          runCmd: |
+            # Temporarily unset GITHUB_TOKEN
+            GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
+            unset GITHUB_TOKEN
+
+            echo "Debugging environment:"
+            env | grep -i github || true
+            env | grep -i gh_ || true
+            
+            echo "Authenticating with PAT..."
+            gh auth login --with-token <<< "$GH_ACTIONS_PAT"
+            
+            echo "Verifying GitHub authentication..."
+            gh auth status
+            
+            ENV=dev
+            echo "> Attempting to access $ENV environment variables..."
+
+            echo "Listing variables for $ENV:"
+            if ! VARS=$(gh variable list -e $ENV 2>&1); then
+              echo "Failed to list variables. Error:"
+              echo "$VARS"
+              echo "Attempting to get repository details..."
+              gh api repos/$GITHUB_REPOSITORY || echo "Failed to access repo API"
+              echo "Attempting to list environments..."
+              gh api repos/$GITHUB_REPOSITORY/environments || echo "Failed to list environments"
+            else
+              echo "$VARS"
+            fi
+            
+            # Restore GITHUB_TOKEN if needed for other operations
+            export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
+
+
         
   check-changes:
     name: Check Changes
