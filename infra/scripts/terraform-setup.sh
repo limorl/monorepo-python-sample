@@ -26,7 +26,7 @@ check_env_vars() {
 # Create S3 Bucket on primary region (on dev, staging and prod).
 # Source: https://developer.hashicorp.com/terraform/language/settings/backends/s3
 create_s3_bucket() {
-    if aws s3api head-bucket --bucket "$TERRAFORM_BACKEND_BUCKET_NAME" --profile "$ENVIRONMENT" 2>/dev/null; then
+    if aws s3api head-bucket --bucket "$TERRAFORM_BACKEND_BUCKET_NAME" --profile "$ENVIRONMENT" >/dev/null; then
 
         echo "Bucket $TERRAFORM_BACKEND_BUCKET_NAME already exists. Skipping creation."
     else
@@ -67,7 +67,7 @@ create_s3_bucket() {
 create_dynamodb_table() {
     local table_name="tfstate-lock-$ENVIRONMENT"
     
-    if aws dynamodb describe-table --table-name "$table_name" --profile "$ENVIRONMENT" 2>/dev/null; then
+    if aws dynamodb describe-table --table-name "$table_name" --profile "$ENVIRONMENT" >/dev/null; then
         echo "DynamoDB table $table_name already exists. Checking deletion protection."
         
         # Check if deletion protection is enabled
@@ -107,7 +107,7 @@ create_dynamodb_table() {
 create_github_actions_role() {
     local role_name="GithubActionsRole"
 
-    if ! aws iam get-role --role-name "$role_name" --profile "$ENVIRONMENT" 2>/dev/null; then
+    if ! aws iam get-role --role-name "$role_name" --profile "$ENVIRONMENT" >/dev/null; then
         echo "Creating an OIDC provider for GithubActions"
         aws iam create-open-id-connect-provider \
             --url "https://token.actions.githubusercontent.com" \
@@ -166,7 +166,7 @@ manage_terraform_policy() {
     local policy_arn="arn:aws:iam::$AWS_ACCOUNT_ID:policy/$policy_name"
     local policy_document="terraform-iam-policy.json"
 
-    if aws iam get-policy --policy-arn "$policy_arn" --profile "$ENVIRONMENT" 2>/dev/null; then
+    if aws iam get-policy --policy-arn "$policy_arn" --profile "$ENVIRONMENT" >/dev/null; then
         echo "Updating existing policy: $policy_name"
         
         local version_id=$(aws iam get-policy --policy-arn "$policy_arn" --profile "$ENVIRONMENT" --query 'Policy.DefaultVersionId' --output text)
@@ -207,7 +207,7 @@ manage_github_actions_trust_policy() {
     local role_name="GithubActionsRole"
     local trust_policy=$(generate_github_actions_trust_policy)
 
-    if aws iam get-role --role-name "$role_name" --profile "$ENVIRONMENT" 2>/dev/null; then
+    if aws iam get-role --role-name "$role_name" --profile "$ENVIRONMENT" >/dev/null; then
         echo "Updating trust policy for role: $role_name"
         aws iam update-assume-role-policy \
             --role-name "$role_name" \

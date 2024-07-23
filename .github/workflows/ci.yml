@@ -31,54 +31,54 @@ jobs:
           echo "Processing Pull Request"
           BASE_SHA=${{ github.event.pull_request.base.sha }}
           HEAD_SHA=${{ github.event.pull_request.head.sha }}
+          
           git diff --name-only $BASE_SHA $HEAD_SHA > changed_files.txt
+          
           echo "Changed files:"
           cat changed_files.txt
           
           echo "Checking for Terraform changes..."
-          if grep -q "^infra/terraform/" changed_files.txt; then
+          if grep -q "^infra/terraform/.*\.(tf|tfvars|lock\.hcl)$" changed_files.txt; then
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
-            echo "terraform_changed=true"
             echo "Matching Terraform files:"
             grep "^infra/terraform/" changed_files.txt
           else
             echo "terraform_changed=false" >> $GITHUB_OUTPUT
-            echo "terraform_changed=false"
           fi
           
           echo "Checking for Code changes..."
-          if grep -qE "^services/|^packages/" changed_files.txt; then
+          if grep -qE "^(services|packages)/.*\.(py|toml|ya?ml|lock)$" changed_files.txt; then
              echo "code_changed=true" >> $GITHUB_OUTPUT
-             echo "code_changed=true"
              echo "Matching Code files:"
              grep -E "^services/|^packages/" changed_files.txt
           else
              echo "code_changed=false" >> $GITHUB_OUTPUT
-             echo "code_changed=false"
           fi
 
           echo "Checking for Devcontainer changes..."
           if grep -qE "^.devcontainer/" changed_files.txt; then
              echo "devcontainer_changed=true" >> $GITHUB_OUTPUT
-             echo "devcontainer_changed=true"
              echo "Matching Code files:"
              grep -E "^.devcontainer/" changed_files.txt
           else
              echo "devcontainer_changed=false" >> $GITHUB_OUTPUT
-             echo "devcontainer_changed=false"
           fi
+    
       - name: Display check-changes Output
         run: |
           echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
           echo "Code changed: ${{ steps.check.outputs.code_changed }}"
           echo "Devcontainer changed: ${{ steps.check.outputs.devcontainer_changed }}"
   
+  # The reusable workflow checks if devcontainer file has changed or not, since this is a required job by code-validation which is a required PR check
   pre-build-devcontainer:
     name: Pre-build Devcontainer
     needs: [check-changes]
     if: needs.check-changes.outputs.devcontainer_changed == 'true'
     uses: ./.github/workflows/pre-build-devcontainer.yml
-  
+    with:
+      devcontainer_changed: ${{ needs.check-changes.outputs.devcontainer_changed }}
+
   # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
   code-validation:
     name: Validate Code

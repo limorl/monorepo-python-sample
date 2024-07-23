@@ -2,8 +2,15 @@ name: Pre-build Dev Container
 
 on:
   workflow_dispatch:  # Allows manual triggering
+    inputs:
+      devcontainer_changed:
+        required: false
+        type: string
   workflow_call:      # Allows this workflow to be called by other workflows (e.g. CI when devcontainer has changed)
-
+    inputs:
+      devcontainer_changed:
+        required: true
+        type: string
 
 permissions:
   id-token: write # Required for requesting the JWT
@@ -13,6 +20,7 @@ permissions:
 jobs:
   pre-build:
     runs-on: ubuntu-latest
+    if: inputs.devcontainer_changed == 'true'
     permissions:
       contents: read
       packages: write

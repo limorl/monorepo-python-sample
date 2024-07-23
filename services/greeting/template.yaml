@@ -50,7 +50,7 @@ Resources:
       FunctionName: "greeting"
       PackageType: Image
       ImageUri: !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/greeting:${DockerTag}'
-      Role: !Sub arn:aws:iam::${AWS:AccountId}:role/greeting-lambda-role
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/greeting-lambda-role
       Architectures:
         - !Ref Architecture  
       Environment:
