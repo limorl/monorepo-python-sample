@@ -16,6 +16,7 @@ jobs:
     outputs:
       terraform_changed: ${{ steps.check.outputs.terraform_changed }}
       code_changed: ${{ steps.check.outputs.code_changed }}
+      service_config_changed: ${{ steps.check.outputs.service_config_changed }}
   
     steps:
       - name: Check-out Code
@@ -56,10 +57,23 @@ jobs:
              echo "code_changed=false" >> $GITHUB_OUTPUT
              echo "code_changed=false"
           fi
+
+          echo "Checking for Service Config changes..."
+          if grep -q "^services/.*/config/" changed_files.txt; then
+            echo "service_config_changed=true" >> $GITHUB_OUTPUT
+            echo "Configuration files have changed"
+            echo "Matching Code files:"
+            grep -q "^services/.*/config/" changed_files.txt
+          else
+            echo "service_config_changed=false" >> $GITHUB_OUTPUT
+            echo "No configuration files have changed"
+          fi
+
       - name: Display check-changes Output
         run: |
           echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
           echo "Code changed: ${{ steps.check.outputs.code_changed }}"
+          echo "Service Config changed: ${{ steps.check.outputs.service_config_changed }}"
 
   deploy-infra:
     name: Deploy Infrastructure

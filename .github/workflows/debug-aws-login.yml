@@ -116,7 +116,7 @@ jobs:
               chmod +x .github/scripts/sam-build-and-deploy-services.sh 
               chmod +x .github/scripts/deploy-service-configuration.sh
 
-              if ! .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION ; then
+              if ! .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION true ; then
                 echo "Deployment failed for $ENV environment"
                 return 1
               fi

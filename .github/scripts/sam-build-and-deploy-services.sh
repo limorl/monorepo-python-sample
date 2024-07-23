@@ -8,14 +8,15 @@ set -e
 
 
 # Ensure correct number of arguments
-if [ $# -ne 3 ]; then
-    echo "Usage: ./sam-build-and-deploy-services.sh <dev|staging|prod> <aws-account-id> <aws-region>"
+if [ $# -ne 4 ]; then
+    echo "Usage: $0 <dev|staging|prod> <aws-account-id> <aws-region> <update-config>"
     exit 1
 fi
 
 ENVIRONMENT=$1
 AWS_ACCOUNT_ID=$2
 AWS_REGION=$3
+UPDATE_CONFIG=$4
 
 ENVIRONMENT_UPPER=$(echo "$ENVIRONMENT" | tr '[:lower:]' '[:upper:]')
 ACCOUNT_ID_PLACEHOLDER="__${ENVIRONMENT_UPPER}_ACCOUNT_ID__"
@@ -48,13 +49,16 @@ replace_placeholder_with_value() {
 deploy_service_configuration() {
     local service_name=$1
 
-    echo " > Deploying configuration for service $service_name"
+    if [ "$UPDATE_CONFIG" = "true" ]; then
+        echo "Deploying configuration for service $service_name"
 
-    if ! ./deploy-service-configuration.sh --service-name "$service_name" --stage "$ENVIRONMENT" --region "$AWS_REGION" --platform AWS; then
-        echo "Error: Failed to deploy configuratio for service $service_name on environment $ENVIRONMENT in region $AWS_REGION. Aborting."
-        return 1
+        if ! ./deploy-service-configuration.sh --service-name "$service_name" --stage "$ENVIRONMENT" --region "$AWS_REGION" --platform AWS; then
+            echo "Error: Failed to deploy configuratio for service $service_name on environment $ENVIRONMENT in region $AWS_REGION. Aborting."
+            return 1
+        fi
+    else
+        echo "Skipping configuration deployment for service $service_name"
     fi
-    
 }
 
 build_and_deploy_service() {
