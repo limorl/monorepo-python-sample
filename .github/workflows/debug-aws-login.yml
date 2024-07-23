@@ -48,6 +48,7 @@ jobs:
             AWS_ACCESS_KEY_ID=${{ steps.aws-creds.outputs.aws-access-key-id }}
             AWS_SECRET_ACCESS_KEY=${{ steps.aws-creds.outputs.aws-secret-access-key }}
             AWS_SESSION_TOKEN=${{ steps.aws-creds.outputs.aws-session-token }}
+            AWS_REGION=${{ vars.AWS_PRIMARY_REGION }}
           runCmd: |
             # Temporarily unset GITHUB_TOKEN
             GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
@@ -68,6 +69,7 @@ jobs:
             echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:0:5}..."
             echo "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:0:5}..."
             echo "AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:0:5}..."
+            echo "AWS_REGION: $AWS_REGION"
 
 
             echo "Verifying AWS credentials..."
@@ -108,8 +110,6 @@ jobs:
               echo "AWS_GITHUB_ACTIONS_ROLE: $AWS_GITHUB_ACTIONS_ROLE"
 
               echo ">> Deploying to $ENV environment..."
-              # poetry run install-all
-              # poetry run build-all
 
               chmod +x .github/scripts/sam-build-and-deploy-services.sh
               if ! .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION; then
