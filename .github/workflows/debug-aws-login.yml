@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  id-token: write # Required for requesting the JWT
+  contents: read  # Required for actions/checkout
+  packages: write # Required for publishing packages/images to gcr
+  pull-requests: write  # Allows the workflow to comment on PRs
+
+jobs:
+  debug-gh-token:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Check-out Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full checkout
+      
+      - name: Configure AWS credentials
+        id: aws-creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
+          role-session-name: GithubWorkflow-TerraformPlan-${{ inputs.environment }}
+          aws-region: ${{ vars.AWS_PRIMARY_REGION }}
+          output-credentials: true
+      
+      - name: Set-up Devcontainer Environment Variables
+        run: |
+          echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+          cp .devcontainer/.env.ci .devcontainer/.env
+          echo ".devcontainer/.env:"
+          cat .devcontainer/.env
+
+      - name: Debug Git Auth inside Devcontainer
+        uses: devcontainers/ci@v0.3
+        env:
+          GH_ACTIONS_PAT: ${{ secrets.GH_ACTIONS_PAT }}
+        with:
+          cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
+          push: never
+          env: |
+            GH_TOKEN=${{ secrets.GH_ACTIONS_PAT }}
+            AWS_ACCESS_KEY_ID=${{ steps.aws-creds.outputs.aws-access-key-id }}
+            AWS_SECRET_ACCESS_KEY=${{ steps.aws-creds.outputs.aws-secret-access-key }}
+            AWS_SESSION_TOKEN=${{ steps.aws-creds.outputs.aws-session-token }}
+          runCmd: |
+            # Temporarily unset GITHUB_TOKEN
+            GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
+            unset GITHUB_TOKEN
+
+            echo "Authenticating with GH_ACTIONS_PAT" 
+            gh auth login --with-token <<< "$GH_TOKEN"
+
+            echo "Verifying Github credentials..."
+            if ! gh auth status; then
+              echo "Github authentication failed. Debug info:"
+              gh auth status
+              exit 1
+            fi
+            echo "Successfully authenticated with GitHub"
+
+            echo "Verifying AWS credentials..."
+            if ! aws sts get-caller-identity; then
+              echo "AWS authentication failed. Debug info:"
+              aws sts get-caller-identity
+              exit 1
+            fi
+            echo "Successfully authenticated with AWS"
+            
+            deploy_to_env() {
+              local ENV=$1
+              ENV=dev
+              
+              echo ">> Getting variables for $ENV environment:"
+              if ! VARS=$(gh variable list -e $ENV 2>&1); then
+                echo "Failed to list variables. Error:"
+                echo "$VARS"
+                echo "Attempting to get repository details..."
+                gh api repos/$GITHUB_REPOSITORY || echo "Failed to access repo API"
+                echo "Attempting to list environments..."
+                gh api repos/$GITHUB_REPOSITORY/environments || echo "Failed to list environments"
+              else
+                echo "$VARS"
+              fi
+
+              AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
+              AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
+              AWS_GITHUB_ACTIONS_ROLE=$(echo "$VARS" | grep AWS_GITHUB_ACTIONS_ROLE | awk '{print $2}')
+
+              if [ -z "$AWS_ACCOUNT_ID" ] || [ -z "$AWS_PRIMARY_REGION" ] || [ -z "$AWS_GITHUB_ACTIONS_ROLE" ]; then
+                echo "Failed to retrieve necessary AWS variables for $ENV environment"
+                return 1
+              fi
+
+              echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
+              echo "AWS_PRIMARY_REGION: $AWS_PRIMARY_REGION"
+              echo "AWS_GITHUB_ACTIONS_ROLE: $AWS_GITHUB_ACTIONS_ROLE"
+
+              echo ">> Deploying to $ENV environment..."
+              # poetry run install-all
+              # poetry run build-all
+
+              chmod +x .github/scripts/sam-build-and-deploy-services.sh
+              if ! .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION; then
+                echo "Deployment failed for $ENV environment"
+                return 1
+              fi
+
+              echo "Deployment completed successfully for $ENV environment"
+            }
+              deploy_to_env "dev" || exit 1
+              #deploy_to_env "staging" || exit 1
+
+              # Restore GITHUB_TOKEN if needed for other operations
+              export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
