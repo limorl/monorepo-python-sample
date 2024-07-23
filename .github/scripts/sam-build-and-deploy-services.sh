@@ -52,7 +52,7 @@ deploy_service_configuration() {
     if [ "$UPDATE_CONFIG" = "true" ]; then
         echo "Deploying configuration for service $service_name"
 
-        if ! ./deploy-service-configuration.sh --service-name "$service_name" --stage "$ENVIRONMENT" --region "$AWS_REGION" --platform AWS; then
+        if ! .github/scripts/deploy-service-configuration.sh --service-name "$service_name" --stage "$ENVIRONMENT" --region "$AWS_REGION" --platform AWS; then
             echo "Error: Failed to deploy configuratio for service $service_name on environment $ENVIRONMENT in region $AWS_REGION. Aborting."
             return 1
         fi
