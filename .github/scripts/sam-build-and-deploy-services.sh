@@ -9,13 +9,13 @@ set -e
 
 # Ensure correct number of arguments
 if [ $# -ne 3 ]; then
-    echo "Usage: ./sam-build-and-deploy-services.sh <dev|staging|prod> <aws-account-id> <aws-primary-region>"
+    echo "Usage: ./sam-build-and-deploy-services.sh <dev|staging|prod> <aws-account-id> <aws-region>"
     exit 1
 fi
 
 ENVIRONMENT=$1
 AWS_ACCOUNT_ID=$2
-AWS_PRIMARY_REGION=$3
+AWS_REGION=$3
 
 ENVIRONMENT_UPPER=$(echo "$ENVIRONMENT" | tr '[:lower:]' '[:upper:]')
 ACCOUNT_ID_PLACEHOLDER="__${ENVIRONMENT_UPPER}_ACCOUNT_ID__"
@@ -45,10 +45,23 @@ replace_placeholder_with_value() {
     fi
 }
 
-build_and_deploy_service() {
-    local service_name=$(basename "$PWD")
+deploy_service_configuration() {
+    local service_name=$1
+
+    echo " > Deploying configuration for service $service_name"
+
+    if ! ./deploy-service-configuration.sh --service-name "$service_name" --stage "$ENVIRONMENT" --region "$AWS_REGION" --platform AWS; then
+        echo "Error: Failed to deploy configuratio for service $service_name on environment $ENVIRONMENT in region $AWS_REGION. Aborting."
+        return 1
+    fi
     
-    echo "Processing $service_name"
+}
+
+build_and_deploy_service() {
+    local service_name=$1
+    cd "services/$service_name"
+    
+    echo "Building and Deploying $service_name"
     
     # Check if samconfig.toml exists
     if [ ! -f "samconfig.toml" ]; then
@@ -75,35 +88,26 @@ build_and_deploy_service() {
         echo "Warning: pyproject.toml not found in $service_name. Using 'latest' as version."
     fi
     
-    echo "Building $service_name:$package_version"
+    echo "SAM Building $service_name:$package_version"
     echo "> sam build --config-env $ENVIRONMENT --parameter-overrides \"Stage=$ENVIRONMENT DockerTag=$package_version\""
-    sam build --config-env "$ENVIRONMENT" --parameter-overrides "Stage=$ENVIRONMENT DockerTag=$package_version"
+    sam build --config-env "$ENVIRONMENT" --region "$AWS_REGION" --parameter-overrides "Stage=$ENVIRONMENT DockerTag=$package_version"
 
-    echo "Deploying service configuration $service_name:$package_version"
-    echo "> poetry run deploy-service-configuration --service-name $service_name --stage $ENVIRONMENT --region $AWS_PRIMARY_REGION"
-    poetry run deploy-service-configuration --service-name "$service_name" --stage "$ENVIRONMENT" --region "$AWS_PRIMARY_REGION"
-    
-    echo "Deploying $service_name:$package_version"
+    echo "SAM Deploying $service_name:$package_version"
     echo "> sam deploy --config-env $ENVIRONMENT --parameter-overrides \"Stage=$ENVIRONMENT DockerTag=$package_version\""
-    sam deploy --config-env "$ENVIRONMENT" --parameter-overrides "Stage=$ENVIRONMENT DockerTag=$package_version"
+    sam deploy --config-env "$ENVIRONMENT" --region "$AWS_REGION" --parameter-overrides "Stage=$ENVIRONMENT DockerTag=$package_version"
 }
 
-echo "Starting build and deploy process for environment: $ENVIRONMENT"
+echo "Starting Build & Deploy deploy process for environment: $ENVIRONMENT on region $AWS_REGION"
 
 repo_root=$PWD
 
-# Iterate over all directories in the services folder
-# For now, we are deploying greeting only, for all services, uncomment this block
-# while IFS= read -r -d '' service_dir; do
-#     if [ -d "$service_dir" ]; then
-#         cd "$service_dir" || continue
-#         build_and_deploy_service
-#         cd "$repo_root" || exit
-#     fi
-# done < <(find ./services -mindepth 1 -maxdepth 1 -type d -print0)
+# For now, we are deploying greeting only, should be changed to iterate over all services under ./services 
+services_to_deploy=("greeting")
 
-cd ./services/greeting
-build_and_deploy_service
-cd "$repo_root"
+for service in "${services_to_deploy[@]}"; do
+    deploy_service_configuration $service 
+    build_and_deploy_service $service
+    cd "$repo_root"
+done
 
 echo "Build and deploy process completed."

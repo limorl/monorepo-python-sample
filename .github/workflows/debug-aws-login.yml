@@ -50,43 +50,7 @@ jobs:
             AWS_SESSION_TOKEN=${{ steps.aws-creds.outputs.aws-session-token }}
             AWS_REGION=${{ vars.AWS_PRIMARY_REGION }}
           runCmd: |
-            echo "==== Poetry Configuration ===="
-            poetry config --list
-            
-            echo "==== Poetry Environment Info ===="
-            poetry env info
-            
-            echo "==== Poetry Installed Packages ===="
-            poetry show
-            
-            echo "==== Locating deploy-service-configuration ===="
-            find . -name deploy-service-configuration
-            
-            echo "==== Content of packages/scripts/pyproject.toml ===="
-            cat packages/scripts/pyproject.toml
-            
-            echo "==== Checking if script is executable ===="
-            SCRIPT_PATH=$(find . -name deploy-service-configuration)
-            if [ -n "$SCRIPT_PATH" ]; then
-              ls -l $SCRIPT_PATH
-              file $SCRIPT_PATH
-            else
-              echo "Script not found"
-            fi
-            
-            echo "==== Attempting to run script directly ===="
-            if [ -n "$SCRIPT_PATH" ]; then
-              $SCRIPT_PATH --service-name greeting --stage dev --region $AWS_REGION || echo "Direct execution failed"
-            fi
-            
-            echo "==== Attempting to run with poetry run ===="
-            poetry run deploy-service-configuration --service-name greeting --stage dev --region $AWS_REGION || echo "Poetry run failed"
-            
-            echo "==== Checking PATH ===="
-            echo $PATH
-            
-            echo "==== Checking if poetry executables are in PATH ===="
-            ls -l $(poetry env info --path)/bin
+            set -e
             
             # Temporarily unset GITHUB_TOKEN
             GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
@@ -149,9 +113,10 @@ jobs:
               echo "AWS_GITHUB_ACTIONS_ROLE: $AWS_GITHUB_ACTIONS_ROLE"
 
               echo ">> Deploying to $ENV environment..."
+              chmod +x .github/scripts/sam-build-and-deploy-services.sh 
+              chmod +x .github/scripts/deploy-service-configuration.sh
 
-              chmod +x .github/scripts/sam-build-and-deploy-services.sh
-              if ! .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION; then
+              if ! .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION ; then
                 echo "Deployment failed for $ENV environment"
                 return 1
               fi
