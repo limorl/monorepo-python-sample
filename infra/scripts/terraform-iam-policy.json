@@ -39,7 +39,16 @@
           "cognito-idp:*",
           "cognito-identity:*",
           "route53:*",
-          "cloudfront:*"
+          "cloudfront:*",
+          "cloudformation:Describe*",
+          "cloudformation:List*",
+          "cloudformation:Get*",
+          "cloudformation:CreateChangeSet",
+          "cloudformation:CreateStack",
+          "cloudformation:UpdateStack",
+          "cloudformation:DeleteStack",
+          "cloudformation:ValidateTemplate",
+          "apigateway:*"
         ],
         "Resource": "*"
       },
