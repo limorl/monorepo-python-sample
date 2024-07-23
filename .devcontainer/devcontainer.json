@@ -40,7 +40,6 @@
         "vscode-icons-team.vscode-icons",
         "wayou.vscode-todo-highlight",
         "timonwong.shellcheck",
-        "cweijan.vscode-office"
     ],
 
     "postCreateCommand": "bash .devcontainer/post_create.sh"

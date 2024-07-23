@@ -8,15 +8,16 @@ set -e
 
 
 # Ensure correct number of arguments
-if [ $# -ne 4 ]; then
-    echo "Usage: $0 <dev|staging|prod> <aws-account-id> <aws-region> <update-config>"
+if [ $# -lt 3 ]; then
+    echo "Usage: $0 <dev|staging|prod> <aws-account-id> <aws-region> [true|false]"
     exit 1
 fi
 
 ENVIRONMENT=$1
 AWS_ACCOUNT_ID=$2
 AWS_REGION=$3
-UPDATE_CONFIG=$4
+UPDATE_CONFIG=${4:-"false"}
+
 
 ENVIRONMENT_UPPER=$(echo "$ENVIRONMENT" | tr '[:lower:]' '[:upper:]')
 ACCOUNT_ID_PLACEHOLDER="__${ENVIRONMENT_UPPER}_ACCOUNT_ID__"
@@ -105,6 +106,7 @@ echo "Starting Build & Deploy deploy process for environment: $ENVIRONMENT on re
 
 repo_root=$PWD
 
+# TODO (@limorl): Iterate over all services that has changed, based on package version (or get as parameter a list of changed services)
 # For now, we are deploying greeting only, should be changed to iterate over all services under ./services 
 services_to_deploy=("greeting")
 
