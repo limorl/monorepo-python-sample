@@ -72,7 +72,7 @@ jobs:
     strategy:
       matrix:
         environment: [dev, staging]
-    environment: ${{ inputs.environment }}
+    environment: ${{ matrix.environment }}
     steps:
       - name: Check-out Code
         if: needs.check-changes.outputs.services_with_config_changed != '[]'
