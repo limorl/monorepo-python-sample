@@ -81,7 +81,6 @@ jobs:
 
   debug-gh-token:
     runs-on: ubuntu-latest
-    needs: [pre-build-devcontainer]
     environment: dev
     steps:
       - name: Check-out Code
