@@ -35,7 +35,6 @@ jobs:
           cp .devcontainer/.env.ci .devcontainer/.env
           echo ".devcontainer/.env:"
           cat .devcontainer/.env
-
       - name: Debug Git Auth inside Devcontainer
         uses: devcontainers/ci@v0.3
         env:
@@ -53,12 +52,10 @@ jobs:
             set -e
             
             # Temporarily unset GITHUB_TOKEN
-            GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
-            unset GITHUB_TOKEN
-
+            #GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
+            #unset GITHUB_TOKEN
             echo "Authenticating with GH_ACTIONS_PAT" 
             gh auth login --with-token <<< "$GH_TOKEN"
-
             echo "Verifying Github credentials..."
             if ! gh auth status; then
               echo "Github authentication failed. Debug info:"
@@ -66,14 +63,11 @@ jobs:
               exit 1
             fi
             echo "Successfully authenticated with GitHub"
-
             echo "Verifying AWS credentials..."
             echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:0:5}..."
             echo "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:0:5}..."
             echo "AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:0:5}..."
             echo "AWS_REGION: $AWS_REGION"
-
-
             echo "Verifying AWS credentials..."
             if ! aws sts get-caller-identity; then
               echo "AWS authentication failed. Debug info:"
@@ -81,8 +75,6 @@ jobs:
               exit 1
             fi
             echo "Successfully authenticated with AWS"
-
-
             deploy_to_env() {
               local ENV=$1
               ENV=dev
@@ -98,20 +90,16 @@ jobs:
               else
                 echo "$VARS"
               fi
-
               AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
               AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
               AWS_GITHUB_ACTIONS_ROLE=$(echo "$VARS" | grep AWS_GITHUB_ACTIONS_ROLE | awk '{print $2}')
-
               if [ -z "$AWS_ACCOUNT_ID" ] || [ -z "$AWS_PRIMARY_REGION" ] || [ -z "$AWS_GITHUB_ACTIONS_ROLE" ]; then
                 echo "Failed to retrieve necessary AWS variables for $ENV environment"
                 return 1
               fi
-
               echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
               echo "AWS_PRIMARY_REGION: $AWS_PRIMARY_REGION"
               echo "AWS_GITHUB_ACTIONS_ROLE: $AWS_GITHUB_ACTIONS_ROLE"
-
               echo ">> Deploying to $ENV environment..."
               chmod +x .github/scripts/sam-build-and-deploy-services.sh 
               chmod +x .github/scripts/deploy-service-configuration.sh
@@ -120,7 +108,6 @@ jobs:
                 echo "Deployment failed for $ENV environment"
                 return 1
               fi
-
               echo "Deployment completed successfully for $ENV environment"
             }
               
@@ -128,4 +115,4 @@ jobs:
             #deploy_to_env "staging" || exit 1
 
             # Restore GITHUB_TOKEN if needed for other operations
-            export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
+            #export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
