@@ -7,6 +7,7 @@ on:
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
+  packages: write # Required for publishing packages/images to gcr
   pull-requests: write  # This allows the workflow to comment on PRs
 
 jobs:
@@ -16,7 +17,7 @@ jobs:
     outputs:
       terraform_changed: ${{ steps.check.outputs.terraform_changed }}
       code_changed: ${{ steps.check.outputs.code_changed }}
-      service_config_changed: ${{ steps.check.outputs.service_config_changed }}
+      services_with_config_changed: ${{ steps.check.outputs.services_with_config_changed }}
   
     steps:
       - name: Check-out Code
@@ -37,43 +38,33 @@ jobs:
           cat changed_files.txt
           
           echo "Checking for Terraform changes..."
-          if grep -q "^infra/terraform/" changed_files.txt; then
+          if grep -q "^infra/terraform/.*\.(tf|tfvars|lock\.hcl)$" changed_files.txt; then
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
-            echo "terraform_changed=true"
             echo "Matching Terraform files:"
             grep "^infra/terraform/" changed_files.txt
           else
             echo "terraform_changed=false" >> $GITHUB_OUTPUT
-            echo "terraform_changed=false"
           fi
           
           echo "Checking for Code changes..."
-          if grep -qE "^services/|^packages/" changed_files.txt; then
+          if grep -qE "^(services|packages)/.*\.(py|toml|ya?ml|lock)$" changed_files.txt; then
              echo "code_changed=true" >> $GITHUB_OUTPUT
-             echo "code_changed=true"
              echo "Matching Code files:"
              grep -E "^services/|^packages/" changed_files.txt
           else
              echo "code_changed=false" >> $GITHUB_OUTPUT
-             echo "code_changed=false"
           fi
 
           echo "Checking for Service Config changes..."
-          if grep -q "^services/.*/config/" changed_files.txt; then
-            echo "service_config_changed=true" >> $GITHUB_OUTPUT
-            echo "Configuration files have changed"
-            echo "Matching Code files:"
-            grep -q "^services/.*/config/" changed_files.txt
-          else
-            echo "service_config_changed=false" >> $GITHUB_OUTPUT
-            echo "No configuration files have changed"
-          fi
+          services_with_config_changed=$(grep "^services/.*/config/" changed_files.txt | cut -d'/' -f2 | sort -u | jq -R -s -c 'split("\n")[:-1]')
+          echo "services_with_config_changed=$services_with_config_changed" >> $GITHUB_OUTPUT
+
 
       - name: Display check-changes Output
         run: |
           echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
           echo "Code changed: ${{ steps.check.outputs.code_changed }}"
-          echo "Service Config changed: ${{ steps.check.outputs.service_config_changed }}"
+          echo "Services with Config changed: ${{ steps.check.outputs.services_with_config_changed }}"
 
   deploy-infra:
     name: Deploy Infrastructure
@@ -86,216 +77,147 @@ jobs:
       environment: ${{ matrix.environment }}
       terraform_changed: ${{ needs.check-changes.outputs.terraform_changed }}
 
-  deploy-services:
+  deploy-service-config:
+    name: Deploy Service Config
     needs: [check-changes, deploy-infra]
-    if: needs.check-changes.outputs.code_changed == 'true'
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        environment: [dev, staging]
+    environment: ${{ matrix.environment }}
     steps:
       - name: Check-out Code
+        if: needs.check-changes.outputs.services_with_config_changed != '[]'
         uses: actions/checkout@v4
 
-      - name: Set-up Devcontainer Environment Variables
-        run: |
-          echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
-          cp .devcontainer/.env.ci .devcontainer/.env
-          echo ".devcontainer/.env:"
-          cat .devcontainer/.env
-
-      - name: Build and Deploy to Dev & Staging
-        uses: devcontainers/ci@v0.3
-        env:
-          GH_TOKEN: ${{ secrets.GH_ACTIONS_PAT }}
+      - name: Configure AWS credentials
+        if: needs.check-changes.outputs.services_with_config_changed != '[]'
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          env: |
-            GH_TOKEN=${{ secrets.GH_ACTIONS_PAT }}
-          runCmd: |
-            set -e
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
+          role-session-name: GithubWorkflow-ServiceConfigDeployment-${{ matrix.environment }}
+          aws-region: ${{ vars.AWS_PRIMARY_REGION }}
+          role-duration-seconds: 900
+          role-skip-session-tagging: true
 
-            # Temporarily unset GITHUB_TOKEN, it does not have all the required permissions by default
-            GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
-            unset GITHUB_TOKEN
-            
-            echo ">> Authenticating with GH_ACTIONS_PAT..."
-            gh auth login --with-token <<< "$GH_ACTIONS_PAT"
-            
-            echo "Verifying GitHub authentication..."
-            gh auth status
-            if [ $? -ne 0 ]; then
-              echo "GitHub CLI is not authenticated"
-              exit 1
+      - name: Deploy Service Configurations
+        if: needs.check-changes.outputs.services_with_config_changed != '[]'
+        run: |
+          services_array=$(echo '${{ needs.check-changes.outputs.services_with_config_changed }}' | jq -r '.[]')
+
+          chmod +x .github/scripts/deploy-service-configuration.sh
+
+          for service in $services_array; do
+            echo "Deploying configuration for service: $service"
+            if ! .github/scripts/deploy-service-configuration.sh --service-name "$service" --stage ${{ matrix.environment }} --region ${{ vars.AWS_PRIMARY_REGION }} --platform AWS; then
+              echo "Error: Failed to deploy configuratio for service $service on environment ${{ matrix.environment }} in region ${{ vars.AWS_PRIMARY_REGION }} . Aborting."
+              return 1
             fi
+          done
 
-            deploy_to_env() {
-              local ENV=$1
-              ENV=dev
+          echo "Services' configuration deployment completed successfully!"
+
+          deploy-services-dev-staging:
+            runs-on: ubuntu-latest
+            needs: [check-changes, deploy-service-config]
+            if: needs.check-changes.outputs.code_changed  == 'true'
+            environment: dev
+            steps:
+              - name: Check-out Code
+                uses: actions/checkout@v4
+                with:
+                  fetch-depth: 0  # Ensure full checkout
               
-              echo ">> Getting variables for $ENV environment:"
-              if ! VARS=$(gh variable list -e $ENV 2>&1); then
-                echo "Failed to list variables. Error:"
-                echo "$VARS"
-                echo "Attempting to get repository details..."
-                gh api repos/$GITHUB_REPOSITORY || echo "Failed to access repo API"
-                echo "Attempting to list environments..."
-                gh api repos/$GITHUB_REPOSITORY/environments || echo "Failed to list environments"
-              else
-                echo "$VARS"
-              fi
-
-              AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
-              AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
-              AWS_GITHUB_ACTIONS_ROLE=$(echo "$VARS" | grep AWS_GITHUB_ACTIONS_ROLE | awk '{print $2}')
-
-              if [ -z "$AWS_ACCOUNT_ID" ] || [ -z "$AWS_PRIMARY_REGION" ] || [ -z "$AWS_GITHUB_ACTIONS_ROLE" ]; then
-                echo "Failed to retrieve necessary AWS variables for $ENV environment"
-                return 1
-              fi
-
-              echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
-              echo "AWS_PRIMARY_REGION: $AWS_PRIMARY_REGION"
-              echo "AWS_GITHUB_ACTIONS_ROLE: $AWS_GITHUB_ACTIONS_ROLE"
-
-              echo ">> Configuring AWS credentials for $ENV..."
-              # Similarly to aws-actions/configure-aws-credentials to set up credentials
-              aws-actions-configure-aws-credentials \
-                --role-to-assume "$AWS_GITHUB_ACTIONS_ROLE" \
-                --role-session-name "GithubWorkflow-DeployServices-$ENV" \
-                --aws-region "$AWS_PRIMARY_REGION"
-
-              echo "Verifying AWS authentication for $ENV..."
-              aws sts get-caller-identity
-
-              echo ">> Deploying to $ENV environment..."
-              poetry run install-all
-              poetry run build-all
-
-              chmod +x .github/scripts/sam-build-and-deploy-services.sh
+              - name: Configure AWS credentials
+                id: aws-creds
+                uses: aws-actions/configure-aws-credentials@v4
+                with:
+                  role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
+                  role-session-name: GithubWorkflow-Deployment-dev-staging
+                  aws-region: ${{ vars.AWS_PRIMARY_REGION }}
+                  output-credentials: true
               
-              # Temporarily disable deployment
-              .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION
-
-            deploy_to_env "dev" || exit 1
-            deploy_to_env "staging" || exit 1
-
-            # Restore GITHUB_TOKEN if needed for other operations
-            export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
-
-
-# name: Deploy to Dev & Staging
-
-# on:
-#   push:
-#     branches: [main]
-
-# permissions:
-#   id-token: write # This is required for requesting the JWT
-#   contents: read  # This is required for actions/checkout
-#   pull-requests: write  # This allows the workflow to comment on PRs
-
-# jobs:
-#   check-terraform-changes:
-#     runs-on: ubuntu-latest
-#     outputs:
-#       terraform_changed: ${{ steps.tf-changes.outputs.terraform_changed }}
-#     steps:
-#       - name: Check-out Code
-#         uses: actions/checkout@v4
-#         with:
-#           fetch-depth: 0  # Ensure full checkout
-
-#       - name: Check for Terraform Changes
-#         id: tf-changes
-#         run: |
-#           echo "Processing Push Event"
-#           BASE_SHA=${{ github.event.before }}
-#           HEAD_SHA=${{ github.event.after }}
-
-#           echo "Comparing $BASE_SHA...$HEAD_SHA"
-          
-#           ALL_CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
-#           echo "All changed files:"
-#           echo "------------------"
-#           echo "$ALL_CHANGED_FILES"
-          
-#           FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^infra/terraform/' || true)
-#           echo "Filtered files:"
-#           echo "---------------"
-#           echo "$FILTERED_FILES"
-          
-#           if [ -n "$FILTERED_FILES" ]; then
-#             echo "terraform_changed=true" >> $GITHUB_OUTPUT
-#             echo "Matching files found"
-#           else
-#             echo "terraform_changed=false" >> $GITHUB_OUTPUT
-#             echo "No matching files found"
-#           fi
-      
-#       - name: Display terraform_changed Output
-#         run: |
-#           echo "Terraform changed: ${{ steps.tf-changes.outputs.terraform_changed }}"
-  
-#   terraform-apply:
-#     name: Terraform Apply
-#     needs: [check-terraform-changes]
-#     if: needs.check-terraform-changes.outputs.terraform_changed == 'true'
-#     strategy:
-#       matrix:
-#         environment: [dev, staging]
-#     uses: ./.github/workflows/terraform-apply-reusable.yml
-#     with:
-#       environment: ${{ matrix.environment }}
-  
-#   check-code-changes:
-#     runs-on: ubuntu-latest
-#     outputs:
-#       code_changed: ${{ steps.code-changes.outputs.code_changed }}
-#     steps:
-#       - name: Check-out Code
-#         uses: actions/checkout@v4
-#         with:
-#           fetch-depth: 0  # Ensure full checkout
-
-#       - name: Check for Code Changes
-#         id: code-changes
-#         run: |
-#           echo "Processing Push Event"
-#           BASE_SHA=${{ github.event.before }}
-#           HEAD_SHA=${{ github.event.after }}
-
-#           echo "Comparing $BASE_SHA...$HEAD_SHA"
-          
-#           ALL_CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
-#           echo "All changed files:"
-#           echo "------------------"
-#           echo "$ALL_CHANGED_FILES"
-          
-#           FILTERED_FILES=$(echo "$ALL_CHANGED_FILES" | grep -E '^packages/|^services/' || true)
-#           echo "Filtered files:"
-#           echo "---------------"
-#           echo "$FILTERED_FILES"
-          
-#           if [ -n "$FILTERED_FILES" ]; then
-#             echo "code_changed=true" >> $GITHUB_OUTPUT
-#             echo "Matching files found"
-#           else
-#             echo "code_changed=false" >> $GITHUB_OUTPUT
-#             echo "No matching files found"
-#           fi
-      
-#       - name: Display code_changed Output
-#         run: |
-#           echo "Code changed: ${{ steps.code-changes.outputs.code_changed }}"
-  
-#   # Simple implementation to deploy all services, when code changed
-#   # TODO (@limorl): Deploy only changed services, based on dervice version change
-#   deploy-services:
-#     name: Terraform Apply
-#     needs: [check-code-changes, terraform-apply]
-#     if: needs.check-code-changes.outputs.code_changed == 'true'
-#     strategy:
-#       matrix:
-#         environment: [dev, staging]
-#     uses: ./.github/workflows/deployment-services-reusable.yml
-#     with:
-#       environment: ${{ matrix.environment }}
-      
+              - name: Set-up Devcontainer Environment Variables
+                run: |
+                  echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+                  cp .devcontainer/.env.ci .devcontainer/.env
+                  echo ".devcontainer/.env:"
+                  cat .devcontainer/.env
+              - name: Debug Git Auth inside Devcontainer
+                uses: devcontainers/ci@v0.3
+                env:
+                  GH_ACTIONS_PAT: ${{ secrets.GH_ACTIONS_PAT }}
+                with:
+                  cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
+                  push: never
+                  env: |
+                    GH_TOKEN=${{ secrets.GH_ACTIONS_PAT }}
+                    AWS_ACCESS_KEY_ID=${{ steps.aws-creds.outputs.aws-access-key-id }}
+                    AWS_SECRET_ACCESS_KEY=${{ steps.aws-creds.outputs.aws-secret-access-key }}
+                    AWS_SESSION_TOKEN=${{ steps.aws-creds.outputs.aws-session-token }}
+                    AWS_REGION=${{ vars.AWS_PRIMARY_REGION }}
+                  runCmd: |
+                    # Temporarily unset GITHUB_TOKEN
+                    GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
+                    unset GITHUB_TOKEN
+                    echo "Authenticating with GH_ACTIONS_PAT" 
+                    gh auth login --with-token <<< "$GH_TOKEN"
+                    echo "Verifying Github credentials..."
+                    if ! gh auth status; then
+                      echo "Github authentication failed. Debug info:"
+                      gh auth status
+                      exit 1
+                    fi
+                    echo "Successfully authenticated with GitHub"
+                    echo "Verifying AWS credentials..."
+                    echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:0:5}..."
+                    echo "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:0:5}..."
+                    echo "AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:0:5}..."
+                    echo "AWS_REGION: $AWS_REGION"
+                    echo "Verifying AWS credentials..."
+                    if ! aws sts get-caller-identity; then
+                      echo "AWS authentication failed. Debug info:"
+                      aws sts get-caller-identity --debug
+                      exit 1
+                    fi
+                    echo "Successfully authenticated with AWS"
+                    
+                    deploy_to_env() {
+                      local ENV=$1
+                      ENV=dev
+                      
+                      echo ">> Getting variables for $ENV environment:"
+                      if ! VARS=$(gh variable list -e $ENV 2>&1); then
+                        echo "Failed to list variables. Error:"
+                        echo "$VARS"
+                        echo "Attempting to get repository details..."
+                        gh api repos/$GITHUB_REPOSITORY || echo "Failed to access repo API"
+                        echo "Attempting to list environments..."
+                        gh api repos/$GITHUB_REPOSITORY/environments || echo "Failed to list environments"
+                      else
+                        echo "$VARS"
+                      fi
+                      AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
+                      AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
+                      AWS_GITHUB_ACTIONS_ROLE=$(echo "$VARS" | grep AWS_GITHUB_ACTIONS_ROLE | awk '{print $2}')
+                      if [ -z "$AWS_ACCOUNT_ID" ] || [ -z "$AWS_PRIMARY_REGION" ] || [ -z "$AWS_GITHUB_ACTIONS_ROLE" ]; then
+                        echo "Failed to retrieve necessary AWS variables for $ENV environment"
+                        return 1
+                      fi
+                      echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
+                      echo "AWS_PRIMARY_REGION: $AWS_PRIMARY_REGION"
+                      echo "AWS_GITHUB_ACTIONS_ROLE: $AWS_GITHUB_ACTIONS_ROLE"
+                      echo ">> Deploying to $ENV environment..."
+                      chmod +x .github/scripts/sam-build-and-deploy-services.sh 
+                      chmod +x .github/scripts/deploy-service-configuration.sh
+        
+                      if ! .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION false ; then
+                        echo "Deployment failed for $ENV environment"
+                        return 1
+                      fi
+                      echo "Deployment completed successfully for $ENV environment"
+                    }
+                      deploy_to_env "dev" || exit 1
+                      #deploy_to_env "staging" || exit 1
+                      # Restore GITHUB_TOKEN if needed for other operations
+                      export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
