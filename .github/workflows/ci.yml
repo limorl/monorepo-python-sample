@@ -82,7 +82,7 @@ jobs:
   # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
   code-validation:
     name: Validate Code
-    needs: [check-changes, pre-build-devcontainer,  debug-gh-token]
+    needs: [check-changes, pre-build-devcontainer]
     runs-on: ubuntu-latest
 
     steps:

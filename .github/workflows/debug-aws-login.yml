@@ -1,4 +1,4 @@
-name: CI
+name: Debug AWS Login
 
 on:
   pull_request:
