@@ -79,6 +79,53 @@ jobs:
               exit 1
             fi
             echo "Successfully authenticated with AWS"
+
+            echo "==== Environment Information ===="
+            echo "Current directory: $(pwd)"
+            echo "Content of current directory:"
+            ls -la
+            echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+            echo "WORKSPACE_DIR: $WORKSPACE_DIR"
+            
+            echo "==== Python and Poetry Setup ===="
+            echo "Python version: $(python --version)"
+            echo "Python executable location: $(which python)"
+            echo "Poetry version: $(poetry --version)"
+            echo "Poetry executable location: $(which poetry)"
+            
+            echo "==== Poetry Configuration ===="
+            poetry config --list
+            echo "Poetry cache directory content:"
+            ls -la $GITHUB_WORKSPACE/.cache || echo "Cache directory not found"
+            
+            echo "==== Virtual Environments ===="
+            poetry env list
+            poetry env info
+            
+            echo "==== Project Structure ===="
+            echo "Content of packages/scripts:"
+            ls -la packages/scripts
+            echo "Content of services/greeting:"
+            ls -la services/greeting
+            
+            echo "==== pyproject.toml Contents ===="
+            echo "Root pyproject.toml:"
+            cat pyproject.toml || echo "Root pyproject.toml not found"
+            echo "packages/scripts/pyproject.toml:"
+            cat packages/scripts/pyproject.toml || echo "packages/scripts/pyproject.toml not found"
+            echo "services/greeting/pyproject.toml:"
+            cat services/greeting/pyproject.toml || echo "services/greeting/pyproject.toml not found"
+            
+            echo "==== Dependency Installation ===="
+            poetry install -v
+            
+            echo "==== Installed Packages ===="
+            poetry show
+            
+            echo "==== Script Locations ===="
+            poetry run which deploy-service-configuration || echo "deploy-service-configuration not found in PATH"
+            find . -name "deploy_service_configuration.py"
+            
             
             deploy_to_env() {
               local ENV=$1
