@@ -49,11 +49,9 @@ jobs:
             AWS_SESSION_TOKEN=${{ steps.aws-creds.outputs.aws-session-token }}
             AWS_REGION=${{ vars.AWS_PRIMARY_REGION }}
           runCmd: |
-            set -e
-            
             # Temporarily unset GITHUB_TOKEN
-            #GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
-            #unset GITHUB_TOKEN
+            GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
+            unset GITHUB_TOKEN
             echo "Authenticating with GH_ACTIONS_PAT" 
             gh auth login --with-token <<< "$GH_TOKEN"
             echo "Verifying Github credentials..."
@@ -75,6 +73,7 @@ jobs:
               exit 1
             fi
             echo "Successfully authenticated with AWS"
+            
             deploy_to_env() {
               local ENV=$1
               ENV=dev
@@ -110,9 +109,7 @@ jobs:
               fi
               echo "Deployment completed successfully for $ENV environment"
             }
-              
-            deploy_to_env "dev" || exit 1
-            #deploy_to_env "staging" || exit 1
-
-            # Restore GITHUB_TOKEN if needed for other operations
-            #export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
+              deploy_to_env "dev" || exit 1
+              #deploy_to_env "staging" || exit 1
+              # Restore GITHUB_TOKEN if needed for other operations
+              export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
