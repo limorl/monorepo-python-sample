@@ -69,12 +69,15 @@ get_or_create_resource() {
 
 # Get or create application
 APP_ID=$(get_or_create_resource "application" "$APP_NAME")
+echo "APP_ID=$APP_ID"
 
 # Get or create environment
 ENV_ID=$(get_or_create_resource "environment" "$STAGE" "--application-id $APP_ID" "--application-id $APP_ID")
+echo "ENV_ID=$ENV_ID"
 
 # Get or create configuration profile
 PROFILE_ID=$(get_or_create_resource "configuration-profile" "$CONFIG_NAME" "--application-id $APP_ID" "--application-id $APP_ID --location-uri hosted")
+echo "PROFILE_ID=$PROFILE_ID"
 
 # Create hosted configuration version
 if [ -f "$CONFIG_FILE" ]; then
