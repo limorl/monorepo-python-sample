@@ -44,10 +44,13 @@
           "cloudformation:List*",
           "cloudformation:Get*",
           "cloudformation:CreateChangeSet",
+          "cloudformation:DeleteChangeSet",
+          "cloudformation:ExecuteChangeSet",
           "cloudformation:CreateStack",
           "cloudformation:UpdateStack",
           "cloudformation:DeleteStack",
           "cloudformation:ValidateTemplate",
+          
           "apigateway:*"
         ],
         "Resource": "*"
