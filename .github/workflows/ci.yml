@@ -73,11 +73,14 @@ jobs:
           echo "Code changed: ${{ steps.check.outputs.code_changed }}"
           echo "Devcontainer changed: ${{ steps.check.outputs.devcontainer_changed }}"
   
+  # The reusable workflow checks if devcontainer file has changed or not, since this is a required job by code-validation which is a required PR check
   pre-build-devcontainer:
     name: Pre-build Devcontainer
     needs: [check-changes]
     if: needs.check-changes.outputs.devcontainer_changed == 'true'
     uses: ./.github/workflows/pre-build-devcontainer.yml
+    with:
+      devcontainer_changed: ${{ needs.check-changes.outputs.devcontainer_changed }}
 
   # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
   code-validation:
