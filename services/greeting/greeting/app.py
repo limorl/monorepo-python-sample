@@ -26,14 +26,12 @@ def create_app(config_provider: IConfigurationProvider, greeting: IGreeting) -> 
 
     @app.route('/hello')
     def hello() -> str:
-        logger.info("greeting/hello")
         if config and config.html_heading:
             return f'<{config.html_heading}>{greeting.hello()}</{config.html_heading}>'
         return greeting.hello()
 
     @app.route('/hello/<name>')
     def hello_name(name: str) -> str:
-        logger.info(f"greeting/hello/{name}")
         if config and config.html_heading:
             return f'<{config.html_heading}>{greeting.hello(name)}</{config.html_heading}>'
         return greeting.hello(name)
