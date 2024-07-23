@@ -68,16 +68,17 @@ jobs:
   deploy-service-config:
     name: Deploy Service Configurations
     needs: [check-changes]
-    if: needs.check-changes.outputs.services_with_config_changed != '[]'
     runs-on: ubuntu-latest
     strategy:
       matrix:
         environment: [dev, staging]
     steps:
       - name: Check-out Code
+        if: needs.check-changes.outputs.services_with_config_changed != '[]'
         uses: actions/checkout@v4
 
       - name: Configure AWS credentials
+        if: needs.check-changes.outputs.services_with_config_changed != '[]'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
@@ -87,6 +88,7 @@ jobs:
           role-skip-session-tagging: true
 
       - name: Deploy Service Configurations
+        if: needs.check-changes.outputs.services_with_config_changed != '[]'
         run: |
           services_array=$(echo '${{ needs.check-changes.outputs.services_with_config_changed }}' | jq -r '.[]')
 
