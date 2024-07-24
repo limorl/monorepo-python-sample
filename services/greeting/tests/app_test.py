@@ -35,7 +35,7 @@ def test_hello(app, mock_config_provider):
     greeting_configuration: GreetingConfiguration = mock_config_provider.get_configuration(GreetingConfiguration)
     heading_start, heading_end = _get_heading_tags(app_configuration)
 
-    expected_greeting = f'{heading_start}Hello {"!" * greeting_configuration.num_of_exclamations}{heading_end}'
+    expected_greeting = f'{heading_start}Hi {"!" * greeting_configuration.num_of_exclamations}{heading_end}'
 
     with app.test_client() as client:
         response = client.get('/hello')
@@ -49,7 +49,7 @@ def test_hello_name(app, mock_config_provider):
     greeting_configuration: GreetingConfiguration = mock_config_provider.get_configuration(GreetingConfiguration)
     heading_start, heading_end = _get_heading_tags(app_configuration)
 
-    expected_greeting = f'{heading_start}Hello John{"!" * greeting_configuration.num_of_exclamations}{heading_end}'
+    expected_greeting = f'{heading_start}Hi John{"!" * greeting_configuration.num_of_exclamations}{heading_end}'
 
     with app.test_client() as client:
         response = client.get('/hello/John')
