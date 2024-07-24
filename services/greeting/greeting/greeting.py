@@ -16,4 +16,4 @@ class Greeting(IGreeting):
         self._config = config_provider.get_configuration(GreetingConfiguration)
 
     def hello(self, name: str = '') -> str:
-        return f"Hello {name}{'!' * self._config.num_of_exclamations}"
+        return f"Hi {name}{'!' * self._config.num_of_exclamations}"
