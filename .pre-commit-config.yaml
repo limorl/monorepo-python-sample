@@ -73,7 +73,7 @@ repos:
       hooks:
         - id: unit-tests
           name: unit-tests
-          entry: poetry pytest -m "not integration and not e2e"
+          entry: poetry run pytest -m "not integration and not e2e"
           language: system
           stages: [push]
           pass_filenames: false
