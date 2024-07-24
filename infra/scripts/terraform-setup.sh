@@ -12,13 +12,19 @@
 #   1. Ensure you configured AWS SSO for each environment and saved the profile as dev, staging and prod (see README.md)
 #   2. terraform-setup.sh <dev|staging|prod>
 
-AWS_PRIMARY_REGION_DEV='eu-west-1'
-AWS_PRIMARY_REGION_STAGING='us-east-1'
-AWS_PRIMARY_REGION_PROD='us-east-1'
+# Load setup environment variables
+source .env
 
-AWS_ACCOUNT_ID_DEV='058264375193'
-AWS_ACCOUNT_ID_STAGING='730335430497'
-AWS_ACCOUNT_ID_PROD='471112979414'
+check_env_vars() {
+    local vars=("AWS_PRIMARY_REGION_DEV" "AWS_PRIMARY_REGION_STAGING" "AWS_PRIMARY_REGION_PROD"
+                "AWS_ACCOUNT_ID_DEV" "AWS_ACCOUNT_ID_STAGING" "AWS_ACCOUNT_ID_PROD")
+    for var in "${vars[@]}"; do
+        if [ -z "${!var}" ]; then
+            echo "Error: $var is not set"
+            exit 1
+        fi
+    done
+}
 
 # Create S3 Bucket on primary region (on dev, staging and prod).
 # Source: https://developer.hashicorp.com/terraform/language/settings/backends/s3
