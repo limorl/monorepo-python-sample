@@ -187,7 +187,6 @@ jobs:
             
             deploy_to_env() {
               local ENV=$1
-              ENV=dev
               
               echo ">> Getting variables for $ENV environment:"
               if ! VARS=$(gh variable list -e $ENV 2>&1); then
