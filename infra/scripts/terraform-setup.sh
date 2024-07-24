@@ -248,7 +248,7 @@ else
     exit 1
 fi
 
-echo "Setting up terraform backend on region $AWS_PRIMARY_REGION"
+echo "Setting up terraform backend for ENVIRONMENT=$ENVIRONMENT on region $AWS_PRIMARY_REGION"
 
 create_s3_bucket
 create_dynamodb_table
