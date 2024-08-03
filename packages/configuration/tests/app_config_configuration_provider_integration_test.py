@@ -46,8 +46,8 @@ def configuration_with_populated_secrets():
 def service_env():
     clear_service_environment()
     os.environ['PLATFORM'] = 'AWS'
-    os.environ['STAGE'] = 'dev'
-    os.environ['REGION'] = 'us-west-2'
+    os.environ['STAGE'] = 'staging'
+    os.environ['REGION'] = 'us-east-1'
     os.environ['SERVICE_NAME'] = 'test-appconfig'
 
     config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
