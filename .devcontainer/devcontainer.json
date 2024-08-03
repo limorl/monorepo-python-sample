@@ -5,7 +5,7 @@
     "dockerComposeFile": "docker-compose.yml",
     "service": "devcontainer",
     "workspaceFolder": "${localWorkspaceFolder}",
-    "runArgs": ["--env-file",".devcontainer/.env"],
+
     "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",
         "python.pythonPath": "/usr/local/bin/python",
