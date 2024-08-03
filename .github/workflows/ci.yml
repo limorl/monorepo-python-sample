@@ -34,34 +34,37 @@ jobs:
           
           git diff --name-only $BASE_SHA $HEAD_SHA > changed_files.txt
           
-          echo "Changed files:"
+          echo $'\nChanged files:'
           cat changed_files.txt
-          
-          echo "Checking for Terraform changes..."
-          if grep -q "^infra/terraform/.*\.(tf|tfvars|lock\.hcl)$" changed_files.txt; then
+
+          echo $'\nChecking for Terraform changes...'
+          if grep "^infra/terraform/" changed_files.txt | grep -qv "\.md$"; then
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
             echo "Matching Terraform files:"
-            grep "^infra/terraform/" changed_files.txt
+            grep "^infra/terraform/" changed_files.txt | grep -v "\.md$"
           else
             echo "terraform_changed=false" >> $GITHUB_OUTPUT
+            echo "No matching Terraform files"
           fi
-          
-          echo "Checking for Code changes..."
+
+          echo $'\nChecking for Code changes...'
           if grep -qE "^(services|packages)/.*\.(py|toml|ya?ml|lock)$" changed_files.txt; then
              echo "code_changed=true" >> $GITHUB_OUTPUT
              echo "Matching Code files:"
              grep -E "^services/|^packages/" changed_files.txt
           else
              echo "code_changed=false" >> $GITHUB_OUTPUT
+             echo "No matching Code files"
           fi
 
-          echo "Checking for Devcontainer changes..."
+          echo $'\nChecking for Devcontainer changes...'
           if grep -qE "^.devcontainer/" changed_files.txt; then
              echo "devcontainer_changed=true" >> $GITHUB_OUTPUT
              echo "Matching Code files:"
              grep -E "^.devcontainer/" changed_files.txt
           else
              echo "devcontainer_changed=false" >> $GITHUB_OUTPUT
+             echo "No matching Devcontainer files"
           fi
     
       - name: Display check-changes Output
@@ -93,6 +96,7 @@ jobs:
         fetch-depth: 0
 
     - name: Login to GitHub Container Registry
+      if: needs.check-changes.outputs.code_changed == 'true'
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
@@ -112,7 +116,6 @@ jobs:
       if: needs.check-changes.outputs.code_changed == 'true'
       uses: devcontainers/ci@v0.3
       with:    
-        # imageName: ghcr.io/limorl/monorepo-python-sample-devcontainer
         cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
         push: never
         runCmd: |
