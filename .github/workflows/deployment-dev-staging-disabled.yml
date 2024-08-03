@@ -1,9 +1,9 @@
-name: Deploy to Dev & Staging (NEW)
+name: Deploy to Dev & Staging (Disabled)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
+  # push:
+  #  branches: [main]
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -120,14 +120,11 @@ jobs:
 
           echo "Services' configuration deployment completed successfully!"
 
-  deploy-services:
+  deploy-services-dev-staging:
     runs-on: ubuntu-latest
     needs: [check-changes, deploy-service-config]
     if: needs.check-changes.outputs.code_changed  == 'true'
-    strategy:
-      matrix:
-        environment: [dev, staging]
-    environment: ${{ matrix.environment }}
+    environment: dev
     steps:
       - name: Check-out Code
         uses: actions/checkout@v4
@@ -149,8 +146,7 @@ jobs:
           cp .devcontainer/.env.ci .devcontainer/.env
           echo ".devcontainer/.env:"
           cat .devcontainer/.env
-
-      - name: Deploy Services to 
+      - name: Debug Git Auth inside Devcontainer
         uses: devcontainers/ci@v0.3
         env:
           GH_ACTIONS_PAT: ${{ secrets.GH_ACTIONS_PAT }}
@@ -163,30 +159,26 @@ jobs:
             AWS_SECRET_ACCESS_KEY=${{ steps.aws-creds.outputs.aws-secret-access-key }}
             AWS_SESSION_TOKEN=${{ steps.aws-creds.outputs.aws-session-token }}
             AWS_REGION=${{ vars.AWS_PRIMARY_REGION }}
-            AWS_ACCOUNT_ID=${{ vars.AWS_ACCOUNT_ID }}
-            AWS_PRIMARY_REGION=${{ vars.AWS_PRIMARY_REGION }}
-            AWS_GITHUB_ACTIONS_ROLE=${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
-            ENV=${{ matrix.environment }}
           runCmd: |
             # Temporarily unset GITHUB_TOKEN
-            # GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
-            # unset GITHUB_TOKEN
+            GITHUB_TOKEN_BACKUP=$GITHUB_TOKEN
+            unset GITHUB_TOKEN
 
-            # echo "Authenticating with GH_ACTIONS_PAT" 
-            # gh auth login --with-token <<< "$GH_TOKEN"
-            # echo "Verifying Github credentials..."
-            # if ! gh auth status; then
-            #   echo "Github authentication failed. Debug info:"
-            #   gh auth status
-            #   exit 1
-            # fi
+            echo "Authenticating with GH_ACTIONS_PAT" 
+            gh auth login --with-token <<< "$GH_TOKEN"
+            echo "Verifying Github credentials..."
+            if ! gh auth status; then
+              echo "Github authentication failed. Debug info:"
+              gh auth status
+              exit 1
+            fi
 
-            # echo "Successfully authenticated with GitHub"
-            # echo "Verifying AWS credentials..."
-            # echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:0:5}..."
-            # echo "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:0:5}..."
-            # echo "AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:0:5}..."
-            # echo "AWS_REGION: $AWS_REGION"
+            echo "Successfully authenticated with GitHub"
+            echo "Verifying AWS credentials..."
+            echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:0:5}..."
+            echo "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:0:5}..."
+            echo "AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:0:5}..."
+            echo "AWS_REGION: $AWS_REGION"
 
             echo "Verifying AWS credentials..."
             if ! aws sts get-caller-identity; then
@@ -197,23 +189,23 @@ jobs:
             echo "Successfully authenticated with AWS"
             
             deploy_to_env() {
-            #  local ENV=$1
+              local ENV=$1
               
-            #   echo ">> Getting variables for $ENV environment:"
-            #   if ! VARS=$(gh variable list -e $ENV 2>&1); then
-            #     echo "Failed to list variables. Error:"
-            #     echo "$VARS"
-            #     echo "Attempting to get repository details..."
-            #     gh api repos/$GITHUB_REPOSITORY || echo "Failed to access repo API"
-            #     echo "Attempting to list environments..."
-            #     gh api repos/$GITHUB_REPOSITORY/environments || echo "Failed to list environments"
-            #   else
-            #     echo "$VARS"
-            #   fi
+              echo ">> Getting variables for $ENV environment:"
+              if ! VARS=$(gh variable list -e $ENV 2>&1); then
+                echo "Failed to list variables. Error:"
+                echo "$VARS"
+                echo "Attempting to get repository details..."
+                gh api repos/$GITHUB_REPOSITORY || echo "Failed to access repo API"
+                echo "Attempting to list environments..."
+                gh api repos/$GITHUB_REPOSITORY/environments || echo "Failed to list environments"
+              else
+                echo "$VARS"
+              fi
 
-            #   AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
-            #   AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
-            #   AWS_GITHUB_ACTIONS_ROLE=$(echo "$VARS" | grep AWS_GITHUB_ACTIONS_ROLE | awk '{print $2}')
+              AWS_ACCOUNT_ID=$(echo "$VARS" | grep AWS_ACCOUNT_ID | awk '{print $2}')
+              AWS_PRIMARY_REGION=$(echo "$VARS" | grep AWS_PRIMARY_REGION | awk '{print $2}')
+              AWS_GITHUB_ACTIONS_ROLE=$(echo "$VARS" | grep AWS_GITHUB_ACTIONS_ROLE | awk '{print $2}')
               
               if [ -z "$AWS_ACCOUNT_ID" ] || [ -z "$AWS_PRIMARY_REGION" ] || [ -z "$AWS_GITHUB_ACTIONS_ROLE" ]; then
                 echo "Failed to retrieve necessary AWS variables for $ENV environment"
@@ -233,8 +225,7 @@ jobs:
               fi
               echo "Deployment completed successfully for $ENV environment"
             }
-              deploy_to_env
-              # deploy_to_env "dev" || exit 1
+              deploy_to_env "dev" || exit 1
               # deploy_to_env "staging" || exit 1
               # Restore GITHUB_TOKEN if needed for other operations
               export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
