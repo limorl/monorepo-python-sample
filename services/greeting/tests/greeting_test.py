@@ -23,13 +23,13 @@ def greeting(mock_config_provider):
 
 def test_hello(greeting, greeting_configuration):
     msg = greeting.hello()
-    expected = f'Hi {"!" * greeting_configuration.num_of_exclamations}'
+    expected = f'Hello {"!" * greeting_configuration.num_of_exclamations}'
 
     assert msg == expected
 
 
 def test_hello_name(greeting, greeting_configuration):
     msg = greeting.hello('John')
-    expected = f'Hi John{"!" * greeting_configuration.num_of_exclamations}'
+    expected = f'Hello John{"!" * greeting_configuration.num_of_exclamations}'
 
     assert msg == expected

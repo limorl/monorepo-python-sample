@@ -36,7 +36,7 @@ RUN LATEST_COMPOSE_VERSION=$(curl -sSL "https://api.github.com/repos/docker/comp
 
 
 # Install terraform
-ARG TERRAFORM_VERSION="1.7.5"
+ARG TERRAFORM_VERSION="1.9.3"
 RUN ARCH=${TARGETARCH:-$(dpkg --print-architecture)} && \
     echo "ARCH is set to: $ARCH" && \
     case $ARCH in \

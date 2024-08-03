@@ -37,22 +37,24 @@ jobs:
           echo "Changed files:"
           cat changed_files.txt
           
-          echo "Checking for Terraform changes..."
-          if grep -q "^infra/terraform/.*\.(tf|tfvars|lock\.hcl)$" changed_files.txt; then
+          echo $'\nChecking for Terraform changes...'
+          if grep "^infra/terraform/" changed_files.txt | grep -qv "\.md$"; then
             echo "terraform_changed=true" >> $GITHUB_OUTPUT
             echo "Matching Terraform files:"
-            grep "^infra/terraform/" changed_files.txt
+            grep "^infra/terraform/" changed_files.txt | grep -v "\.md$"
           else
             echo "terraform_changed=false" >> $GITHUB_OUTPUT
+            echo "No matching Terraform files"
           fi
-          
-          echo "Checking for Code changes..."
+
+          echo $'\nChecking for Code changes...'
           if grep -qE "^(services|packages)/.*\.(py|toml|ya?ml|lock)$" changed_files.txt; then
              echo "code_changed=true" >> $GITHUB_OUTPUT
              echo "Matching Code files:"
              grep -E "^services/|^packages/" changed_files.txt
           else
              echo "code_changed=false" >> $GITHUB_OUTPUT
+             echo "No matching Code files"
           fi
 
           echo "Checking for Service Config changes..."
@@ -187,7 +189,6 @@ jobs:
             
             deploy_to_env() {
               local ENV=$1
-              ENV=dev
               
               echo ">> Getting variables for $ENV environment:"
               if ! VARS=$(gh variable list -e $ENV 2>&1); then

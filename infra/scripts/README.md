@@ -10,7 +10,7 @@
 **Configure SSO**
 To run the script for each account, one needs to have administrator permissions to dev, staging and prod.
 Please ensure to `configure SSO` for each account and name the profile `dev`, `staging`, and `prod` respectively.
-Alternatively, edit the `/home/vscode/.aws/config` file to include all three profiles:
+Alternatively, edit the `~/.aws/config` file to include all three profiles:
 ```bash
 [profile dev]
 sso_start_url = __CHANGE_ME__
