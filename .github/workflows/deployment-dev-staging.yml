@@ -225,6 +225,6 @@ jobs:
               echo "Deployment completed successfully for $ENV environment"
             }
               deploy_to_env "dev" || exit 1
-              deploy_to_env "staging" || exit 1
+              # deploy_to_env "staging" || exit 1
               # Restore GITHUB_TOKEN if needed for other operations
               export GITHUB_TOKEN=$GITHUB_TOKEN_BACKUP
