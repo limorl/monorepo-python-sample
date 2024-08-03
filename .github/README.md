@@ -15,6 +15,6 @@ AWS_PRIMARY_REGION = your environment primary region (e.g. us-east1)
 AWS_GITHUB_ACTIONS_ROLE = The ARN of the GithubActions Role created in step 1 (should look like `arn:aws:iam::__AWS_ACCOUNT_ID__:role/GithubActionsRole`)
 ```
 3. **GH_ACTIONS_PAT** - A Github Personal Access Token to allow Github Workflow Access the repo. Go to Account --> Settings --> Developer Settings --> Personal Access Tokens and create a token (classic) with `repo` and `read:org` scope. Then go to the Repository settings and repo secret named `GH_ACTIONS_PAT` with the copied token value.
-4. **Require Status Checks** - Update Repo Setings with Branch policies for `main`:
+4. **Require Status Checks** - Update Repo Settings with Branch policies for `main`:
 - Require status checks to pass before merging
 - Require branches to be up to date before merging: `Terraform Plan (dev) / Plan`, `Terraform Plan (staging) / Plan` and `Validate Code`
