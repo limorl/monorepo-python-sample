@@ -12,7 +12,7 @@
 #   1. Ensure you configured AWS SSO for each environment and saved the profile as dev, staging and prod (see README.md)
 #   2. terraform-setup.sh <dev|staging|prod>
 
-# Load setup environment variables
+# Load accountenvironment variables
 source .env
 
 check_env_vars() {

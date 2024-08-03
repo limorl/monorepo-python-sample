@@ -1,0 +1,58 @@
+name: Integration Tests - Staging
+on:
+    schedule:
+        - cron: '00 20 * * *' 
+    workflow_dispatch:
+    workflow_call:
+
+jobs:
+    test-integration:
+        name: Run Integration Tests against Staging
+        environment: staging
+        runs-on: ubuntu-latest
+        steps:
+        - name: Check-out Code
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+    
+        - name: Login to GitHub Container Registry
+          uses: docker/login-action@v3
+          with:
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+            
+        - name: Set-up Devcontainer Environment Variables
+          run: |
+            echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+            cp .devcontainer/.env.ci .devcontainer/.env
+            echo ".devcontainer/.env:"
+            cat .devcontainer/.env
+            
+        - name: Run Code Validation in Devcontainer
+          uses: devcontainers/ci@v0.3
+          with:    
+            cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
+            push: never
+            runCmd: |
+                set -e
+                echo $"\nRunning detect-secrets..."
+                poetry run pre-commit run detect-secrets --all-files
+                
+                echo $"\nRunning ruff..."
+                poetry run pre-commit run ruff --all-files --hook-stage push
+                
+                echo $"\nRunning flake8..."
+                poetry run pre-commit run flake8 --all-files --hook-stage push
+                
+                echo $"\nRunning codespell..."
+                poetry run pre-commit run codespell --all-files --hook-stage push
+                
+                echo $"\nRunning Unit tests..."
+                poetry run pytest -m "not integration and not e2e"
+
+                echo $"\nRunning Integration tests..."
+                poetry run pytest -m "integration and e2e"
+                
+                echo "All code validation checks completed!"
