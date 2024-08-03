@@ -33,6 +33,9 @@ export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
 # Note that due to how pytest handles test discovery, the order of paths matter. Changing the order can cause issues.
 [tool.pytest.ini_options]
 addopts = "--import-mode=importlib"
+markers = [
+    "integration: marks integration tests (deselect with '-m \"not integration\"')"
+]
 pythonpath = [  
   "packages/configuration",
   "packages/environment",

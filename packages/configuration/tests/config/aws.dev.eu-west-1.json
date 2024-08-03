@@ -1,0 +1,10 @@
+{
+    "GooConfiguration": {
+        "int1": 1,
+        "str2": "2",
+        "secrets": {
+            "secret_plain": "secret:test/fake-secret-plain",
+            "secret_pair": "secret:test/fake-secret-pair"
+        }
+    }
+}
