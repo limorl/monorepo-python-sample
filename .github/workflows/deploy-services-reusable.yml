@@ -1,0 +1,75 @@
+name: Service Deployment to {env}
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  deploy-services:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Check-out Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full checkout
+      
+      - name: Configure AWS credentials
+        id: aws-creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
+          role-session-name: GithubWorkflow-Deployment-dev-staging
+          aws-region: ${{ vars.AWS_PRIMARY_REGION }}
+          output-credentials: true
+      
+      - name: Set-up Devcontainer Environment Variables
+        run: |
+          echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+          cp .devcontainer/.env.ci .devcontainer/.env
+          echo ".devcontainer/.env:"
+          cat .devcontainer/.env
+
+      - name: Deploy Services to ${{ inputs.environment }}
+        uses: devcontainers/ci@v0.3
+        env:
+          GH_ACTIONS_PAT: ${{ secrets.GH_ACTIONS_PAT }}
+        with:
+          cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
+          push: never
+          env: |
+            AWS_REGION=${{ vars.AWS_PRIMARY_REGION }}
+            AWS_ACCOUNT_ID=${{ vars.AWS_ACCOUNT_ID }}
+            AWS_PRIMARY_REGION=${{ vars.AWS_PRIMARY_REGION }}
+            AWS_GITHUB_ACTIONS_ROLE=${{ vars.AWS_GITHUB_ACTIONS_ROLE }}
+            ENV=${{ inputs.environment }}
+          runCmd: |
+            echo $"\nVerifying AWS credentials..."
+            if ! aws sts get-caller-identity; then
+              echo "AWS authentication failed. Debug info:"
+              aws sts get-caller-identity --debug
+              exit 1
+            fi
+            echo "Successfully authenticated with AWS"
+            
+            if [ -z "$AWS_ACCOUNT_ID" ] || [ -z "$AWS_PRIMARY_REGION" ] || [ -z "$AWS_GITHUB_ACTIONS_ROLE" ]; then
+              echo "Failed to retrieve necessary AWS variables for $ENV environment"
+              return 1
+            fi
+            
+            echo $"\nDeploying to $ENV environment..."
+            chmod +x .github/scripts/sam-build-and-deploy-services.sh 
+            chmod +x .github/scripts/deploy-service-configuration.sh
+
+            if ! .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION false ; then
+              echo "Deployment failed for $ENV environment"
+              return 1
+            fi
+            echo "Deployment completed successfully for $ENV environment"
