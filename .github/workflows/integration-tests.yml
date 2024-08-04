@@ -81,6 +81,6 @@ jobs:
                 echo "Successfully authenticated with AWS"
 
                 echo $"\nRunning Integration tests..."
-                poetry run pytest -m "integration and e2e"
+                poetry run pytest -m "integration"
                 
                 echo "All code validation checks completed!"
