@@ -123,7 +123,7 @@ jobs:
   deploy-services:
     name: Deploy Services
     needs: [check-changes, deploy-service-config]
-    if: needs.check-changes.outputs.code_changed  == 'true'
+    # UNCOMENT TEMPORARY FOR DEBUGGINGif: needs.check-changes.outputs.code_changed  == 'true'
     strategy:
       matrix:
         environment: [dev, staging]
