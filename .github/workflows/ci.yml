@@ -18,7 +18,7 @@ jobs:
       terraform_changed: ${{ steps.check.outputs.terraform_changed }}
       code_changed: ${{ steps.check.outputs.code_changed }}
       devcontainer_changed: ${{ steps.check.outputs.devcontainer_changed }}
-  
+
     steps:
       - name: Check-out Code
         uses: actions/checkout@v4
@@ -31,9 +31,9 @@ jobs:
           echo "Processing Pull Request"
           BASE_SHA=${{ github.event.pull_request.base.sha }}
           HEAD_SHA=${{ github.event.pull_request.head.sha }}
-          
+
           git diff --name-only $BASE_SHA $HEAD_SHA > changed_files.txt
-          
+
           echo $'\nChanged files:'
           cat changed_files.txt
 
@@ -66,23 +66,53 @@ jobs:
              echo "devcontainer_changed=false" >> $GITHUB_OUTPUT
              echo "No matching Devcontainer files"
           fi
-    
+
       - name: Display check-changes Output
         run: |
           echo "Terraform changed: ${{ steps.check.outputs.terraform_changed }}"
           echo "Code changed: ${{ steps.check.outputs.code_changed }}"
           echo "Devcontainer changed: ${{ steps.check.outputs.devcontainer_changed }}"
-  
+
   # The reusable workflow checks if devcontainer file has changed or not, since this is a required job by code-validation which is a required PR check
   pre-build-devcontainer:
     name: Pre-build Devcontainer
     needs: [check-changes]
-    if: needs.check-changes.outputs.devcontainer_changed == 'true'
-    uses: ./.github/workflows/pre-build-devcontainer.yml
-    with:
-      devcontainer_changed: ${{ needs.check-changes.outputs.devcontainer_changed }}
+    runs-on: ubuntu-latest
 
-  # we're checking if code changed in each step and not in job level since code-checks are required to pass before merging to main
+    steps:
+    - name: Checkout code
+      if: needs.check-changes.outputs.devcontainer_changed == 'true'
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      if: needs.check-changes.outputs.devcontainer_changed == 'true'
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to GitHub Container Registry
+      if: needs.check-changes.outputs.devcontainer_changed == 'true'
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set-up Devcontainer Environment Variables
+      if: needs.check-changes.outputs.devcontainer_changed == 'true'
+      run: |
+        echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+        cp .devcontainer/.env.ci .devcontainer/.env
+        echo ".devcontainer/.env:"
+        cat .devcontainer/.env
+
+    - name: Pre-build Devcontainer
+      if: needs.check-changes.outputs.devcontainer_changed == 'true'
+      uses: devcontainers/ci@v0.3
+      with:
+        imageName: ghcr.io/limorl/monorepo-python-sample-devcontainer
+        cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
+        push: always
+
+  # we're checking if code changed in each step and not in job level since validation code checks are required to pass before merging to main
   code-validation:
     name: Validate Code
     needs: [check-changes, pre-build-devcontainer]
@@ -95,6 +125,9 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
     - name: Login to GitHub Container Registry
       if: needs.check-changes.outputs.code_changed == 'true'
       uses: docker/login-action@v3
@@ -102,8 +135,7 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-  
-    # TODO (@limorl): We can use with env in next job and retire .env and ci.env
+
     - name: Set-up Devcontainer Environment Variables
       if: needs.check-changes.outputs.code_changed == 'true'
       run: |

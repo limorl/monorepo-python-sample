@@ -158,10 +158,6 @@ jobs:
           cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
           push: never
           env: |
-            GH_TOKEN=${{ secrets.GH_ACTIONS_PAT }}
-            AWS_ACCESS_KEY_ID=${{ steps.aws-creds.outputs.aws-access-key-id }}
-            AWS_SECRET_ACCESS_KEY=${{ steps.aws-creds.outputs.aws-secret-access-key }}
-            AWS_SESSION_TOKEN=${{ steps.aws-creds.outputs.aws-session-token }}
             AWS_REGION=${{ vars.AWS_PRIMARY_REGION }}
             AWS_ACCOUNT_ID=${{ vars.AWS_ACCOUNT_ID }}
             AWS_PRIMARY_REGION=${{ vars.AWS_PRIMARY_REGION }}
