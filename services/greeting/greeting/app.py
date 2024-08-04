@@ -13,7 +13,7 @@ logger = get_lambda_logger()
 
 
 class AppConfiguration(Configuration):
-    """Sample Lambda with API using Flask framework"""
+    """Sample Lambda with API using Flask"""
     def __init__(self, data: dict):
         self.html_heading: str = data['html_heading']
 
