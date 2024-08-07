@@ -7,22 +7,23 @@ import pathlib
 from greeting.app import AppConfiguration
 import pytest
 
-from unittest.mock import Mock
 from configuration.local_configuration_provider import LocalConfigurationProvider
 from environment.service_environment import ServiceEnvironment, Stage, get_primary_region, clear_service_environment, restore_local_dev_service_environment
-from greeting.greeting import Greeting, GreetingConfiguration
+from greeting.greeting import GreetingConfiguration
 
 
 @pytest.fixture
 def integration_test_env():
     return Stage(os.environ['INTEGRATION_TEST_ENV'])
 
+
 @pytest.fixture
 def lambda_client(integration_test_env):
     region = get_primary_region(integration_test_env)
     options: dict = {'region_name': region}
 
-    return boto3.client('lambda')
+    return boto3.client('lambda', **options)
+
 
 @pytest.fixture
 def service_env(integration_test_env):
@@ -37,6 +38,7 @@ def service_env(integration_test_env):
 
     yield ServiceEnvironment()
     restore_local_dev_service_environment()
+
 
 @pytest.fixture
 def configuration_provider(service_env):
@@ -62,8 +64,3 @@ def test_greeting_lambda_hello(lambda_client, configuration_provider):
     assert response['StatusCode'] == 200
     payload_body = json.loads(response['Payload'].read())['body']
     assert payload_body == expected_payload_body
-    
-
-
-
-

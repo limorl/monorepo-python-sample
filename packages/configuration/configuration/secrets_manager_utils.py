@@ -8,14 +8,13 @@ from configuration.secret import parse_secret_value, try_get_secret_name
 
 logger = logging.getLogger()
 
+
 def create_secret_manager_client(region: str, endpoint_url: str | None = None) -> any:
     options: dict = {'region_name': region}
     if endpoint_url:
         options['endpoint_url'] = endpoint_url
 
     return boto3.client('secretsmanager', **options)
-
-
 
 
 def secrets_manager_get_secret_value(secretesmanager: Any, secret_config_val: str) -> str:

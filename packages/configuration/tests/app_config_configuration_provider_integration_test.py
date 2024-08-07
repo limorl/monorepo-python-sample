@@ -52,7 +52,7 @@ def service_env(integration_test_stage):
     clear_service_environment()
     os.environ['PLATFORM'] = 'AWS'
     os.environ['STAGE'] = integration_test_stage.value
-    os.environ['REGION'] =  get_primary_region(integration_test_stage)
+    os.environ['REGION'] = get_primary_region(integration_test_stage)
     os.environ['SERVICE_NAME'] = 'test-appconfig'
 
     config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
