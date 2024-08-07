@@ -5,7 +5,7 @@ from configuration.app_config_utils import app_config_deploy_service_configurati
 from configuration.app_config_configuration_provider import AppConfigConfigurationProvider
 from configuration.configuration_provider import ConfigurationSection
 from configuration.configuration import Configuration
-from environment.service_environment import ServiceEnvironment, clear_service_environment, restore_local_dev_service_environment
+from environment.service_environment import ServiceEnvironment, Stage, get_primary_region, clear_service_environment, restore_local_dev_service_environment
 
 
 class GooConfiguration(Configuration):
@@ -43,11 +43,16 @@ def configuration_with_populated_secrets():
 
 
 @pytest.fixture
-def service_env():
+def integration_test_stage():
+    return Stage(os.environ['INTEGRATION_TEST_ENV'])
+
+
+@pytest.fixture
+def service_env(integration_test_stage):
     clear_service_environment()
     os.environ['PLATFORM'] = 'AWS'
-    os.environ['STAGE'] = 'staging'
-    os.environ['REGION'] = 'us-east-1'
+    os.environ['STAGE'] = integration_test_stage.value
+    os.environ['REGION'] = get_primary_region(integration_test_stage)
     os.environ['SERVICE_NAME'] = 'test-appconfig'
 
     config_folder = os.path.join(pathlib.Path(__file__).parent.resolve(), 'config')
@@ -69,8 +74,8 @@ def app_configuration_provider(service_env):
     dev-deployment-strategy configuration deployment strategy (all at once with duration 0 and bake time 0)
 
     Two secrets are stored on Secretes Manager:
-    - Plain text secret: 'test/app/fake-secret-plain' = fake-secret-val
-    - Key/Value secret: 'secret:test/app/fake-secret-pair': {
+    - Plain text secret: 'test/fake-secret-plain' = fake-secret-val
+    - Key/Value secret: 'secret:test/fake-secret-pair': {
                 'Username': 'fake-username',
                 'Password': 'fake-password'
             }

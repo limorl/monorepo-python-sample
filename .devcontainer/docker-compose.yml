@@ -9,6 +9,7 @@ services:
       - PLATFORM=local
       - STAGE=dev
       - CLOUD_ENDPOINT_OVERRIDE=http://localhost:4566
+      - INTEGRATION_TEST_ENV=${INTEGRATION_TEST_ENV:-dev}
     volumes:
       - ${PWD}/:${PWD} # Paths has to match wince we are starting containers from within the dev container when invoking lambda using SAM CLI
       - /var/run/docker.sock:/var/run/docker.sock
