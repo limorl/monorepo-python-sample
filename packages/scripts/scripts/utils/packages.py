@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-excluded_directories = ['.aws-sam', '__pycache__']
+excluded_directories = ['.aws-sam', '__pycache__', '.venv']
 service_directories = ['services']
 
 

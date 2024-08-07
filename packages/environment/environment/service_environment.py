@@ -26,7 +26,7 @@ def is_cloud_platform(platform: Platform) -> bool:
 
 class ServiceEnvironment:
     def __init__(self, dotenvpath: str | None = None):
-        if dotenvpath:
+        if dotenvpath and os.path.exists(dotenvpath):
             load_dotenv(dotenvpath)  # loads environment variables from .env file under project's folder
 
         self.platform: Platform = os.getenv('PLATFORM') and Platform(os.getenv('PLATFORM'))
@@ -80,6 +80,6 @@ def clear_service_environment() -> None:
 
 def restore_local_dev_service_environment() -> None:
     clear_service_environment()
-    os.environ['PLAFORM'] = Platform.LOCAL.value
+    os.environ['PLATFORM'] = Platform.LOCAL.value
     os.environ['STAGE'] = Stage.DEV.value
     os.environ['CLOUD_ENDPOINT_OVERRIDE'] = 'http://localhost:4566'
