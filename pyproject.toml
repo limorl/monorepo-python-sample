@@ -43,6 +43,18 @@ markers = [
   "e2e: mark a test as end-to-end test (deselect with '-m \"not e2e\"')",
   "local_integration: mark a test as local invoke test (deselect with '-m \"not local_integration\"')",
 ]
+pythonpath = [  
+  "packages/configuration",
+  "packages/environment",
+  "services/hello-world",
+  "services/greeting"
+]
+testpaths = [
+  "packages/configuration",
+  "packages/environment",
+  "services/hello-world",
+  "services/greeting"
+]
 
 [tool.semantic_release]
 version_variable = "pyproject.toml:tool.poetry.version"
