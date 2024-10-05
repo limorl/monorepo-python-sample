@@ -2,10 +2,10 @@
 # replace the suffix -primary with -secondary and use aws.dev-secondary provider
 
 module "network" {
-  source                             = "../network"
-  env                                = var.env
-  current_region                     = var.current_region
-  availability_zones                 = var.availability_zones 
+  source             = "../network"
+  env                = var.env
+  current_region     = var.current_region
+  availability_zones = var.availability_zones
 }
 
 # Added RDS Postgress infra for the example, not yet used
@@ -45,10 +45,10 @@ module "services" {
   source     = "../services"
   depends_on = [module.network]
 
-  env                           = var.env
-  vpc_id                        = module.network.main_vpc_id
-  private_subnet_ids            = module.network.main_private_subnet_ids
-  vpc_endpoints_sg_id           = module.network.main_vpc_endpoints_sg_id
+  env                 = var.env
+  vpc_id              = module.network.main_vpc_id
+  private_subnet_ids  = module.network.main_private_subnet_ids
+  vpc_endpoints_sg_id = module.network.main_vpc_endpoints_sg_id
   # rds_security_group_id         = module.maindb.rds_security_group_id
   # maindb_credentials_secret_arn = module.maindb.maindb_credentials_secret_arn
 

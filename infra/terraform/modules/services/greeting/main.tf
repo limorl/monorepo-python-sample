@@ -7,7 +7,7 @@ module "greeting_service" {
 
   env                  = var.env
   service_name         = local.service_name
-  vpc_id               = var.vpc_id 
+  vpc_id               = var.vpc_id
   vpc_endpoints_sg_id  = var.vpc_endpoints_sg_id
   private_subnet_cidrs = var.private_subnet_cidrs
 
