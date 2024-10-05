@@ -1,0 +1,22 @@
+{
+    "name": "CI DevContainer",
+    "image": "ghcr.io/limorl/monorepo-python-sample-devcontainer:latest",
+
+    "workspaceFolder": "${localWorkspaceFolder}",
+    "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind,consistency=cached",
+
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+
+    "remoteEnv": {
+        "WORKSPACE_DIR": "${localWorkspaceFolder}",
+        "PLATFORM": "local",
+        "STAGE": "dev",
+        "CLOUD_ENDPOINT_OVERRIDE": "http://localhost:4566",
+        "INTEGRATION_TEST_ENV": "staging",
+        "BUILD_TARGET": "ci"
+    },
+
+    "postCreateCommand": "bash .devcontainer/post_create.sh"
+}

@@ -1,0 +1,52 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "appconfig:listApplications",
+          "appconfig:listConfigurationProfiles",
+          "appconfig:listEnvironments",
+          "appconfig:listDeploymentStrategies",
+          "appconfig:CreateApplication",
+          "appconfig:CreateEnvironment",
+          "appconfig:CreateConfigurationProfile",
+          "appconfig:StartConfigurationSession",
+          "appconfig:GetLatestConfiguration"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ecr:*"
+        ],
+        "Resource": [
+          "${ecr_repository_arn}"
+        ]
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ecr:GetAuthorizationToken"
+        ],
+        "Resource": "*",
+        "Condition": {
+          "StringEquals": {
+            "aws:RequestedRegion": "${region}"
+          }
+        }
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource": [
+          "${lambda_log_group_arn}"
+        ]
+      }
+    ]
+  }

@@ -12,8 +12,8 @@
 #   1. Ensure you configured AWS SSO for each environment and saved the profile as dev, staging and prod (see README.md)
 #   2. terraform-setup.sh <dev|staging|prod>
 
-# Load accountenvironment variables
-source .env
+# Load account variables
+source account-setup.env
 
 check_env_vars() {
     local vars=("AWS_PRIMARY_REGION_DEV" "AWS_PRIMARY_REGION_STAGING" "AWS_PRIMARY_REGION_PROD"
@@ -69,10 +69,10 @@ create_s3_bucket() {
 # Source: https://developer.hashicorp.com/terraform/language/settings/backends/s3
 create_dynamodb_table() {
     local table_name="tfstate-lock-$ENVIRONMENT"
-    
+
     if aws dynamodb describe-table --table-name "$table_name" --profile "$ENVIRONMENT" &> /dev/null; then
         echo "DynamoDB table $table_name already exists. Checking deletion protection."
-        
+
         # Check if deletion protection is enabled
         if aws dynamodb describe-table --table-name "$table_name" --profile "$ENVIRONMENT" | grep -q '"DeletionProtectionEnabled": true'; then
             echo "Deletion protection is already enabled for $table_name."
@@ -93,17 +93,17 @@ create_dynamodb_table() {
             --deletion-protection-enabled \
             --region "$AWS_PRIMARY_REGION" \
             --profile "$ENVIRONMENT" || { echo "Failed to create DynamoDB table"; exit 1; }
-        
+
         echo "Waiting for table to be created..."
         aws dynamodb wait table-exists \
             --table-name "$table_name" \
             --profile "$ENVIRONMENT" || { echo "Failed to wait for table creation"; exit 1; }
-        
+
         echo "Table created successfully with deletion protection enabled."
     fi
 }
 
-# Create OIDC IAM Role on primary region (for dev, staging and prod) to allow Github Actions 
+# Create OIDC IAM Role on primary region (for dev, staging and prod) to allow Github Actions
 # to provision resources on AWS (see below for more details).
 # Guidelines here:
 # https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
@@ -171,20 +171,20 @@ manage_terraform_policy() {
 
     if aws iam get-policy --policy-arn "$policy_arn" --profile "$ENVIRONMENT" &> /dev/null; then
         echo "Updating existing policy: $policy_name"
-        
+
         local version_id=$(aws iam get-policy --policy-arn "$policy_arn" --profile "$ENVIRONMENT" --query 'Policy.DefaultVersionId' --output text)
-        
+
         aws iam create-policy-version \
             --policy-arn "$policy_arn" \
             --policy-document file://$policy_document \
             --set-as-default \
             --profile "$ENVIRONMENT" || { echo "Failed to update policy"; exit 1; }
-        
+
         aws iam delete-policy-version \
             --policy-arn "$policy_arn" \
             --version-id "$version_id" \
             --profile "$ENVIRONMENT" || { echo "Failed to delete old policy version"; exit 1; }
-        
+
         echo "Policy updated successfully"
     else
         echo "Creating new policy: $policy_name"
@@ -229,8 +229,8 @@ if [ $# -eq 0 ]; then
 fi
 
 readonly ENVIRONMENT=$1
-readonly TERRAFORM_BACKEND_BUCKET_NAME="terraform-backend-$ENVIRONMENT-450y5"
-readonly GITHUB_OIDC_THUMBPRINT="1b511abead59c6ce207077c0bf0e0043b1382612"
+readonly TERRAFORM_BACKEND_BUCKET_NAME="$ENVIRONMENT-terraform-backend-450y5"
+readonly GITHUB_OIDC_THUMBPRINT="1b511abead59c6ce207077c0bf0e0043b1382612" # This thumbrint is not a secret, it's public
 
 check_env_vars
 

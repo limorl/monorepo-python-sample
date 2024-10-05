@@ -1,5 +1,14 @@
 module "greeting" {
   source = "./greeting"
-  stage  = var.stage
-  tags   = var.tags
+  env    = var.env
+
+  vpc_id              = var.vpc_id
+  vpc_endpoints_sg_id = var.vpc_endpoints_sg_id
+  private_subnet_ids  = var.private_subnet_ids
+
+  tags = var.tags
+
+  providers = {
+    aws = aws
+  }
 }

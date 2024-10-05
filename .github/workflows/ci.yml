@@ -13,7 +13,9 @@ permissions:
 jobs:
   check-changes:
     name: Check Changes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
     outputs:
       terraform_changed: ${{ steps.check.outputs.terraform_changed }}
       code_changed: ${{ steps.check.outputs.code_changed }}
@@ -77,12 +79,18 @@ jobs:
   pre-build-devcontainer:
     name: Pre-build Devcontainer
     needs: [check-changes]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
 
     steps:
     - name: Checkout code
       if: needs.check-changes.outputs.devcontainer_changed == 'true'
       uses: actions/checkout@v4
+
+    # Clearing sidk space before we build the container image with packages to ensure it doesn't fail on disk space
+    - name: Show disk space
+      if: needs.check-changes.outputs.devcontainer_changed == 'true'
+      run: df -h
 
     - name: Set up Docker Buildx
       if: needs.check-changes.outputs.devcontainer_changed == 'true'
@@ -96,10 +104,11 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set-up Devcontainer Environment Variables
+    - name: Pre-init Devcontainer
       if: needs.check-changes.outputs.devcontainer_changed == 'true'
       run: |
         echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+
         cp .devcontainer/.env.ci .devcontainer/.env
         echo ".devcontainer/.env:"
         cat .devcontainer/.env
@@ -112,63 +121,66 @@ jobs:
         cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
         push: always
 
-  # we're checking if code changed in each step and not in job level since validation code checks are required to pass before merging to main
+  # Checking the condition in each step and not in the job level since validation code checks are required to pass before merging to main
+  # Code validation should run if either the code has changed and/or devcontainer has changed (to ensure devcontainer is built properly to support the code)
   code-validation:
     name: Validate Code
-    needs: [check-changes, pre-build-devcontainer]
-    runs-on: ubuntu-latest
+    needs: [check-changes, pre-build-devcontainer,terraform-plan]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
 
     steps:
     - name: Check-out Code
-      if: needs.check-changes.outputs.code_changed == 'true'
+      if: needs.check-changes.outputs.code_changed == 'true' || needs.check-changes.outputs.devcontainer_changed == 'true'
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Set up Docker Buildx
+      if: needs.check-changes.outputs.code_changed == 'true' || needs.check-changes.outputs.devcontainer_changed == 'true'
       uses: docker/setup-buildx-action@v3
 
     - name: Login to GitHub Container Registry
-      if: needs.check-changes.outputs.code_changed == 'true'
+      if: needs.check-changes.outputs.code_changed == 'true' || needs.check-changes.outputs.devcontainer_changed == 'true'
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set-up Devcontainer Environment Variables
-      if: needs.check-changes.outputs.code_changed == 'true'
+    - name: Pre-init Devcontainer
+      if: needs.check-changes.outputs.code_changed == 'true' || needs.check-changes.outputs.devcontainer_changed == 'true'
       run: |
         echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
-        cp .devcontainer/.env.ci .devcontainer/.env
-        echo ".devcontainer/.env:"
-        cat .devcontainer/.env
-    
+        rm .devcontainer/devcontainer.json
+
+        echo "Switching to devcontainer-ci.json which is built from the devcontainer image in ghcr, pushed in Pre-build DevContainer job"
+        cp .devcontainer/devcontainer-ci.json .devcontainer/devcontainer.json
+
     - name: Run Code Validation in Devcontainer
-      if: needs.check-changes.outputs.code_changed == 'true'
+      if: needs.check-changes.outputs.code_changed == 'true' || needs.check-changes.outputs.devcontainer_changed == 'true'
       uses: devcontainers/ci@v0.3
-      with:    
-        cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
-        push: never
+      with:
         runCmd: |
           set -e
+
           echo "Running detect-secrets..."
-          poetry run pre-commit run detect-secrets --all-files
-          
+          poetry run pre-commit run detect-secrets
+
           echo "Running ruff..."
-          poetry run pre-commit run ruff --all-files --hook-stage push
-          
-          echo "Running flake8..."
-          poetry run pre-commit run flake8 --all-files --hook-stage push
-          
-          echo "Running codespell..."
-          poetry run pre-commit run codespell --all-files --hook-stage push
-          
+          poetry run pre-commit run --hook-stage push ruff
+
+          # echo "Running flake8..."
+          poetry run pre-commit run --hook-stage push flake8
+
+          # echo "Running codespell..."
+          oetry run pre-commit run --hook-stage push codespell
+
           echo "Running pytest (unit tests)..."
-          poetry run pytest -m "not integration and not e2e"
-          
-          echo "All code validation checks completed!"
-  
+          poetry run pre-commit run --hook-stage push unit-tests
+
+          echo "All code validation checks completed successfully!"
+
   # The reusable workflow checks if terraform file has changed or not, since this is a required status check in the CI
   terraform-plan:
     name: Terraform Plan

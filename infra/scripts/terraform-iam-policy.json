@@ -9,14 +9,7 @@
           "ecr:*",
           "ecr:SetRepositoryPolicy",
           "appconfig:*",
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:PutSecretValue",
-          "secretsmanager:CreateSecret",
-          "secretsmanager:UpdateSecret",
-          "secretsmanager:TagResource",
-          "secretsmanager:DescribeSecret",
-          "secretsmanager:GetResourcePolicy",
-          "secretsmanager:DeleteSecret",
+          "secretsmanager:*",
           "events:*",
           "iot:*",
           "s3:*",
@@ -26,14 +19,7 @@
           "glue:*",
           "athena:*",
           "ec2:*",
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:DescribeLogGroups",
-          "logs:PutLogEvents",
-          "logs:TagResource",
-          "logs:PutRetentionPolicy",
-          "logs:ListTagsForResource",
-          "logs:DeleteLogGroup",
+          "logs:*",
           "kms:Decrypt",
           "kms:GenerateDataKey",
           "cognito-idp:*",
@@ -50,8 +36,21 @@
           "cloudformation:UpdateStack",
           "cloudformation:DeleteStack",
           "cloudformation:ValidateTemplate",
-          
-          "apigateway:*"
+          "apigateway:*",
+          "vpc:*",
+          "ssm:*"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "application-autoscaling:DescribeScalableTargets",
+          "application-autoscaling:DescribeScalingPolicies",
+          "application-autoscaling:PutScalingPolicy",
+          "application-autoscaling:RegisterScalableTarget",
+          "application-autoscaling:DeregisterScalableTarget",
+          "application-autoscaling:ListTagsForResource"
         ],
         "Resource": "*"
       },
@@ -68,9 +67,13 @@
         "Action": [
           "s3:GetObject",
           "s3:PutObject",
+          "s3:ListBucket",
           "s3:DeleteObject"
         ],
-        "Resource": "arn:aws:s3:::terraform-backend-*/*"
+        "Resource": [
+          "arn:aws:s3:::ml-model-artifacts-*",
+          "arn:aws:s3:::ml-model-artifacts-*/*"
+        ]
       },
       {
         "Effect": "Allow",
@@ -81,6 +84,27 @@
           "dynamodb:DeleteItem"
         ],
         "Resource": "arn:aws:dynamodb:*:*:table/tfstate-lock-*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+            "sagemaker:AddTags",
+            "sagemaker:CreateModelPackage",
+            "sagemaker:CreateModelPackageGroup",
+            "sagemaker:CreateModel",
+            "sagemaker:CreateEndpoint",
+            "sagemaker:CreateEndpointConfig",
+            "sagemaker:DescribeModel",
+            "sagemaker:DescribeModelPackageGroup",
+            "sagemaker:DescribeModelPackage",
+            "sagemaker:DescribeEndpoint",
+            "sagemaker:DescribeEndpointConfig",
+            "sagemaker:ListModelPackages",
+            "sagemaker:ListEndpoints",
+            "sagemaker:ListEndpointConfigs",
+            "sagemaker:ListTags"
+        ],
+        "Resource": "*"
       }
     ]
   }

@@ -10,17 +10,21 @@ on:
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
+  packages: read # Required for pulling packages/images to gcr
+
 
 jobs:
   deploy-services:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
     environment: ${{ inputs.environment }}
     steps:
       - name: Check-out Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Ensure full checkout
-      
+
       - name: Configure AWS credentials
         id: aws-creds
         uses: aws-actions/configure-aws-credentials@v4
@@ -29,21 +33,25 @@ jobs:
           role-session-name: GithubWorkflow-Deployment-dev-staging
           aws-region: ${{ vars.AWS_PRIMARY_REGION }}
           output-credentials: true
-      
-      - name: Set-up Devcontainer Environment Variables
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pre-init Devcontainer
         run: |
           echo "PWD=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
-          cp .devcontainer/.env.ci .devcontainer/.env
-          echo ".devcontainer/.env:"
-          cat .devcontainer/.env
+          rm .devcontainer/devcontainer.json
+
+          echo "Switching to devcontainer-ci.json which is built from the devcontainer image in ghcr, pushed in Pre-build DevContainer job"
+          cp .devcontainer/devcontainer-ci.json .devcontainer/devcontainer.json
 
       - name: Deploy Services to ${{ inputs.environment }}
         uses: devcontainers/ci@v0.3
-        env:
-          GH_ACTIONS_PAT: ${{ secrets.GH_ACTIONS_PAT }}
         with:
-          cacheFrom: ghcr.io/limorl/monorepo-python-sample-devcontainer
-          push: never
           env: |
             AWS_ACCESS_KEY_ID=${{ steps.aws-creds.outputs.aws-access-key-id }}
             AWS_SECRET_ACCESS_KEY=${{ steps.aws-creds.outputs.aws-secret-access-key }}
@@ -61,17 +69,24 @@ jobs:
               exit 1
             fi
             echo "Successfully authenticated with AWS"
-            
+
             if [ -z "$AWS_ACCOUNT_ID" ] || [ -z "$AWS_PRIMARY_REGION" ] || [ -z "$AWS_GITHUB_ACTIONS_ROLE" ]; then
               echo "Failed to retrieve necessary AWS variables for $ENV environment"
               return 1
             fi
-            
+
+            TAG_AS_LATEST=true
+            UPDATE_CONFIG=false
+
+            if [ "$ENV" = "prod" ]; then
+                TAG_AS_LATEST="false"
+            fi
+
             echo $"\nDeploying to $ENV environment..."
-            chmod +x .github/scripts/sam-build-and-deploy-services.sh 
+            chmod +x .github/scripts/sam-build-and-deploy-services.sh
             chmod +x .github/scripts/deploy-service-configuration.sh
 
-            if ! .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION false ; then
+            if ! .github/scripts/sam-build-and-deploy-services.sh $ENV $AWS_ACCOUNT_ID $AWS_PRIMARY_REGION $UPDATE_CONFIG TAG_AS_LATEST; then
               echo "Deployment failed for $ENV environment"
               return 1
             fi

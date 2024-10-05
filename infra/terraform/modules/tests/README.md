@@ -1,7 +1,9 @@
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.69.0 |
 
 ## Providers
 
@@ -13,7 +15,7 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_appconfig_app"></a> [appconfig\_app](#module\_appconfig\_app) | ../appconfig-app | n/a |
+| <a name="module_appconfig_test_app"></a> [appconfig\_test\_app](#module\_appconfig\_test\_app) | ../aws-appconfig-app | n/a |
 
 ## Resources
 
@@ -28,10 +30,13 @@ No requirements.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_stage"></a> [stage](#input\_stage) | n/a | `string` | `null` | no |
+| <a name="input_env"></a> [env](#input\_env) | The Environment (dev, staging prod) | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | n/a | `map(string)` | `{}` | no |
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_appconfig_test_app"></a> [appconfig\_test\_app](#output\_appconfig\_test\_app) | n/a |
+| <a name="output_test_secrets"></a> [test\_secrets](#output\_test\_secrets) | n/a |
 <!-- END_TF_DOCS -->

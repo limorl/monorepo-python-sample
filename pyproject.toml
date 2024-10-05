@@ -10,58 +10,52 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-pydevd-pycharm = "^241.15989.155"
+scripts        = { path = "packages/scripts/",            develop = true }
+configuration  = { path = "packages/configuration",       develop = true }
+environment    = { path = "packages/environment",         develop = true }
+greeting       = { path = "services/greeting",             develop = true }
+
+
 
 [tool.poetry.dev-dependencies]
-python-semantic-release = "9.3.1"
+alembic      = "^1.13.2"
+aws-sam-cli  = "^1.123.0"
+awscli-local = "^0.22.0"
 nox-poetry = "1.0.3"
-pytest = "8.2.0"
-pytest-asyncio = "0.23.6"
+pytest     = "^8.3.2"
 pytest-cov = "3.0.0"
-pydevd-pycharm = "241.15989.155"
-pylint = "2.17.7"
-pyright = "1.1.296"
+flake8     = "7.0.0"
+pylint     = "2.17.7"
+pyright    = "1.1.296"
 pre-commit = "3.6.2"
-debugpy = "1.8.1"
-localstack = "3.3.0"
-scripts = { path = "packages/scripts", develop = false }
-
-[tool.poetry.plugins."poetry.application.plugin"]
-export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
-
+debugpy    = "1.8.1"
+localstack = "3.7.2"
+pytest-asyncio = "0.23.6"
+python-semantic-release = "9.8.8"
+pytest-mock = "^3.14.0"
 # We're adding test paths here for pytest discoverability in vs code testing extension (and also running pytest from monorepo root)
 # Note that due to how pytest handles test discovery, the order of paths matter. Changing the order can cause issues.
 [tool.pytest.ini_options]
-addopts = "--import-mode=importlib"
 markers = [
-    "integration: marks integration tests (deselect with '-m \"not integration\"')"
-]
-pythonpath = [  
-  "packages/configuration",
-  "packages/environment",
-  "services/hello-world",
-  "services/greeting"
-]
-testpaths = [
-  "packages/configuration",
-  "packages/environment",
-  "services/hello-world",
-  "services/greeting"
+  "unit: mark a test as a unit test (deselect with '-m \"not unit\"')",
+  "integration: mark a test as integration test (deselect with '-m \"not integration\"')",
+  "e2e: mark a test as end-to-end test (deselect with '-m \"not e2e\"')",
+  "local_integration: mark a test as local invoke test (deselect with '-m \"not local_integration\"')",
 ]
 
 [tool.semantic_release]
 version_variable = "pyproject.toml:tool.poetry.version"
 branch = "main"
 upload_to_pypi = "false"    # We're not publishing all packages yet
-commit_parser = "angular"
+commit_parser  = "angular"
 commit_subject = "{{type}}({{scope}}): {{subject}}"
 commit_message = "{{type}}({{scope}}): {{subject}}\n\n{{body}}"
 changelog_file = "CHANGELOG.md"
 
 [tool.semantic_release.release_rules]
+feat     = "minor"
+fix      = "patch"
+docs     = "patch"
+style    = "patch"
+chore    = "patch"
 breaking = "major"
-feat = "minor"
-fix = "patch"
-docs = "patch"
-style = "patch"
-chore = "patch"

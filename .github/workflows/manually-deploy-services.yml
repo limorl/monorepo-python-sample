@@ -1,0 +1,25 @@
+name: Manual Service Deployment to {env}
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+        - dev
+        - staging
+        - prod
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+  packages: read  # Required for publishing packages/images to gcr
+
+jobs:
+  deploy-services:
+    name: Deploy Services
+    uses: ./.github/workflows/deploy-services-reusable.yml
+    with:
+      environment: ${{ inputs.environment }}

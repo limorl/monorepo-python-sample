@@ -124,6 +124,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+account-setup.env
 .env
 .venv
 env/

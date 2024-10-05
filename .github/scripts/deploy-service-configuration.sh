@@ -53,17 +53,17 @@ get_or_create_resource() {
     local list_args="${3:-}"
     local create_args="${4:-}"
     local warn_if_not_exists="${5:-true}"
-    
+
     resource_id=$(aws appconfig list-${resource_type}s $list_args --query "Items[?Name=='$name'].Id" --output text)
-    
+
     if [ -z "$resource_id" ]; then
         if [ "$warn_if_not_exists" = true ]; then
-            echo "WARNING: $resource_type '$name' does not exist. Ensure it is included in Terraform configuration."
+            echo "WARNING: $resource_type '$name' does not exist. Ensure it is included in Terraform configuration." >&2
         fi
-        echo "Creating $resource_type: $name"
+        echo "Creating $resource_type: $name" >&2
         resource_id=$(aws appconfig create-${resource_type} --name "$name" $create_args --query "Id" --output text)
     fi
-    
+
     echo "$resource_id"
 }
 
@@ -85,7 +85,7 @@ if [ -f "$CONFIG_FILE" ]; then
 
     CONTENT_BASE64=$(base64 -w 0 "$CONFIG_FILE")
     TEMP_OUTPUT_FILE=$(mktemp)
-    
+
     # Create the hosted configuration version and capture the output
     CLI_OUTPUT=$(aws appconfig create-hosted-configuration-version \
         --application-id "$APP_ID" \
@@ -93,21 +93,21 @@ if [ -f "$CONFIG_FILE" ]; then
         --content "$CONTENT_BASE64" \
         --content-type "application/json" \
         $TEMP_OUTPUT_FILE)
-    
+
     # Check if the command was successful
     if [ $? -ne 0 ]; then
         echo "Failed to create hosted configuration version"
         exit 1
     fi
-    
+
     # Extract the version number from the CLI output
     VERSION=$(echo "$CLI_OUTPUT" | jq -r '.VersionNumber')
-    
+
     if [ -z "$VERSION" ] || [ "$VERSION" == "null" ]; then
         echo "Failed to extract version number from response"
         exit 1
     fi
-    
+
     echo "Created version: $VERSION"
     echo "Full CLI output:"
     echo "$CLI_OUTPUT" | jq '.'
@@ -117,7 +117,7 @@ else
 fi
 
 # Get deployment strategy
-STRATEGY_NAME="${STAGE}-deployment-strategy"
+STRATEGY_NAME="deployment-strategy-${STAGE}"
 STRATEGY_ID=$(aws appconfig list-deployment-strategies --query "Items[?Name=='$STRATEGY_NAME'].Id" --output text)
 
 if [ -z "$STRATEGY_ID" ]; then
@@ -145,7 +145,7 @@ while true; do
         --deployment-number "$DEPLOYMENT_ID" \
         --query "State" \
         --output text)
-    
+
     if [ "$STATUS" == "COMPLETE" ]; then
         echo "Deployment completed successfully"
         break
@@ -153,7 +153,7 @@ while true; do
         echo "Deployment failed"
         exit 1
     fi
-    
+
     sleep 10
 done
 

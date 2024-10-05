@@ -1,8 +1,8 @@
-# Terraform [Work in Progress, super simple without networking and sgs]
+# Terraform
 
 To manage our infrastructure, we're using:
 
-* 'Vanila terrafirm` with S3 bucket backend.
+* 'Vanila terraform` with S3 bucket backend.
 * Github Actions are used to deploy infrastructure using terraform.
 
 >> **Note:** In larger organizations, a good practice is to use an `infrastructure` account to manage infrastructure on all environments/accounts.
@@ -25,6 +25,23 @@ When pull request is merged to main, the github workflow `deployment-dev-staging
 >> **Note**: A common practice when the RnD team and the project grows significantly, is manage all environments from a centralized account. Here for simplicity we manage terraform seprataely with backend on each account.
 >>
 
+### Terraform Config Structure
+We follow [Terraform Best Practices](https://www.terraform-best-practices.com/) and use module composition. Therefore we have a 'flat' list of child modules under `modules/` folder.
+
+### Running terraform plan locally
+
+To run `terrafor plan` locally:
+```bash
+cd inra/terraform/environments/<env>
+terraform plan -var-file=terraform.tfvars -out=<dev>.tfplan
+```
+
+If there are many changes, you can save the plan as plain text:
+```bash
+cd inra/terraform/environments/<env>
+terraform plan -var-file=terraform.tfvars -no-color > tfplan.txt
+```
+
 ## Environments
 
 In this sample repo we use 3 environment, one environment on each account per the three stages: dev, staging and prod.
@@ -39,7 +56,8 @@ In the code we use the combination of `Platform` (local,AWS) and `Stage` (dev, s
 
 ## Multi-region deployment
 
-In this example we are using multi-regions (primary and secondary) for prod and staging and a single region for dev.
+We are using single region deloyment, but assume multi-region deployment may be needed in the future into two regions.
+We define two providers `primary` and `secondary` for prod and staging and a single region for dev.
 
 - Every environment has has a primary region `AWS_PRIMARY_REGION`
 - In `AWS_PRIMARY_REGION` we manage centrally the shared resources for the environment:  ECR, AppConfig, SecretsManager, Terraform S3 BAckend, DynamoDB lock table for terraform state
@@ -53,3 +71,39 @@ In this example we are using multi-regions (primary and secondary) for prod and 
 | dev     | eu-west-1      | N\A              | Should be close to dev teams                                                   |
 | staging | us-east-1      | us-west-1        | Preferably similar to prod                                                     |
 | prod    | us-east-1      | us-west-1        | Main region, should be optimized for the location of the majority of customers |
+
+## Single Regon Config
+While we design for multi region, are terraform configuration is deploying on a single region (the primary region).
+To enable multi region in the future, we will create AppConfig app, ECR repo and Secrets on the primary region only.
+This will required to use remote terraform state to pull the ARNs and outputs from the deployment to primary region which should take place first.
+
+for example:
+```terraform
+# modules/service-base/main.tf
+
+# Reference the remote state from the primary region
+data "terraform_remote_state" "primary_region" {
+  backend = "s3"
+  config = {
+    bucket = "your-primary-region-terraform-state-bucket"
+    key    = "path/to/primary-region/terraform.tfstate"
+    region = var.primary_region
+  }
+}
+
+module "lambda_function" {
+  source = "../lambda"
+
+  env           = var.env
+  function_name = var.service_name
+
+  # Use the outputs from the remote state of the primary region
+  ecr_repository_url    = data.terraform_remote_state.primary_region.outputs.ecr_repository_url
+  ecr_repository_arn    = data.terraform_remote_state.primary_region.outputs.ecr_repository_arn
+  ecr_repository_policy = data.terraform_remote_state.primary_region.outputs.ecr_repository_policy
+
+  appconfig_app_arn = data.terraform_remote_state.primary_region.outputs.appconfig_app_arn
+
+  tags = var.tags
+}
+```

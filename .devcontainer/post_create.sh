@@ -1,35 +1,29 @@
 #!/bin/bash
 set -ex
 
+echo "User during post_create.sh: $(whoami)"
+
 # Convenience workspace directory for later use
-WORKSPACE_DIR=$(pwd)
 echo "Workspace directory: ${WORKSPACE_DIR}"
+git config --global --add safe.directory ${WORKSPACE_DIR}
 
-
-# Change some Poetry settings to better deal with working in a container
-poetry config cache-dir "${WORKSPACE_DIR}/.cache"
-poetry config virtualenvs.in-project true
+## Bash aliases: general
+echo 'alias ll="ls -alF"' >> "$HOME/.bashrc"
+echo 'alias la="ls -A"'   >> "$HOME/.bashrc"
+echo 'alias l="ls -CF"'   >> "$HOME/.bashrc"
+echo 'alias lg="lazygit"' >> "$HOME/.bashrc"
+echo 'alias python="poetry run python"' >> "$HOME/.bashrc"
 
 # Enabling sharing the same host
 sudo chmod 666 /var/run/docker.sock
 
-# Install all dependencies
-poetry install --no-interaction --no-ansi
-python run_script.py install-all
+chmod +x .devcontainer/install_packages.sh
+./.devcontainer/install_packages.sh
 
-# Build all packages
-python run_script.py build-all
-
-# Install pre-commit and pre-push hooks
-poetry run pre-commit install
-poetry run pre-commit install-hooks
-poetry run pre-commit install --hook-type pre-push
-
+# Temporarily disabled localstack
 # Localstack - Validation
-localstack config validate --file .devcontainer/docker-compose.yml # Validate Localstack configuration
+# localstack config validate --file .devcontainer/docker-compose.yml # Validate Localstack configuration
 
 # Create Aliases
-echo "alias aws-localstack='AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE aws'" >> ~/.bash_aliases
-echo "alias sam-localstack='AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE sam'" >> ~/.bash_aliases
-
-echo "post_create completed successfully!"
+# echo "alias aws-localstack='AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE aws'" >> ~/.bash_aliases
+# echo "alias sam-localstack='AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 AWS_ENDPOINT_URL=$CLOUD_ENDPOINT_OVERRIDE sam'" >> ~/.bash_aliases

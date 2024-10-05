@@ -30,23 +30,24 @@ repos:
       rev: v0.18.0
       hooks:
         - id: terraform-docs-go
-          # args: ["markdown", "table", "--recursive", "true", "--recursive-include-main", "false", "output-file", "README.md", "./infra/terraform/environments/prod"]
           args: ["markdown", "table", "--recursive", "--recursive-include-main=false", "--output-file", "README.md", "./infra/terraform"]
-          stages: [commit]
+          files: ".tf$"
+          stages: [push]
           
     - repo: https://github.com/antonbabenko/pre-commit-terraform
       rev: v1.91.0
       hooks:
         - id: terraform_fmt
-          stages: [commit]
+          stages: [push]
         #- id: terraform_tflint  TODO (@limorl): Install TFLint in docker and enable this hook
         #  stages: [push]
         - id: terraform_validate
+          files: ^infra/terraform/environments/ # terraform_validate should run on the module root
           args:
             - --tf-init-args=-backend=false
            # - --chdir=infra/terraform
-          stages: [commit]
-        #- id: terraform_docs     TODO (@limorl): Install TFLint in docker and enable this hook omstead of terraform-docs-go
+          stages: [push]
+        #- id: terraform_docs     TODO (@limorl): Install TFLint in docker and enable this hook instead of terraform-docs-go
         #  stages: [push]
 
     # - repo: local
@@ -73,7 +74,7 @@ repos:
       hooks:
         - id: unit-tests
           name: unit-tests
-          entry: poetry run pytest -m "not integration and not e2e"
+          entry: poetry run pytest -m "not integration and not e2e" --durations=10 -vs
           language: system
           stages: [push]
           pass_filenames: false

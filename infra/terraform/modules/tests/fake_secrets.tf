@@ -1,38 +1,30 @@
+locals {
+  fake_secret_plain_name  = "test/fake-secret-plain"
+  fake_secret_plain_value = "fake-secret-val"
+
+  fake_secret_pair_name  = "test/fake-secret-pair"
+  fake_secret_pair_value = "{\"Username\":\"fake-username\",\"Password\":\"fake-password\"}"
+}
 
 resource "aws_secretsmanager_secret" "fake_secret_plain" {
-  name                    = "test/fake-secret-plain"
-  description             = "Fake secret (plain text) used in integration tests"
+  name                    = local.fake_secret_plain_name
+  description             = "Fake secret used in integration tests"
   recovery_window_in_days = 0
-
-  tags = merge(
-    var.tags,
-    {
-      Type = "aws_secret_metadata"
-    },
-  )
 }
 
 resource "aws_secretsmanager_secret_version" "fake_secret_plain_value" {
   secret_id     = aws_secretsmanager_secret.fake_secret_plain.id
-  secret_string = "fake-secret-val"
+  secret_string = local.fake_secret_plain_value
 }
 
 resource "aws_secretsmanager_secret" "fake_secret_pair" {
-  name                    = "test/fake-secret-pair"
-  description             = "Fake secret (key-value pair) used in integration tests"
+  name                    = local.fake_secret_pair_name
+  description             = "Fake secret used in integration tests"
   recovery_window_in_days = 0
-
-
-  tags = merge(
-    var.tags,
-    {
-      Type = "aws_secret_metadata"
-    },
-  )
 }
 
 resource "aws_secretsmanager_secret_version" "fake_secret_pair_value" {
   secret_id     = aws_secretsmanager_secret.fake_secret_pair.id
-  secret_string = "{\"Username\":\"fake-username\",\"Password\":\"fake-password\"}"
+  secret_string = local.fake_secret_pair_value
 }
 
