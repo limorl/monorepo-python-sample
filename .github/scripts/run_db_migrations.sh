@@ -30,7 +30,7 @@ cleanup() {
     fi
 }
 
-# Set up trap to call cleanup function on script exit -----------> Uncoment
+# Set up trap to call cleanup function on script exit
 trap cleanup EXIT
 
 echo "Retrieving database credentials from secrets manager..."

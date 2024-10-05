@@ -72,7 +72,7 @@ We define two providers `primary` and `secondary` for prod and staging and a sin
 | staging | us-east-1      | us-west-1        | Preferably similar to prod                                                     |
 | prod    | us-east-1      | us-west-1        | Main region, should be optimized for the location of the majority of customers |
 
-## Single Regon Config
+## Single Region Config
 While we design for multi region, are terraform configuration is deploying on a single region (the primary region).
 To enable multi region in the future, we will create AppConfig app, ECR repo and Secrets on the primary region only.
 This will required to use remote terraform state to pull the ARNs and outputs from the deployment to primary region which should take place first.
